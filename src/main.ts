@@ -9,7 +9,7 @@ let pivot = {x:0, y:0 }
 let scale = 1;
 let matrix:DOMMatrix|undefined;
 let mouseDrag = false;
-
+let focusedChild :Child|undefined;
 function getMousePos(canvas, event) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width; // account for CSS scaling
@@ -62,22 +62,47 @@ canvas.addEventListener('mousemove', (event) => {
     const sy = mousePos.y - mouse.y;
 
     if( mouseDrag )
-    ctx.translate( sx/scale, sy/scale )
+        ctx.translate( sx/scale, sy/scale )
+
+    if( focusedChild )
+    {
+        focusedChild.x += sx/scale;
+        focusedChild.y += sy/scale;
+    }
 
     mouse = mousePos;
 });
 
 canvas.addEventListener("mousedown", ev=>{
+    mouse = getMousePos(canvas, ev);
+
     if( ev.button == 1 )
-    {
-        mouse = getMousePos(canvas, ev);
+    { 
         mouseDrag = true;
+    }
+    else if( ev.button==0 )
+    {
+        const cursor = getCanvasMousePosition( canvas, mouse );
+
+        //find which obj...
+        objs.forEach( obj=>{
+
+            if( cursor.x>obj.x && cursor.x<obj.x+obj.w && cursor.y>obj.y && cursor.y<obj.y+obj.h )
+            { 
+                focusedChild = obj;
+            }
+
+        });
     }
 });
 canvas.addEventListener("mouseup", ev=>{
     if( ev.button == 1 )
     {
         mouseDrag = false;
+    }
+    else if( focusedChild )
+    {
+        focusedChild = undefined;
     }
 });
 
@@ -119,6 +144,51 @@ let objs : Child[] = [
                 text:"Hola mundo"
             }
         ]
+    },
+
+    {
+        origin: {x:0, y:0},
+        x:70, 
+        y:70,
+        color:"#ff0000",
+        w:50,
+        h:50,  
+    }
+]
+
+type Outlet = {
+    child: Child,
+    x:number,
+    y:number,
+    dir: {
+        x:number,
+        y:number
+    }
+}
+
+let connections : {
+    from: Outlet,
+    to: Outlet
+}[] = [
+    {
+        from: {
+            child:objs[0],
+            x: 50,
+            y: 25,
+            dir: {
+                x: 1,
+                y: 0
+            }
+        },
+        to: {
+            child:objs[1],
+            x: 0,
+            y: 25,
+            dir: {
+               x: -1,
+               y: 0 
+            }
+        }
     }
 ]
 
@@ -170,6 +240,28 @@ function draw() {
     });
 
    
+    // draw connetions....
+    connections.forEach( connection=>{
+
+        ctx.beginPath();
+        ctx.moveTo( connection.from.child.x + connection.from.x, connection.from.child.y + connection.from.y);
+
+        ctx.bezierCurveTo(
+            (connection.from.child.x + connection.from.x) + connection.from.dir.x*10, 
+            (connection.from.child.y + connection.from.y) + connection.from.dir.y*10, 
+
+            (connection.to.child.x + connection.to.x) + connection.to.dir.x*10, 
+            (connection.to.child.y + connection.to.y) + connection.to.dir.y*10,  
+
+            connection.to.child.x + connection.to.x, 
+            connection.to.child.y + connection.to.y, 
+            );
+
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+    })
     
  
     //--------------
