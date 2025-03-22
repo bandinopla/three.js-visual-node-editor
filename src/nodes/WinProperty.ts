@@ -3,7 +3,7 @@ import { BaseNode } from "./BaseNode";
 export class WinProperty extends BaseNode {
 
     protected hasInput = true;
-    protected hasOutput = true;
+    protected hasOutput = false;
 
     constructor( readonly name:string, readonly fsize = 12, readonly padding=11 ) {
         super();
@@ -16,12 +16,12 @@ export class WinProperty extends BaseNode {
         
         // input
         if( this.hasInput )
-            this.drawCircle(ctx, 0, maxHeight!/2, 5, "red", "black", 1);
+            this.drawCircle(ctx, 0, maxHeight!/2, 5, "#63c763", "black", 1);
          
 
         // output
         if( this.hasOutput )
-            this.drawCircle(ctx, maxWidth!, maxHeight!/2, 5, "blue", "black", 1);
+            this.drawCircle(ctx, maxWidth!, maxHeight!/2, 5, "#63c763", "black", 1);
 
         
         this.renderContents( ctx, maxWidth!, maxHeight! );
@@ -38,7 +38,10 @@ export class WinProperty extends BaseNode {
 
     protected renderContents( ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number )
     {
-        this.drawText(ctx, this.name, this.padding, maxHeight/2 + this.fsize/3, this.fsize, "white" )
-        this.drawText(ctx, "Output", maxWidth - this.padding, maxHeight/2 + this.fsize/3, this.fsize, "white", "right" ) 
+        if( this.hasInput )
+            this.drawText(ctx, this.name, this.padding, maxHeight/2 + this.fsize/3, this.fsize, "white" )
+
+        if( this.hasOutput)
+            this.drawText(ctx, "Output", maxWidth - this.padding, maxHeight/2 + this.fsize/3, this.fsize, "white", "right" ) 
     }
 }

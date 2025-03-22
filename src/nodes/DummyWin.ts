@@ -7,12 +7,14 @@ import { WinOutputProperty } from './WinOutputProperty';
 
 export class DummyWin extends WinNode {
     constructor() {
-        super("Image Sample"); 
+        super("Image Texture"); 
 
         this.childs = [
-            new WinOutputProperty("vec4"),
+            new WinOutputProperty("Color"),
+            new WinOutputProperty("Alpha"),
             new WinProperty("Texture"),
-            new WinSlideProperty("UV", 0,100)
+            new WinProperty("UV"),
+            new WinSlideProperty("Opacity", 0,100)
         ]
     }
 }

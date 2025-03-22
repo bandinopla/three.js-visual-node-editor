@@ -6,6 +6,8 @@ export class WinNode extends BaseNode {
 
     editor?:Editor
 
+    protected headerColor:CanvasFillStrokeStyles["fillStyle"] = '#2b652b'
+
     width = 200; 
     fontSize = 16;
     childsHeight = 20;
@@ -45,6 +47,10 @@ export class WinNode extends BaseNode {
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 0.5;
         ctx.stroke();
+
+        this.roundedRect(ctx, 1, 1, this.width-2, this.fontSize+5, 5); // Draws a square with rounded corners.
+        ctx.fillStyle = this.headerColor;
+        ctx.fill(); 
  
         ctx.fillStyle = "white";
         ctx.font = this.fontSize+'px Arial red';
@@ -64,7 +70,7 @@ export class WinNode extends BaseNode {
 
     pressetOutlet( localX:number, localY:number, onOutletPressed:(outlet:Outlet)=>void ):boolean
     {  
-        let ratio = 5;
+        let ratio = 10;
 
         // for each child check if we hit an outlet...
         for (let i = 0; i < this.childs.length; i++) {

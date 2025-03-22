@@ -1,7 +1,6 @@
 import { WinProperty } from "./WinProperty";
 
-export class WinSlideProperty extends WinProperty
-{
+export class WinIntProperty extends WinProperty { 
     constructor( name:string, readonly min:number, readonly max:number ) {
         super(name)
         this.hasOutput = false;
@@ -19,15 +18,11 @@ export class WinSlideProperty extends WinProperty
 
         // Draw the background.
         ctx.fillStyle = "#545454";
-        ctx.fillRect(0, 0, maxWidth, maxHeight);
-
-        // Draw the progress bar fill.
-        ctx.fillStyle = "#4772b3";
-        ctx.fillRect(0, 0, maxWidth*.75, maxHeight);
-        ctx.restore();
+        ctx.fillRect(0, 0, maxWidth, maxHeight); 
 
         this.drawLeftText( this.name, ctx, maxWidth, maxHeight, 10 )
-        this.drawRightText( "0.75", ctx, maxWidth, maxHeight, 10 )
+        this.drawRightText( "1", ctx, maxWidth, maxHeight, 10 )
+
+        ctx.restore();
     }
- 
 }

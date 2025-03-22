@@ -6,6 +6,7 @@ export class WinOutputProperty extends WinProperty {
     {
         super(name);
         this.hasInput = false;
+        this.hasOutput = true;
     }
     protected override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
         this.drawRightText( this.name, ctx, maxWidth, maxHeight, 0)

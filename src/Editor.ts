@@ -229,8 +229,11 @@ export class Editor {
 
         ctx.save() 
         ctx.resetTransform()
-        ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = "#1d1d1d";
+        ctx.fillRect(0,0, this.canvas.width, this.canvas.height);
         ctx.restore()
+
+        let connectioDirStrength = 50;
 
         //#region draw connections 
         this.connections.forEach( connection=>{
@@ -243,11 +246,11 @@ export class Editor {
             if( "child" in to )
             {
                 ctx.bezierCurveTo(
-                    (connection.from.child.x + connection.from.x) + connection.from.dir.x*10, 
-                    (connection.from.child.y + connection.from.y) + connection.from.dir.y*10, 
+                    (connection.from.child.x + connection.from.x) + connection.from.dir.x*connectioDirStrength, 
+                    (connection.from.child.y + connection.from.y) + connection.from.dir.y*connectioDirStrength, 
     
-                    (to.child.x + to.x) + to.dir.x*10, 
-                    (to.child.y + to.y) + to.dir.y*10,  
+                    (to.child.x + to.x) + to.dir.x*connectioDirStrength, 
+                    (to.child.y + to.y) + to.dir.y*connectioDirStrength,  
     
                     to.child.x + to.x, 
                     to.child.y + to.y, 
@@ -256,8 +259,8 @@ export class Editor {
             else 
             {
                 ctx.bezierCurveTo(
-                    (connection.from.child.x + connection.from.x) + connection.from.dir.x*10, 
-                    (connection.from.child.y + connection.from.y) + connection.from.dir.y*10, 
+                    (connection.from.child.x + connection.from.x) + connection.from.dir.x*connectioDirStrength, 
+                    (connection.from.child.y + connection.from.y) + connection.from.dir.y*connectioDirStrength, 
     
                     to.x, 
                     to.y,  
@@ -268,8 +271,8 @@ export class Editor {
             }
             
 
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#63c763';
+            ctx.lineWidth = 3;
             ctx.stroke();
 
         })
