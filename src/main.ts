@@ -1,26 +1,14 @@
-import './style.css'
-// import typescriptLogo from './typescript.svg'
-// import viteLogo from '/vite.svg' 
-
+import './style.css' 
 
 // Get the canvas and context
 const canvas = document.getElementById('app') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 let mouse = {x:0, y:0 }
+let offset = {x:0, y:0 }
+let pivot = {x:0, y:0 }
 let scale = 1;
-
-function resizeCanvasToViewport() { 
-    if (canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-  }
-  
-  // Initial resize and resize on window resize
-  resizeCanvasToViewport();
-  window.addEventListener('resize', resizeCanvasToViewport);
-
-
+let matrix:DOMMatrix|undefined;
+let mouseDrag = false;
 
 function getMousePos(canvas, event) {
     const rect = canvas.getBoundingClientRect();
@@ -28,53 +16,77 @@ function getMousePos(canvas, event) {
     const scaleY = canvas.height / rect.height; // account for CSS scaling
 
     let x = (event.clientX - rect.left) * scaleX;
-    let y = (event.clientY - rect.top) * scaleY;
-
-    // // Account for scroll
-    // x += window.pageXOffset;
-    // y += window.pageYOffset;
+    let y = (event.clientY - rect.top) * scaleY; 
 
     return { x: x, y: y };
 }
 
-canvas.addEventListener("wheel", ev=>{
-    //let scale = ctx.getTransform().a; // Get the current scale (assuming uniform scaling)
-    const scaleFactor = 0.1; // Adjust this value to control the scaling speed
+function getCanvasMousePosition( event, cursor ) {
+    //last transform...
+ 
 
-    if (ev.deltaY < 0) {
-        // Scroll up (zoom in)
-        scale += scaleFactor;
-    } else {
-        // Scroll down (zoom out)
-        scale -= scaleFactor;
-        if(scale < 0.1){ //prevent negative or very small scale.
-            scale = 0.1;
-        } 
-    }  
+    const transform = ctx.getTransform()
+    const invTransform = transform.inverse(); 
+ 
+
+    const transformedX = invTransform.a * cursor.x + invTransform.c * cursor.y + invTransform.e;
+    const transformedY = invTransform.b * cursor.x + invTransform.d * cursor.y + invTransform.f;
+
+    return {
+        x: transformedX,
+        y: transformedY,
+    }
+
+}
+
+canvas.addEventListener("wheel", ev=>{
+
+ 
+    const cursor = getMousePos(canvas, ev);
+    const pos = getCanvasMousePosition( ev, cursor );
+
+    ctx.translate( pos.x, pos.y ) 
+ 
+    const scaleFactor =  (ev.deltaY>0?  .9 : 1.1); // Adjust this value to control the scaling speed 
+ 
+    ctx.scale( scaleFactor, scaleFactor )
+    ctx.translate( -pos.x, -pos.y )
 
 })
 
 canvas.addEventListener('mousemove', (event) => {
     let scale = ctx.getTransform().a; // Get the current scale (assuming uniform scaling)
-    const mousePos = getMousePos(canvas, event);
-    console.log('Mouse position in canvas space:', mousePos.x, mousePos.y);
+    const mousePos = getMousePos(canvas, event); 
 
-    mouse.x = mousePos.x;
-    mouse.y = mousePos.y;
-    // // Example: Draw a circle at the mouse position
-    // ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-    // ctx.beginPath();
-    // ctx.arc(mousePos.x*scale, mousePos.y*scale, 10, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
+    const sx = mousePos.x - mouse.x;
+    const sy = mousePos.y - mouse.y;
+
+    if( mouseDrag )
+    ctx.translate( sx/scale, sy/scale )
+
+    mouse = mousePos;
 });
+
+canvas.addEventListener("mousedown", ev=>{
+    if( ev.button == 1 )
+    {
+        mouse = getMousePos(canvas, ev);
+        mouseDrag = true;
+    }
+});
+canvas.addEventListener("mouseup", ev=>{
+    if( ev.button == 1 )
+    {
+        mouseDrag = false;
+    }
+});
+
 
 type Child = {
     x:number
     y:number
     color:number|string
-    w:number
-    rotation:number
+    w:number 
     h:number
     origin?: {x:number, y:number }
     childs?:Child[],
@@ -84,30 +96,26 @@ type Child = {
 
 let objs : Child[] = [
     {
-        origin: {x:25, y:25},
-        x:50, 
-        y:50,
+        origin: {x:0, y:0},
+        x:0, 
+        y:0,
         color:"#ff0000",
         w:50,
-        h:50,
-        scale:10,
-        rotation:Math.PI/4,
+        h:50, 
         childs: [
             {
                 x:25,
                 y:25,
                 w:25,
                 h:25,
-                color:"#0000ff",
-                rotation:0
+                color:"#0000ff", 
             },
             {
                 x:10,
                 y:10,
                 w:10,
                 h:10,
-                color:"#00ff00",
-                rotation:0,
+                color:"#00ff00", 
                 text:"Hola mundo"
             }
         ]
@@ -122,8 +130,7 @@ function drawObj( ctx:CanvasRenderingContext2D, obj:typeof objs[0], offsetX=0, o
     if( obj.scale )
     {
         ctx.scale( obj.scale, obj.scale )
-    }
-    ctx.rotate( obj.rotation );
+    } 
 
     const ox = obj.origin?.x ?? 0;
     const oy = obj.origin?.y ?? 0;
@@ -149,19 +156,25 @@ function drawObj( ctx:CanvasRenderingContext2D, obj:typeof objs[0], offsetX=0, o
 
 function draw() { 
 
+    ctx.save() 
+    ctx.resetTransform()
     ctx.clearRect(0,0,canvas.width, canvas.height);
-
-    objs[0].rotation += 0.01
-
-    objs.forEach( obj=>{
-
+    ctx.restore()
+    //objs[0].rotation += 0.01
+ 
+ 
+ 
+    objs.forEach( obj=>{ 
         
-        drawObj(ctx, obj, 500,500)
-        
+        drawObj(ctx, obj, 0, 0  ) 
     });
+
+   
     
+ 
     //--------------
     requestAnimationFrame(draw);
 }
+ 
 
 draw();
