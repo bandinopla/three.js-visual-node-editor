@@ -92,7 +92,7 @@ export class Editor {
             const canvasPos = this.getCanvasMousePosition(event, mousePos);
 
             const sx = ( mousePos.x - this.mouse.x ) / scale;
-            const sy = ( mousePos.y - this.mouse.y ) / this.aspectCorrection;
+            const sy = ( mousePos.y - this.mouse.y ) / scale / this.aspectCorrection;
 
             this.mouse = mousePos;
             
@@ -114,8 +114,7 @@ export class Editor {
             else 
             {
                 this.connections.filter(c=>!("child" in c.to)).forEach( c=>c.to=canvasPos); 
-            }
-        
+            } 
             
         });
 
