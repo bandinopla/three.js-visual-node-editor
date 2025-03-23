@@ -1,9 +1,9 @@
 import { texture, uv } from 'three/tsl';
 
 import { WinNode } from "./WinNode";
-import { WinProperty } from "./WinProperty";
-import { WinSlideProperty } from "./WinSlideProperty";
-import { WinOutputProperty } from './WinOutputProperty';
+import { WinProperty } from "../properties/WinProperty";
+import { WinSlideProperty } from "../properties/WinSlideProperty";
+import { WinOutputProperty } from '../properties/WinOutputProperty';
 
 export class DummyWin extends WinNode {
     constructor() {

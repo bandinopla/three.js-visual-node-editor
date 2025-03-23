@@ -1,6 +1,6 @@
-import { WinIntProperty } from "./WinIntProperty";
+import { WinIntProperty } from "../properties/WinIntProperty";
 import { WinNode } from "./WinNode";
-import { WinOutputProperty } from "./WinOutputProperty";
+import { WinOutputProperty } from "../properties/WinOutputProperty";
 
 export class UVWindow extends WinNode {
     constructor() {

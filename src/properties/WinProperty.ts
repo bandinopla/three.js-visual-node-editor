@@ -1,4 +1,4 @@
-import { BaseNode } from "./BaseNode";
+import { BaseNode } from "../nodes/BaseNode";
 
 export class WinProperty extends BaseNode {
 

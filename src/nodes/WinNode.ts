@@ -1,7 +1,10 @@
 import { Editor, Outlet } from "../Editor";
 import { BaseNode } from "./BaseNode";
-import { WinProperty } from "./WinProperty";
+import { WinProperty } from "../properties/WinProperty";
 
+/**
+ * The tiny window in the editor that holds all the properties of a node.
+ */
 export class WinNode extends BaseNode {
 
     editor?:Editor

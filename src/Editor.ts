@@ -100,6 +100,9 @@ export class Editor {
                 this.objs.forEach( obj=>{
         
 
+                    //
+                    // mouse down on an outlet??
+                    //
                     if( obj.pressetOutlet( cursor.x-obj.x, cursor.y-obj.y, outlet =>{
 
                         //
@@ -115,8 +118,12 @@ export class Editor {
                             to: cursor
                         })
 
-                    } )) return;
+                    } )) 
+                    return;
 
+                    //
+                    // default: mouse down on the node window.
+                    //
                     if( cursor.x>obj.x && cursor.x<obj.x+obj.width && cursor.y>obj.y && cursor.y<obj.y+obj.height )
                     {    
                         // default... will make the object move...

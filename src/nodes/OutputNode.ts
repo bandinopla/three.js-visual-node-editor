@@ -1,5 +1,5 @@
 import { WinNode } from "./WinNode";
-import { WinProperty } from "./WinProperty";
+import { WinProperty } from "../properties/WinProperty";
 
 export class OutputNode extends WinNode {
     constructor() {
