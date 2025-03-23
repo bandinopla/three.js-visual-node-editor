@@ -2,6 +2,7 @@ import { Editor, Outlet } from "../Editor";
 import { BaseNode } from "./BaseNode";
 import { WinProperty } from "../properties/WinProperty";
 import { IHandlesMouse } from "../events/IHandlesMouse";
+import { Theme } from "../colors/Theme";
 
 type MousePropContext = {
     localX:number
@@ -47,7 +48,7 @@ export class WinNode extends BaseNode {
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Color of the shadow (semi-transparent black)
 
         this.roundedRect(ctx, 0, 0, this.width, this.height, 5); // Draws a square with rounded corners.
-        ctx.fillStyle = '#303030';
+        ctx.fillStyle = Theme.color.nodeWinBgColor;
         ctx.fill(); 
 
         ctx.shadowColor = 'transparent'; //Or, you can reset all shadow properties.

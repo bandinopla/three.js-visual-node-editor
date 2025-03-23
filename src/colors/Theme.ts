@@ -1,0 +1,31 @@
+export type FillStyle = CanvasFillStrokeStyles["fillStyle"];
+
+export class Theme {
+    private static theme:Theme;
+
+    static get color() {
+        if( !Theme.theme )
+        {
+            Theme.theme = new Theme()
+        }
+        return Theme.theme;
+    }
+
+    readonly nodeWinBgColor : FillStyle = "#303030";
+
+    readonly vec4 : FillStyle = "#63c763";
+    readonly vec3 : FillStyle = "#6363c7";
+
+    readonly groupTexture : FillStyle = "#79461d";
+    readonly groupVector : FillStyle = "#3c3c83";
+    readonly groupMath : FillStyle = "#246283";
+    readonly groupInput : FillStyle = "#83314a";
+    readonly groupOutput : FillStyle = "#3c1d26";
+
+    readonly barBgColor : FillStyle = "#545454";
+    readonly barFillColor : FillStyle = "#4772b3";
+    readonly barTextColor : FillStyle = "white";
+
+    readonly textColor : FillStyle = "white";
+    readonly borderColor : FillStyle = "black";
+}

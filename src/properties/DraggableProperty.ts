@@ -1,6 +1,7 @@
 import { clamp } from "three/src/math/MathUtils.js";
 import { IHandlesMouse } from "../events/IHandlesMouse";
 import { WinProperty } from "./WinProperty";
+import { Theme } from "../colors/Theme";
 
 export class DraggableProperty extends WinProperty implements IHandlesMouse
 {
@@ -14,6 +15,7 @@ export class DraggableProperty extends WinProperty implements IHandlesMouse
     constructor( name:string, readonly usesBar:boolean, readonly min:number, readonly max:number ) {
         super(name)
         this.hasOutput = false;
+        this.textColor = Theme.color.barTextColor;
     }  
 
     get stringValue() {
@@ -40,13 +42,13 @@ export class DraggableProperty extends WinProperty implements IHandlesMouse
         ctx.clip(); // Create the clipping region.
 
         // Draw the background.
-        ctx.fillStyle = "#545454";
+        ctx.fillStyle = Theme.color.barBgColor;
         ctx.fillRect(0, 0, maxWidth, maxHeight);
 
         if( this.usesBar )
         {
             // Draw the progress bar fill.
-            ctx.fillStyle = "#4772b3";
+            ctx.fillStyle = Theme.color.barFillColor;
             ctx.fillRect(0, 0, maxWidth* this.value, maxHeight); 
         }
         
