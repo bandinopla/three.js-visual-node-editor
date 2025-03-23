@@ -1,5 +1,7 @@
+import { IHandlesMouse } from "./events/IHandlesMouse";
 import { BaseNode } from "./nodes/BaseNode";
 import { WinNode } from "./nodes/WinNode";
+import { ThreeScene } from "./ThreeScene";
 
 type MouseInfo = {
     clientX:number, clientY:number
@@ -32,9 +34,15 @@ export class Editor {
 
     protected objs:WinNode[] = [];
     readonly connections:Connection[] = [];
+    readonly scene:ThreeScene;
+
+    protected eventsHandler?:IHandlesMouse;
 
     constructor( readonly canvas:HTMLCanvasElement )
     {
+        this.scene = new ThreeScene();
+        document.body.prepend( this.scene.renderer.domElement );
+
         this._ctx = canvas.getContext('2d')!; //TODO:handle error
 
         const aspect = canvas.width / canvas.height;
@@ -44,11 +52,30 @@ export class Editor {
 
         //-------
 
-        canvas.addEventListener("wheel", ev=>{
-
+        canvas.addEventListener("wheel", ev=>{ 
  
             const cursor = this.getMousePos( ev );
             const pos = this.getCanvasMousePosition( ev, cursor );
+
+            //
+            // check if some prop wants to handle the wheel...
+            // 
+            let captured = false;
+
+            this.objs.forEach( node => {
+
+                if( node.onMouseWheel( pos.x-node.x, pos.y-node.y, ev.deltaY ) )
+                {
+                    captured = true;
+                }
+
+            });
+
+            if( captured ) return;
+
+            //
+            // default is to zoom in/out
+            //
         
             this.ctx.translate( pos.x, pos.y ) 
          
@@ -62,26 +89,34 @@ export class Editor {
         canvas.addEventListener('mousemove', (event) => {
             let scale = this.ctx.getTransform().a; // Get the current scale (assuming uniform scaling)
             const mousePos = this.getMousePos( event); 
-        
-            const sx = mousePos.x - this.mouse.x;
-            const sy = mousePos.y - this.mouse.y;
+            const canvasPos = this.getCanvasMousePosition(event, mousePos);
+
+            const sx = ( mousePos.x - this.mouse.x ) / scale;
+            const sy = ( mousePos.y - this.mouse.y ) / this.aspectCorrection;
+
+            this.mouse = mousePos;
+            
+            if( this.eventsHandler )
+            {
+                this.eventsHandler.onMouseMove( sx, sy );
+                return;
+            }
         
             if( this.mouseDrag )
             {
-                this.ctx.translate( sx/scale, (sy/scale)/this.aspectCorrection )
+                this.ctx.translate( sx, sy)
             }
             else if( this.focusedChild )
             {
-                this.focusedChild.x += sx/scale;
-                this.focusedChild.y += (sy/scale)/this.aspectCorrection;
+                this.focusedChild.x += sx;
+                this.focusedChild.y += sy;
             }
             else 
             {
-                const canvasPos = this.getCanvasMousePosition(event, mousePos);
                 this.connections.filter(c=>!("child" in c.to)).forEach( c=>c.to=canvasPos); 
             }
         
-            this.mouse = mousePos;
+            
         });
 
         canvas.addEventListener("mousedown", ev=>{
@@ -97,8 +132,9 @@ export class Editor {
                 // see if someone wants to handle this event....  
         
                 //find which obj...
-                this.objs.forEach( obj=>{
-        
+
+                for (let i = 0; i < this.objs.length; i++) {
+                    const obj = this.objs[i];  
 
                     //
                     // mouse down on an outlet??
@@ -122,6 +158,15 @@ export class Editor {
                     return;
 
                     //
+                    // check if a property wants to hook the event handling...
+                    //
+                    this.eventsHandler = obj.onMouseDown( cursor.x-obj.x, cursor.y-obj.y );
+                    if( this.eventsHandler )
+                    {   
+                        return;
+                    }
+
+                    //
                     // default: mouse down on the node window.
                     //
                     if( cursor.x>obj.x && cursor.x<obj.x+obj.width && cursor.y>obj.y && cursor.y<obj.y+obj.height )
@@ -130,11 +175,21 @@ export class Editor {
                         this.focusedChild = obj; 
                     }
         
-                });
+                };
             }
         });
 
-        canvas.addEventListener("mouseup", ev=>{
+        canvas.addEventListener("mouseup", ev=>{ 
+
+            const cursor = this.getCanvasMousePosition( ev, this.mouse );
+
+            if( this.eventsHandler )
+            {
+                this.eventsHandler.onMouseUp();
+                this.eventsHandler = undefined;
+                return;
+            }
+
             if( ev.button == 1 )
             {
                 this.mouseDrag = false;
@@ -147,7 +202,7 @@ export class Editor {
             {
 
                 // check if we are on top of an oulet...
-                const cursor = this.getCanvasMousePosition( ev, this.mouse );
+                
                 this.objs.forEach( obj=>{
 
                     //
@@ -230,14 +285,17 @@ export class Editor {
         this.connections.push( ...clean );
     }
 
-    start() {
+    start() { 
+
+        this.scene.render()
 
         const ctx = this.ctx;
 
         ctx.save() 
         ctx.resetTransform()
-        ctx.fillStyle = "#1d1d1d";
-        ctx.fillRect(0,0, this.canvas.width, this.canvas.height);
+        ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
+        //ctx.fillStyle = "#1d1d1d";
+        //ctx.fillRect(0,0, this.canvas.width, this.canvas.height);
         ctx.restore()
 
         let connectioDirStrength = 50;

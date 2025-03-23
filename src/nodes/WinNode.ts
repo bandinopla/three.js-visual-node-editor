@@ -1,6 +1,13 @@
 import { Editor, Outlet } from "../Editor";
 import { BaseNode } from "./BaseNode";
 import { WinProperty } from "../properties/WinProperty";
+import { IHandlesMouse } from "../events/IHandlesMouse";
+
+type MousePropContext = {
+    localX:number
+    localY:number
+    prop:IHandlesMouse
+}
 
 /**
  * The tiny window in the editor that holds all the properties of a node.
@@ -27,9 +34,7 @@ export class WinNode extends BaseNode {
 
     get height () {
         return this.headerHeight + this.childs.length * this.childsHeight;
-    }
-
-    
+    }  
 
     override draw(ctx: CanvasRenderingContext2D): void {
         
@@ -116,5 +121,62 @@ export class WinNode extends BaseNode {
         }
 
         return false;
+    }
+
+    private propHandlesMouse(obj: any): obj is IHandlesMouse {
+        return (
+          typeof obj === 'object' &&
+          obj !== null &&
+          'onMouseDown' in obj &&
+          typeof obj.onMouseDown === 'function' 
+        );
+    }
+
+    private getPropThatHandlesMouse(localX:number, localY:number) :MousePropContext | undefined
+    {
+        for (let i = 0; i < this.childs.length; i++) {
+            const child = this.childs[i];
+
+            const y = this.headerHeight + (i*this.childsHeight) ;
+
+            const isInside = localX>0 && localX<this.width && localY>y && localY<y+this.childsHeight;
+
+            if( isInside )
+            { 
+                if( this.propHandlesMouse( child ) )
+                { 
+                    return {
+                        prop:child,
+                        localX,
+                        localY: localY - y
+                    };
+                }
+            }
+
+        };
+    }
+
+    onMouseDown( localX:number, localY:number ):IHandlesMouse | undefined
+    { 
+        const capture = this.getPropThatHandlesMouse( localX, localY );
+
+        if( capture )
+        {  
+            capture.prop.onMouseDown( capture.localX, capture.localY );
+
+            return capture.prop;
+        }
+    }
+
+    onMouseWheel( localX:number, localY:number, delta:number ):IHandlesMouse | undefined
+    {
+        const capture = this.getPropThatHandlesMouse( localX, localY );
+
+        if( capture )
+        {  
+            capture.prop.onMouseWheel( delta );
+
+            return capture.prop;
+        }
     }
 }

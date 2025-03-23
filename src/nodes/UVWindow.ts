@@ -9,7 +9,7 @@ export class UVWindow extends WinNode {
 
         this.childs = [
                     new WinOutputProperty("UV"), 
-                    new WinIntProperty("Index", 0, 10), 
+                    new WinIntProperty("Index", 0, 5), 
                 ]
     }
 }
