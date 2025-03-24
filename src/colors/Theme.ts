@@ -3,7 +3,7 @@ export type FillStyle = CanvasFillStrokeStyles["fillStyle"];
 export class Theme {
     private static theme:Theme;
 
-    static get color() {
+    static get config() {
         if( !Theme.theme )
         {
             Theme.theme = new Theme()
@@ -11,10 +11,17 @@ export class Theme {
         return Theme.theme;
     }
 
+    readonly fontSize = 13;
+    readonly nodeRowHeight = 20;
+    readonly nodeBorderRadius = 5;
+
+    readonly fontFamily:string = "Arial"; //https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+
     readonly nodeWinBgColor : FillStyle = "#303030";
 
     readonly vec4 : FillStyle = "#63c763";
     readonly vec3 : FillStyle = "#6363c7";
+    readonly vec1 : FillStyle = "#cccccc";
 
     readonly groupTexture : FillStyle = "#79461d";
     readonly groupVector : FillStyle = "#3c3c83";
@@ -28,4 +35,7 @@ export class Theme {
 
     readonly textColor : FillStyle = "white";
     readonly borderColor : FillStyle = "black";
+
+    readonly btnBgColor : FillStyle = "#545454"
+    readonly btnTextColor : FillStyle = "white"
 }

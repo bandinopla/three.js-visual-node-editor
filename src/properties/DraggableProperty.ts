@@ -15,7 +15,7 @@ export class DraggableProperty extends WinProperty implements IHandlesMouse
     constructor( name:string, readonly usesBar:boolean, readonly min:number, readonly max:number ) {
         super(name)
         this.hasOutput = false;
-        this.textColor = Theme.color.barTextColor;
+        this.textColor = Theme.config.barTextColor;
     }  
 
     get stringValue() {
@@ -42,13 +42,13 @@ export class DraggableProperty extends WinProperty implements IHandlesMouse
         ctx.clip(); // Create the clipping region.
 
         // Draw the background.
-        ctx.fillStyle = Theme.color.barBgColor;
+        ctx.fillStyle = Theme.config.barBgColor;
         ctx.fillRect(0, 0, maxWidth, maxHeight);
 
         if( this.usesBar )
         {
             // Draw the progress bar fill.
-            ctx.fillStyle = Theme.color.barFillColor;
+            ctx.fillStyle = Theme.config.barFillColor;
             ctx.fillRect(0, 0, maxWidth* this.value, maxHeight); 
         }
         
