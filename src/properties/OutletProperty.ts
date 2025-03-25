@@ -28,7 +28,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
         return this.root as Node;
     }
 
-    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number)  {  
+    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number)  {  
    
         //render circle...
         ctx.save()
@@ -45,7 +45,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
 
         ctx.restore(); 
 
-        super.renderContents(ctx, maxWidth,maxHeight)
+        super.render(ctx, maxWidth,maxHeight)
         
     }
 }

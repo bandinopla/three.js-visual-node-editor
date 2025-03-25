@@ -8,11 +8,10 @@ export class Output extends OutletProperty {
         super( false, dotColor ); 
     }
 
-    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void { 
+    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void { 
         
         this.writeText(ctx, this.label, this.fontSize, maxWidth-10, maxHeight, this.fontColor, "right" );
-
-        super.render(ctx, maxWidth, maxHeight);
+ 
         
     }
 }

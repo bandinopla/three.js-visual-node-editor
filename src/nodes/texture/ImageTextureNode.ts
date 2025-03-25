@@ -9,6 +9,7 @@ import { Vector1Output } from '../../properties/Vector1Output';
 import { UVChannelProperty } from "../../properties/UVChannelProperty";
 import { TextureExtensionProperty } from "../../properties/TextureExtensionProperty";
 import { TextureMappingModeProperty } from "../../properties/TextureMappingModeProperty";
+import { UVProperty } from "../../properties/UVProperty";
 
 export class ImageTextureNode extends Node {
     constructor() {
@@ -22,7 +23,8 @@ export class ImageTextureNode extends Node {
                 new TextureProperty(),  
                 new UVChannelProperty(),
                 new TextureExtensionProperty(),
-                new TextureMappingModeProperty()
+                new TextureMappingModeProperty(),
+                new UVProperty()
             ], {
                 direction:"column",
                 gap: 5

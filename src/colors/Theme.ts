@@ -20,8 +20,9 @@ export class Theme {
     readonly nodeWinBgColor : FillStyle = "#303030";
 
     readonly vec4 : FillStyle = "#63c763";
-    readonly vec3 : FillStyle = "#6363c7";
+    readonly vec3 : FillStyle = "#c7c729";
     readonly vec1 : FillStyle = "#cccccc";
+    readonly vec2 : FillStyle = "#6363c7";
 
     readonly groupTexture : FillStyle = "#79461d";
     readonly groupVector : FillStyle = "#3c3c83";
