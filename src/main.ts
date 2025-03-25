@@ -1,4 +1,6 @@
+ 
 import { Editor } from './Editor';  
+import { UVNode } from './nodes/attribute/UVNode';
 import { ImageTextureNode } from './nodes/texture/ImageTextureNode'; 
 import './style.css' 
 
@@ -8,7 +10,7 @@ const canvas = document.getElementById('app') as HTMLCanvasElement;
 const editor = new Editor(canvas); 
 
  
-let win1 = new ImageTextureNode();
+let win1 = new UVNode();
 win1.x = 20;
 win1.y = 20;
  
@@ -25,5 +27,6 @@ win4.y = 200;
 editor.add( win4 );
 
 editor.start();
+ 
  
  

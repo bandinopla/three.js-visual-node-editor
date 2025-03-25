@@ -29,6 +29,7 @@ export class Theme {
     readonly groupMath : FillStyle = "#246283";
     readonly groupInput : FillStyle = "#83314a";
     readonly groupOutput : FillStyle = "#3c1d26";
+    readonly groupAttribute:FillStyle = "#83314a";
 
     readonly barBgColor : FillStyle = "#545454";
     readonly barFillColor : FillStyle = "#4772b3";

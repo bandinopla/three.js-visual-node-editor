@@ -1,37 +1,24 @@
- 
-import { Theme } from "../../colors/Theme";
-import { HeaderElement } from "../../components/Header";
-import { Layout } from "../../layout/Layout";
-import { Node } from "../Node";
 import { Vector3Output } from '../../properties/Vector3Output';
 import { TextureProperty } from '../../properties/TextureProperty';
 import { Vector1Output } from '../../properties/Vector1Output';
 import { UVChannelProperty } from "../../properties/UVChannelProperty";
 import { TextureExtensionProperty } from "../../properties/TextureExtensionProperty";
 import { TextureMappingModeProperty } from "../../properties/TextureMappingModeProperty";
-import { UVProperty } from "../../properties/UVProperty";
+import { UVTransformProperty } from "../../properties/UVTransformProperty";
+import { TextureTypeNode } from "./TextureTypeNode";
 
-export class ImageTextureNode extends Node {
+export class ImageTextureNode extends TextureTypeNode {
     constructor() {
-        super(new Layout( [
- 
-            new HeaderElement("Image Texture", Theme.config.groupTexture),
-
-            new Layout( [
+        super("Image Texture", 
+            [
                 new Vector3Output("Color"),
                 new Vector1Output("Alpha"),
                 new TextureProperty(),  
                 new UVChannelProperty(),
                 new TextureExtensionProperty(),
                 new TextureMappingModeProperty(),
-                new UVProperty()
-            ], {
-                direction:"column",
-                gap: 5
-            })
-            
-        ], {
-            direction:"column"
-        })); 
+                new UVTransformProperty()
+            ]
+        ); 
     }
 }

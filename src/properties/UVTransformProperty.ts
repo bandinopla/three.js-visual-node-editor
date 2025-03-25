@@ -1,7 +1,7 @@
 import { Theme } from "../colors/Theme"; 
 import { Input } from "./Input";
 
-export class UVProperty extends Input
+export class UVTransformProperty extends Input
 {
     constructor() {
         super( Theme.config.vec2 )  
