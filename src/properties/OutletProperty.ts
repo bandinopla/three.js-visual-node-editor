@@ -19,8 +19,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
     constructor( inputType:boolean, protected dotColor:FillStyle )
     {
         super();
-        this._isInput = inputType;
-        this.singleLine = true;
+        this._isInput = inputType;  
     }
 
     connectedTo?: IOutlet | undefined;
@@ -29,10 +28,8 @@ export class OutletProperty extends LayoutElement implements IOutlet
         return this.root as Node;
     }
 
-    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {  
-
-        super.render(ctx, maxWidth, maxHeight);
-        
+    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number)  {  
+   
         //render circle...
         ctx.save()
         ctx.translate( this.isInput? 0 : maxWidth, maxHeight/2);
@@ -47,6 +44,8 @@ export class OutletProperty extends LayoutElement implements IOutlet
         this._globalY = cursor.y; 
 
         ctx.restore(); 
+
+        super.renderContents(ctx, maxWidth,maxHeight)
         
     }
 }

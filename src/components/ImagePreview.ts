@@ -7,6 +7,10 @@ export class ImagePreview extends LayoutElement {
 
     constructor() {
         super();
+
+        this.backgroundColor = "black";
+        this.boxShadowLevel = 4;
+
         this._img = document.createElement('img');
         this._img.onload = ev=> {
             this.isLoaded = true;
@@ -21,17 +25,11 @@ export class ImagePreview extends LayoutElement {
         return 100
     }
 
-    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
-
-        this.boxShadow(ctx, 4);
-
-        ctx.fillStyle = "black";
-        ctx.fillRect(0,0,maxWidth, maxHeight);
-
+    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+  
         if( this.isLoaded )
-        ctx.drawImage( this._img, 0,0,maxWidth, maxHeight );
-
-        this.boxShadow(ctx, 0);
+            ctx.drawImage( this._img, 0,0,maxWidth, maxHeight );
+ 
     }
 
     reset() {

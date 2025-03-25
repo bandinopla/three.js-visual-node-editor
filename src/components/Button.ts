@@ -8,7 +8,6 @@ export class Button extends InteractiveLayoutElement
     constructor( protected label:string , protected onClick?:VoidFunction )
     {
         super();
-        this.singleLine = true;
     }
 
     override width(ctx: CanvasRenderingContext2D): number {
@@ -27,7 +26,7 @@ export class Button extends InteractiveLayoutElement
         this.writeText(ctx, this.label, this.fontSize, maxWidth/2, maxHeight, Theme.config.btnTextColor, "center");
 
         //hit area...
-        this.defineHitArea(ctx, 0,0,maxWidth,maxHeight); 
+        super.render(ctx, maxWidth, maxHeight);
     }
 
     override onMouseDown(cursorX: number, cursorY: number): void {

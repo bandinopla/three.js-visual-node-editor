@@ -38,4 +38,10 @@ export class Theme {
 
     readonly btnBgColor : FillStyle = "#545454"
     readonly btnTextColor : FillStyle = "white"
+
+    readonly comboboxBgColor : FillStyle = "#282828"
+    readonly comboboxTextColor: FillStyle = "white";
+    readonly comboboxOptionsBgColor : FillStyle = "#181818"
+    readonly comboSelectedItemBgColor : FillStyle = "#4772b3"
+    readonly comboSelectedItemTextColor : FillStyle = "white"
 }

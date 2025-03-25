@@ -9,6 +9,8 @@ import { ImageAtlas } from "./util/ImageAtlas";
 import { HandIcon } from "./components/HandIcon";
 import { calculateDirectionAlignment } from "./util/isPointingAt";
 import { isMouseHandler } from "./events/isMouseHandler";
+import { IOverlayRenderer } from "./layout/IOverlayRenderer";
+import { LayoutElement } from "./layout/LayoutElement";
 
 type MouseInfo = {
     clientX:number, clientY:number
@@ -45,12 +47,15 @@ export class Editor {
 
     readonly scene:ThreeScene;
 
+    /**
+     * An object that will intercept and handle the mouse events.
+     */
     protected eventsHandler?:IHandlesMouse;
 
     /**
-     * If set, it indicates for how long to "pause" and ignore all inputs and stop rendering.
+     * Set this to draw stuff AFTER everything else was drawn. This is the LAST draw call in the frame.
      */
-    private pauseFor = 0;
+    overlay?:IOverlayRenderer; 
 
     constructor( readonly canvas:HTMLCanvasElement )
     {
@@ -74,6 +79,12 @@ export class Editor {
  
             const cursor = this.getMousePos( ev );
             const pos = this.getCanvasMousePosition(cursor );
+
+            if( this.eventsHandler )
+            {
+                this.eventsHandler.onMouseWheel( ev.deltaY )
+                return;
+            }
 
             //
             // check if some prop wants to handle the wheel...
@@ -155,7 +166,22 @@ export class Editor {
             // main mouse button to move stuff arround...
             else if( ev.button==0 )
             {
-                const cursor = this.getCanvasMousePosition(this.mouse );
+                const cursor = this.getCanvasMousePosition(this.mouse ); 
+
+
+                if( this.overlay )
+                {
+                    if( this.clickElementAt( this.mouse, this.overlay.overlayBody ) )
+                    { 
+                        return;
+                    } 
+                    else 
+                    {
+                        //close overlay
+                        this.overlay = undefined;
+                    } 
+                }
+
  
                 // see if someone wants to handle this event....  
                 const outlets:IOutlet[] = []; 
@@ -205,20 +231,12 @@ export class Editor {
                     //#region Click on element...
                     //
                     // check if a property wants to hook the event handling...
-                    //
-                    if( obj.traverse( elem => { 
-                        
-                        if( isMouseHandler(elem) && elem.intersects( this.mouse) )
-                        {   
-                            // got one! this one will handle the mouse events now... until the mouse is lifted...
-                            this.eventsHandler = elem;
-                            elem.onMouseDown(this.mouse.x-elem.hitArea.x, this.mouse.y-elem.hitArea.y);
-                            
-                            return true; 
-                        }
+                    // 
 
-                    }))
-                    return;
+                    if( this.clickElementAt( this.mouse, obj ) )
+                    { 
+                        return;
+                    } 
  
                     //#endregion
 
@@ -261,7 +279,7 @@ export class Editor {
 
             if( this.eventsHandler )
             {
-                this.eventsHandler.onMouseUp();
+                this.eventsHandler.onMouseUp();  
                 this.eventsHandler = undefined;
                 return;
             }
@@ -305,7 +323,7 @@ export class Editor {
 
                 // }); 
                  
-                if( this.chosenOutlet )
+                if( this.chosenOutlet.length )
                 { 
                     if( this.chosenOutlet.length>1 )
                         this.chosenOutlet.sort((a,b)=>b.alignmentScore-a.alignmentScore);
@@ -333,7 +351,7 @@ export class Editor {
             }
         });
         //#endregion
-    }
+    } 
 
     get ctx() {
         return this._ctx;
@@ -342,6 +360,22 @@ export class Editor {
     add( node:Node ) {
         node.editor = this;
         this.objs.push( node );
+    }
+
+    protected clickElementAt( globalPos:Vector2Like, root:LayoutElement )
+    {
+        return root.traverse( elem => { 
+                        
+            if( isMouseHandler(elem) && elem.intersects( globalPos ) )
+            {    
+                elem.onMouseDown( globalPos.x-elem.hitArea.x, globalPos.y-elem.hitArea.y);
+
+                this.eventsHandler = elem;
+
+                return elem; 
+            }
+
+        });
     }
 
     protected getMousePos( event:MouseInfo ):Vector2Like {
@@ -544,7 +578,7 @@ export class Editor {
         });
 
         
-    }
+    } 
 
     start() { 
 
@@ -571,6 +605,10 @@ export class Editor {
         });
 
         this.drawAvailableConnectionPipes(ctx);
+
+        ctx.save()
+        this.overlay?.renderOverlay(ctx);
+        ctx.restore() 
 
         requestAnimationFrame(()=>this.start());
     }

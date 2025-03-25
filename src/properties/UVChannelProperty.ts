@@ -6,12 +6,16 @@ import { Input } from "./Input";
 export class UVChannelProperty extends Input
 {
     constructor() {
-        super( Theme.config.vec1 )
-        this.singleLine = true;
-
-        this.layout = new Layout("column","space-around","stretch",[
+        super( Theme.config.vec1 ) 
+ 
+        //"column","space-around","stretch",
+        this.layout = new Layout([
             new DraggableValue("UV Channel", false, 0, 5, 1)
-        ]);
+        ], {
+            direction:"column",
+            justify:"space-around",
+            align:"stretch"
+        });
     }
 
 

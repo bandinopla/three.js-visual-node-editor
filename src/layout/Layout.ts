@@ -1,3 +1,4 @@
+import { FillStyle, Theme } from "../colors/Theme";
 import { LayoutElement } from "./LayoutElement";
 import { LayoutSorter } from "./LayoutSorter";
 
@@ -5,21 +6,42 @@ export type LayoutDirection = "row" | "column";
 export type LayoutJustify = "start" | "end" | "space-around" | "space-between";
 export type LayoutAlign = "start" | "end" | "center" | "stretch" ;
 
+
+type LayoutConfig = {
+    direction: LayoutDirection,
+    justify: LayoutJustify,
+    align:LayoutAlign
+    gap:number 
+}
+
 export class Layout extends LayoutElement {
 
     private renderer :LayoutSorter;
+    private config: LayoutConfig ;
 
-    constructor( readonly direction:LayoutDirection, readonly justify:LayoutJustify, readonly align:LayoutAlign, readonly childs:LayoutElement[], readonly gap = 0 ) {
+
+    constructor( readonly childs:LayoutElement[], config:Partial<LayoutConfig> ) {
         super();
+
+        this.config = {
+            direction:"row",
+            justify:"start",
+            align:"start",
+            gap: 0,
+            ...config
+        };
+
+        const cfg = this.config;
+ 
 
         childs.forEach( child=>child.parent=this );
 
-        if( direction=="row" ) 
+        if( cfg.direction=="row" ) 
         {
             this.renderer = new LayoutSorter( 
                 1, 
-                justify, 
-                align,
+                cfg.justify, 
+                cfg.align,
 
                 (ctx,elem)=>elem.width(ctx),
                 (w, h)=>w, 
@@ -40,15 +62,15 @@ export class Layout extends LayoutElement {
                     ctx.translate( size+startMargin+endMargin, 0 );
                 },
 
-                gap
+                cfg.gap
             )
         }
         else 
         {
             this.renderer = new LayoutSorter( 
                 1, 
-                justify, 
-                align,
+                cfg.justify, 
+                cfg.align,
 
                 (ctx,elem)=>elem.height(ctx),
                 (w, h)=>h, 
@@ -67,7 +89,7 @@ export class Layout extends LayoutElement {
                     ctx.translate( 0, size+startMargin+endMargin );
                 },
 
-                gap
+                cfg.gap
             )
         }
     } 
@@ -78,27 +100,27 @@ export class Layout extends LayoutElement {
 
     override height(ctx: CanvasRenderingContext2D) {
 
-        if( this.direction=="row" )
+        if( this.config.direction=="row" )
         {
             return this.enabledChilds.reduce( (max, child)=>Math.max( max, child.height(ctx) ), 0);
         }
  
-        return this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0)  + this.gap*this.childs.length + this.gap;
+        return this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0)  + this.config.gap*this.childs.length + this.config.gap;
     }
 
     override width(ctx: CanvasRenderingContext2D) {
-        if( this.direction=="column" )
+        if( this.config.direction=="column" )
         {
             return 0 //this.enabledChilds.reduce( (max, child)=>Math.max( max, child.width(ctx) ), 0);
         }
     
-        return this.enabledChilds.reduce( (total, child)=>total+child.width(ctx), 0) + this.gap*this.childs.length + this.gap;
+        return this.enabledChilds.reduce( (total, child)=>total+child.width(ctx), 0) + this.config.gap*this.childs.length + this.config.gap;
     }
 
-    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
 
-        ctx.save();
-        this.renderer.render(ctx, this.enabledChilds, maxWidth, maxHeight );
+        ctx.save(); 
+        this.renderer.render(ctx, this.enabledChilds, maxWidth, maxHeight ); 
         ctx.restore()
     }
 
@@ -107,14 +129,7 @@ export class Layout extends LayoutElement {
         element.render( ctx, maxWidth, maxHeight );
 
     }
-
-    // override traverse( visitor:(elem:LayoutElement)=>void ) {
-        
-    //     super.traverse( visitor );
-
-    //     if( !this.enabled ) return
-    //     this.enabledChilds.forEach( child=>child.traverse(visitor) );
-    // }
+ 
     override traverse<T>(visitor: (elem: LayoutElement) => T): T | void {
         if( !this.enabled ) return;
         

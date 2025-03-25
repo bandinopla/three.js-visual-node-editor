@@ -19,29 +19,41 @@ export class TextureProperty extends Input {
     constructor() {
         super( Theme.config.vec4 )
 
-        this.initial = new Layout("row", "start", "stretch", [
+        //"row", "start", "stretch",
+        this.initial = new Layout( [
             new Button("+ File", ()=>this.onSelectFileFromDisk().then( file=>file && this.onFileSelected(file)) ),
             new Button("+ URL" ), 
-        ], 10);
+        ], {
+            gap:10,
+            align:"stretch"
+        });
 
         this.imgPreview = new ImagePreview();
 
-        this._imageDisplayLayout = new Layout("column","start","stretch", [
+        //"column","start","stretch",
+        this._imageDisplayLayout = new Layout( [
 
-            new Layout("row","space-around","center", [
+            //"row","space-around","center",
+            new Layout( [
 
                 this.imgPreview, 
                 new Button("X", ()=>this.reset() ), 
 
-            ] )
+            ], {
+                justify:"space-around",
+                align:"center"
+            } )
 
-        ],10);
+        ],{
+            gap: 10,
+            direction:"column",
+            align:"stretch"
+        });
 
         this.initial.parent = this; 
         this._imageDisplayLayout.parent = this;
 
-        this.layout = this.initial;
-        this.singleLine = false;
+        this.layout = this.initial; 
     } 
 
     protected async onSelectFileFromDisk() { 

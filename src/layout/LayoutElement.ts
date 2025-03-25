@@ -14,9 +14,12 @@ export class LayoutElement extends CanvasElement {
      * Used to return the height of this element to the layout. If true it will return the nodeRowHeight defined in the theme, else
      * it will asume the element will be in charge of informing it's own height.
      */
-    protected singleLine = false;
+    protected singleLine = true;
 
     grow = 0;
+    xPadding = 0;
+    backgroundColor?:FillStyle;
+    boxShadowLevel?:number;
 
     protected get layout() { return this._layout; }
     protected set layout( customLayout:Layout|undefined ) {
@@ -65,8 +68,33 @@ export class LayoutElement extends CanvasElement {
      * We blindly render ourselves
      */
     render( ctx: CanvasRenderingContext2D, maxWidth:number, maxHeight:number )
-    {
-        this._layout?.render( ctx, maxWidth, maxHeight );
+    { 
+        this.boxShadow(ctx, this.boxShadowLevel ?? 0 );
+
+        if( this.backgroundColor )
+        {
+            ctx.fillStyle = this.backgroundColor;
+            ctx.fillRect(0,0,maxWidth, maxHeight);
+        }
+
+        if( this.xPadding )
+        {
+            ctx.translate(this.xPadding, 0)
+        }
+
+        this.renderContents( ctx, maxWidth-this.xPadding*2, maxHeight ); 
+
+        this.boxShadow(ctx, 0);
+    }
+
+    /**
+     * This is separated from `render` because renders is the one in charge of paddings, background and box shadows...
+     * @param ctx 
+     * @param maxWidth 
+     * @param maxHeight 
+     */
+    protected renderContents( ctx: CanvasRenderingContext2D, maxWidth:number, maxHeight:number ) {
+        this._layout?.render( ctx, maxWidth , maxHeight );
     }
 
     /**

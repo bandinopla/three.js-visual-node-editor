@@ -12,7 +12,9 @@ export interface IHandlesMouse {
     onMouseDown( cursorX:number, cursorY:number ):void;
     onMouseUp():void;
  
-    hitArea: HitArea
+    hitArea: HitArea 
 
     intersects( mouse:Vector2Like ):boolean
+
+    isLocked?:boolean
 }

@@ -2,8 +2,16 @@ import { Vector2Like } from "three";
 import { HitArea, IHandlesMouse } from "../events/IHandlesMouse";
 import { LayoutElement } from "./LayoutElement";
 
+ 
+/**
+ * Elements that want to react to mouse events must extend this class and implements the desired hooks.
+ */
 export class InteractiveLayoutElement extends LayoutElement implements IHandlesMouse {
 
+    /**
+     * For mouse interaction
+     */
+    isLocked = false;
 
     readonly hitArea: HitArea = {
         x:0,
@@ -36,6 +44,11 @@ export class InteractiveLayoutElement extends LayoutElement implements IHandlesM
         hit.y = A.y;
         hit.w = B.x-A.x;
         hit.h = B.y-A.y;
+    }
+
+    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+        this.defineHitArea(ctx, 0,0,maxWidth,maxHeight); 
+        super.render( ctx,maxWidth,maxHeight );
     }
 
 }

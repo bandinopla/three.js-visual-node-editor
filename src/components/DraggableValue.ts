@@ -11,8 +11,7 @@ export class DraggableValue extends InteractiveLayoutElement {
 
     constructor( readonly name:string, readonly usesBar:boolean, readonly min:number, readonly max:number, protected step:number, protected onChange?:( newValue:number)=>void )
     {
-        super();
-        this.singleLine = true;
+        super(); 
     } 
 
     get stringValue() {
@@ -56,7 +55,7 @@ export class DraggableValue extends InteractiveLayoutElement {
         this.writeText( ctx, this.stringValue, this.fontSize, maxWidth-padding*2, this.rowHeight,  Theme.config.barTextColor, "right"); 
 
         //hit area...
-        this.defineHitArea(ctx, 0,0,maxWidth,maxHeight); 
+        super.render(ctx, maxWidth, maxHeight);
     }
 
     override onMouseMove(deltaX: number, deltaY: number): void {
