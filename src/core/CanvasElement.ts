@@ -51,5 +51,24 @@ export class CanvasElement {
              lineHeght/2 + fsize/3, // vertical align it to the center 
              color, align );
     }
+
+    protected getGlobalCoordinate( ctx: CanvasRenderingContext2D, x=0, y=0 ) {
+        return ctx.getTransform().transformPoint(new DOMPoint(x, y)); 
+    }
+
+    protected boxShadow(ctx: CanvasRenderingContext2D, elevation:number ) {
+        if( elevation==0 )
+        {
+            ctx.shadowColor = 'transparent';
+        }
+        else 
+        {
+            // Shadow properties
+            ctx.shadowOffsetX = 1; // Horizontal offset of the shadow
+            ctx.shadowOffsetY = 3; // Vertical offset of the shadow
+            ctx.shadowBlur = elevation;    // Blur radius of the shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Color of the shadow (semi-transparent black)
+        }
+    }
  
 }

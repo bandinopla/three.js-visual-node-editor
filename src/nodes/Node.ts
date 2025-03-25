@@ -14,19 +14,20 @@ export class Node extends LayoutElement {
     y = 0
     
     override width(ctx: CanvasRenderingContext2D): number {
-        return 200;
+        return 150;
     }
 
     protected _outlets:IOutlet[] = [];
 
-    constructor( protected layout:Layout ) {
+    constructor( layout:Layout ) {
         super(); 
         
-        layout.parent = this;
+        this.layout = layout;
+             layout.parent = this; 
     }
 
     height( ctx: CanvasRenderingContext2D ) {
-        return this.layout.height( ctx );
+        return this.layout!.height( ctx ) + 5;
     }
 
     draw( ctx: CanvasRenderingContext2D ) {
@@ -35,18 +36,18 @@ export class Node extends LayoutElement {
         ctx.translate( this.x, this.y );  
 
         // each child will have a width and a height....
-        const height = this.layout.height(ctx);
+        const height = this.height(ctx);
 
         this.renderPanelBox(ctx, height); 
 
         // render each child...
-        this.layout.render( ctx, this.width(ctx), height ); 
+        this.render( ctx, this.width(ctx), height ); 
 
         //
         // collect outlets... because they can be enabled or disabled, who knows... every render we re-collect.
         //
         this._outlets.length = 0;
-        this.layout.traverse( elem => {
+        this.layout!.traverse( elem => {
 
             if( isOutlet(elem) )
             {
@@ -58,17 +59,19 @@ export class Node extends LayoutElement {
 
     protected renderPanelBox( ctx: CanvasRenderingContext2D, height:number ) 
     {
-        // Shadow properties
-        ctx.shadowOffsetX = 1; // Horizontal offset of the shadow
-        ctx.shadowOffsetY = 3; // Vertical offset of the shadow
-        ctx.shadowBlur = 4;    // Blur radius of the shadow
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Color of the shadow (semi-transparent black)
+        // // Shadow properties
+        // ctx.shadowOffsetX = 1; // Horizontal offset of the shadow
+        // ctx.shadowOffsetY = 3; // Vertical offset of the shadow
+        // ctx.shadowBlur = 4;    // Blur radius of the shadow
+        // ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Color of the shadow (semi-transparent black)
+        this.boxShadow(ctx, 4);
 
         this.roundedRect(ctx, 0, 0, this.width(ctx), height, Theme.config.nodeBorderRadius ); // Draws a square with rounded corners.
         ctx.fillStyle = Theme.config.nodeWinBgColor;
         ctx.fill(); 
 
-        ctx.shadowColor = 'transparent'; //Or, you can reset all shadow properties.
+        //ctx.shadowColor = 'transparent'; //Or, you can reset all shadow properties.
+        this.boxShadow(ctx, 0);
 
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 0.5;
@@ -113,5 +116,5 @@ export class Node extends LayoutElement {
         }
 
         return false;
-    }
+    } 
 }

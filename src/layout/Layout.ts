@@ -83,16 +83,16 @@ export class Layout extends LayoutElement {
             return this.enabledChilds.reduce( (max, child)=>Math.max( max, child.height(ctx) ), 0);
         }
  
-        return this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0);
+        return this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0)  + this.gap*this.childs.length + this.gap;
     }
 
     override width(ctx: CanvasRenderingContext2D) {
         if( this.direction=="column" )
         {
-            return this.enabledChilds.reduce( (max, child)=>Math.max( max, child.width(ctx) ), 0);
+            return 0 //this.enabledChilds.reduce( (max, child)=>Math.max( max, child.width(ctx) ), 0);
         }
     
-        return this.enabledChilds.reduce( (total, child)=>total+child.width(ctx), 0);
+        return this.enabledChilds.reduce( (total, child)=>total+child.width(ctx), 0) + this.gap*this.childs.length + this.gap;
     }
 
     override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
@@ -108,11 +108,22 @@ export class Layout extends LayoutElement {
 
     }
 
-    override traverse( visitor:(elem:LayoutElement)=>void ) {
+    // override traverse( visitor:(elem:LayoutElement)=>void ) {
         
-        super.traverse( visitor );
+    //     super.traverse( visitor );
 
-        if( !this.enabled ) return
-        this.enabledChilds.forEach( child=>child.traverse(visitor) );
+    //     if( !this.enabled ) return
+    //     this.enabledChilds.forEach( child=>child.traverse(visitor) );
+    // }
+    override traverse<T>(visitor: (elem: LayoutElement) => T): T | void {
+        if( !this.enabled ) return;
+        
+        const result = super.traverse( visitor );
+        if( result ) return result;
+        
+        for (const child of this.enabledChilds) {
+            const childResult = child.traverse(visitor);
+            if( childResult ) return childResult;
+        }
     }
 }

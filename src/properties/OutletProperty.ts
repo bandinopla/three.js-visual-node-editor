@@ -14,7 +14,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
 
     get isInput() { return this._isInput; } 
     get globalX() { return this._globalX; }
-    get globalY() { return this._globalY; }
+    get globalY() { return this._globalY; } 
 
     constructor( inputType:boolean, protected dotColor:FillStyle )
     {
@@ -31,6 +31,8 @@ export class OutletProperty extends LayoutElement implements IOutlet
 
     override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {  
 
+        super.render(ctx, maxWidth, maxHeight);
+        
         //render circle...
         ctx.save()
         ctx.translate( this.isInput? 0 : maxWidth, maxHeight/2);
@@ -38,15 +40,13 @@ export class OutletProperty extends LayoutElement implements IOutlet
 
         //
         // obtain the global position of the outlet
-        //
-        const matrix = ctx.getTransform(); 
-        const point = new DOMPoint(0, 0);
-        const cursor = matrix .transformPoint(point); 
+        // 
+        const cursor = this.getGlobalCoordinate(ctx,0,0);  
 
         this._globalX = cursor.x;
         this._globalY = cursor.y; 
 
-        ctx.restore();
+        ctx.restore(); 
         
     }
 }

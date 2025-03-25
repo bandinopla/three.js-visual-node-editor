@@ -8,6 +8,7 @@ import { Theme } from "./colors/Theme";
 import { ImageAtlas } from "./util/ImageAtlas";
 import { HandIcon } from "./components/HandIcon";
 import { calculateDirectionAlignment } from "./util/isPointingAt";
+import { isMouseHandler } from "./events/isMouseHandler";
 
 type MouseInfo = {
     clientX:number, clientY:number
@@ -16,6 +17,11 @@ type MouseInfo = {
 type Connection = {
     from:IOutlet
     to:IOutlet|Vector2Like
+}
+
+type OuletCandidate = {
+    outlet:IOutlet
+    alignmentScore:number
 }
 
 export class Editor {
@@ -35,7 +41,7 @@ export class Editor {
      */
     private availableOutlets:IOutlet[] = [];
     private selectedOutlet?:IOutlet;
-    private chosenOutlet?:IOutlet;
+    private chosenOutlet:OuletCandidate[] = [];
 
     readonly scene:ThreeScene;
 
@@ -69,21 +75,21 @@ export class Editor {
             const cursor = this.getMousePos( ev );
             const pos = this.getCanvasMousePosition(cursor );
 
-            // //
-            // // check if some prop wants to handle the wheel...
-            // // 
-            // let captured = false;
+            //
+            // check if some prop wants to handle the wheel...
+            // 
+            for (const obj of this.objs) { 
+                if( obj.traverse( elem=>{
 
-            // this.objs.forEach( node => {
+                    if( isMouseHandler(elem) && elem.intersects(cursor) )
+                    {
+                        elem.onMouseWheel( ev.deltaY );
+                        return true;
+                    }
 
-            //     if( node.onMouseWheel( pos.x-node.x, pos.y-node.y, ev.deltaY ) )
-            //     {
-            //         captured = true;
-            //     }
-
-            // });
-
-            // if( captured ) return;
+                })) 
+                return;
+            } 
 
             //
             // default is to zoom in/out
@@ -156,14 +162,17 @@ export class Editor {
                 const hitAreaRatio = 10;
 
                 this.selectedOutlet = undefined;
+                this.eventsHandler = undefined;
 
                 //
                 // let's see if some canvas element wants to capture the mouse....
                 //
-                for (let i = 0; i < this.objs.length; i++) {
-                    const obj = this.objs[i];    
+                for (const obj of this.objs) {   
 
-
+                    //#region OUTLET
+                    //
+                    // check if mouse if over an outlet to create/delete a connection
+                    //
                     obj.forEachOutlet( outlet => { 
 
                         if( Math.abs( this.mouse.x - outlet.globalX )<=hitAreaRatio && Math.abs( this.mouse.y - outlet.globalY )<=hitAreaRatio )
@@ -191,37 +200,27 @@ export class Editor {
                     });
 
                     if( this.selectedOutlet ) continue;
+                    //#endregion
+  
+                    //#region Click on element...
+                    //
+                    // check if a property wants to hook the event handling...
+                    //
+                    if( obj.traverse( elem => { 
+                        
+                        if( isMouseHandler(elem) && elem.intersects( this.mouse) )
+                        {   
+                            // got one! this one will handle the mouse events now... until the mouse is lifted...
+                            this.eventsHandler = elem;
+                            elem.onMouseDown(this.mouse.x-elem.hitArea.x, this.mouse.y-elem.hitArea.y);
+                            
+                            return true; 
+                        }
+
+                    }))
+                    return;
  
-
-                    // //
-                    // // mouse down on an outlet??
-                    // //
-                    // if( obj.getOutletUnderMouse( this.mouse.x , this.mouse.y , outlet =>{
- 
-                    //     //
-                    //     // destroy any connectionusing this outlet...
-                    //     //
-                    //     this.destroyConnectionsUsing( outlet );
-
-                    //     //
-                    //     // create a connection
-                    //     //
-                    //     this.connections.push({
-                    //         from: outlet,
-                    //         to: this.mouse
-                    //     })
-
-                    // } )) 
-                    // return;
-
-                    // //
-                    // // check if a property wants to hook the event handling...
-                    // //
-                    // this.eventsHandler = obj.onMouseDown( cursor.x-obj.x, cursor.y-obj.y );
-                    // if( this.eventsHandler )
-                    // {   
-                    //     return;
-                    // }
+                    //#endregion
 
                     //
                     // default: mouse down on the node window.
@@ -308,21 +307,23 @@ export class Editor {
                  
                 if( this.chosenOutlet )
                 { 
-                    this.destroyConnectionsUsing(this.chosenOutlet)
+                    if( this.chosenOutlet.length>1 )
+                        this.chosenOutlet.sort((a,b)=>b.alignmentScore-a.alignmentScore);
 
-                    this.connections.forEach( connection => {
 
-                        
+                    this.destroyConnectionsUsing( this.chosenOutlet[0].outlet )
+
+                    this.connections.forEach( connection => { 
 
                         if( !("owner" in connection.to))
                         {
-                            connection.to = this.chosenOutlet!;
+                            connection.to = this.chosenOutlet[0].outlet;
                         }
 
                     }); 
                 }
 
-                this.chosenOutlet = undefined;
+                this.chosenOutlet.length=0;
                 this.availableOutlets.length=0;
 
                 //remove connections with no end...
@@ -446,8 +447,9 @@ export class Editor {
     {
         if(!this.selectedOutlet) return;
 
-        this.chosenOutlet = undefined;
+        this.chosenOutlet.length = 0;
 
+        const alignmentThreshold = 0.9;
         const maxReachDistance = 300;
         const distToPlug = 8;
 
@@ -495,15 +497,15 @@ export class Editor {
                 // 3. Calculate the dot product
                 const alignment = calculateDirectionAlignment(-dir.x, -dir.y, origin.x, origin.y, position.x, position.y);
 
-                if( alignment<0.7 )
+                if( alignment<alignmentThreshold )
                 {
                     return;
-                }
+                } 
 
-                console.log( alignment)
+                const alignmentScore = ( alignment-alignmentThreshold ) / (1-alignmentThreshold) ;
 
                 // not cut the length based on the distance...
-                v.setLength( Math.min( distanceToCursor, (maxReachDistance-distanceToCursor) ) * (( alignment-0.7 )/0.3) )
+                v.setLength( Math.min( distanceToCursor, (maxReachDistance-distanceToCursor) ) * alignmentScore )
 
 
                 ctx.beginPath();
@@ -530,7 +532,7 @@ export class Editor {
 
                 if( outletGrabbed )
                 {
-                    this.chosenOutlet = outlet;
+                    this.chosenOutlet.push( { outlet, alignmentScore } );
                 }
 
                 this.handIcon.drawSprite(ctx, outletGrabbed ?"grab" : "reach");

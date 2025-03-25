@@ -1,11 +1,11 @@
 import { Theme } from "../colors/Theme";
-import { LayoutElement } from "../layout/LayoutElement";
+import { InteractiveLayoutElement } from "../layout/InteractiveLayoutElement"; 
 
-export class Button extends LayoutElement
+export class Button extends InteractiveLayoutElement
 {
     private xpadding = 5;
 
-    constructor( protected label:string )
+    constructor( protected label:string , protected onClick?:VoidFunction )
     {
         super();
         this.singleLine = true;
@@ -26,5 +26,11 @@ export class Button extends LayoutElement
         //text
         this.writeText(ctx, this.label, this.fontSize, maxWidth/2, maxHeight, Theme.config.btnTextColor, "center");
 
+        //hit area...
+        this.defineHitArea(ctx, 0,0,maxWidth,maxHeight); 
+    }
+
+    override onMouseDown(cursorX: number, cursorY: number): void {
+        this.onClick?.();
     }
 }

@@ -11,7 +11,7 @@ export class Theme {
         return Theme.theme;
     }
 
-    readonly fontSize = 13;
+    readonly fontSize = 12;
     readonly nodeRowHeight = 20;
     readonly nodeBorderRadius = 5;
 

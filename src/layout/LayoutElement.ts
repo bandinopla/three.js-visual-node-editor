@@ -1,5 +1,6 @@
 import { FillStyle, Theme } from "../colors/Theme";
 import { CanvasElement } from "../core/CanvasElement";
+import { Layout } from "./Layout";
 
 export class LayoutElement extends CanvasElement {
 
@@ -7,6 +8,7 @@ export class LayoutElement extends CanvasElement {
     private _fontSize? :number;
     private _fontColor? :FillStyle;
     private _rowHeight? :number ;
+    private _layout?:Layout;
 
     /**
      * Used to return the height of this element to the layout. If true it will return the nodeRowHeight defined in the theme, else
@@ -15,6 +17,14 @@ export class LayoutElement extends CanvasElement {
     protected singleLine = false;
 
     grow = 0;
+
+    protected get layout() { return this._layout; }
+    protected set layout( customLayout:Layout|undefined ) {
+        this._layout = customLayout;
+
+        if( customLayout)
+            customLayout.parent = this;
+    }
 
     get parent() {
         return this._parent;
@@ -42,10 +52,12 @@ export class LayoutElement extends CanvasElement {
      */
     height( ctx:CanvasRenderingContext2D ):number
     { 
+        if( this._layout ) return this._layout.height(ctx);
         return this.singleLine? Theme.config.nodeRowHeight : 0;
     }
 
-    width( ctx:CanvasRenderingContext2D ) {
+    width( ctx:CanvasRenderingContext2D ):number {
+        if( this._layout ) return this._layout.width(ctx) ;
         return 0;
     }
 
@@ -54,12 +66,23 @@ export class LayoutElement extends CanvasElement {
      */
     render( ctx: CanvasRenderingContext2D, maxWidth:number, maxHeight:number )
     {
-
+        this._layout?.render( ctx, maxWidth, maxHeight );
     }
 
-    traverse( visitor:(elem:LayoutElement)=>void ) {
-        if( !this.enabled ) return
-        visitor( this ); 
+    /**
+     * Scan self adn each children. If the visitor function returns Truthy then return whatever it found. In that case this would behave similar to a `find` function.
+     * If nothing is returned or nothing thruthy it will scan everything and ill behave like a `forEaach`
+     * @param visitor 
+     * @returns 
+     */
+    traverse<T>( visitor:(elem:LayoutElement)=>T ):T|void {
+        if( !this.enabled ) return;
+        
+        const rtrn = visitor( this ); 
+
+        if( rtrn ) return rtrn;
+
+        if( this._layout ) return this._layout.traverse( visitor );
     }
     
 }
