@@ -56,7 +56,7 @@ export class LayoutSorter {
 
         items.forEach( (elem, i, arr) => {
 
-            const w = elem? this.getSize(ctx, elem) : 0; 
+            const w = elem? Math.min( maxSize, this.getSize(ctx, elem)) : 0; 
 
             if( !w )
             {
@@ -78,9 +78,9 @@ export class LayoutSorter {
 
             const isFirst = i==0;
             const isLast = i+1==arr.length;
-            const size = elem? this.getSize(ctx, elem) : 0;
+            const size = elem? Math.min( maxSize, this.getSize(ctx, elem))  : 0;
 
-            const crossSize = this.align=="stretch"? maxCrossSize : (elem? this.getCrossSize(ctx, elem) : 0) || maxCrossSize;
+            const crossSize = this.align=="stretch"? maxCrossSize : (elem? Math.min( maxCrossSize, this.getCrossSize(ctx, elem)) : 0) || maxCrossSize;
             const crossFreeSize = maxCrossSize - crossSize;
             const crossOffset = crossFreeSize * ( this.align=="end"? 1 : this.align=="center" ? 0.5 : 0 );
 

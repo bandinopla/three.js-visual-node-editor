@@ -1,14 +1,23 @@
+import { Theme } from "../colors/Theme";
 import { TextLabel } from "../components/TextLabel";
 import { Row } from "../layout/Layout";
 import { Input } from "./Input";
 
 export class MaterialProperty extends Input {
-    constructor( name:string ) {
+    constructor( readonly index:number ) {
         super(5); 
 
         this.layout = new Row([
-            new TextLabel( name ),  
+            new TextLabel( `.material # ${index}  ` ),  
         ] ); 
-        this.xPadding = 10
+        this.xPadding = 10; 
     } 
+
+    override height(ctx: CanvasRenderingContext2D): number {
+        return Theme.config.nodeRowHeight*0.5
+    }
+
+    getMaterial() {
+        // pull data from the input socket....
+    }
 }

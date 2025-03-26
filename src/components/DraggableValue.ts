@@ -72,7 +72,7 @@ export class DraggableValue extends InteractiveLayoutElement {
         this.value = this.dragOriginX / this.hitArea.w  ;
 
         if( oldValue!=this._value )
-            this.onChange?.( this._value, this.min + Math.floor((this.max-this.min)/this.step)*this.step );
+            this.onChange?.( this._value, this.min + Math.floor(((this.max-this.min)*this._value)/this.step)*this.step );
 
     }
     override onMouseDown(cursorX: number, cursorY: number): void {

@@ -118,4 +118,16 @@ export class Node extends LayoutElement {
 
         return false;
     } 
+
+    /**
+     * Inform our output nodes that something has changed...
+     */
+    protected somethingChanged() {
+        this.forEachOutlet( outlet => {
+            if( !outlet.isInput && isOutlet(outlet.connectedTo) )
+            {
+                outlet.connectedTo.owner.somethingChanged();
+            }
+        })
+    }
 }
