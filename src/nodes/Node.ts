@@ -9,6 +9,7 @@ import { LayoutElement } from "../layout/LayoutElement";
 export class Node extends LayoutElement { 
 
     editor!:Editor;
+    canBeDeleted = true;
 
     x = 0
     y = 0

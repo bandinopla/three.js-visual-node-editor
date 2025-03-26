@@ -34,6 +34,10 @@ export class OutletProperty extends LayoutElement implements IOutlet
         ][ size ]
     }
 
+    isCompatible(other: IOutlet): boolean {
+        return this.size == 5 || other.size==5? this.size==other.size : true
+    }
+
     connectedTo?: IOutlet | undefined;
 
     get owner(): Node {

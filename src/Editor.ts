@@ -282,7 +282,8 @@ export class Editor {
                     this.availableOutlets = outlets.filter( outlet=>{
  
                         return (outlet.isInput!=this.selectedOutlet!.isInput ) 
-                                && !outlet.connectedTo
+                                //&& !outlet.connectedTo
+                                && this.selectedOutlet!.isCompatible( outlet )
                                 && ( outlet.owner !== this.selectedOutlet!.owner )
                                 ; // TODO: check for outlet TYPE compatibility 
                     });

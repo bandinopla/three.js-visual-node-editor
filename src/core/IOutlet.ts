@@ -13,4 +13,6 @@ export interface IOutlet {
     get owner():Node
     get size():OutletSize; // the output will be vec1 to 4 always... or in case of materials, we can say 5.
     get color():FillStyle
+
+    isCompatible( other:IOutlet ):boolean
 }
