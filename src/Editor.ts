@@ -11,6 +11,8 @@ import { calculateDirectionAlignment } from "./util/isPointingAt";
 import { isMouseHandler } from "./events/isMouseHandler";
 import { IOverlayRenderer } from "./layout/IOverlayRenderer";
 import { LayoutElement } from "./layout/LayoutElement";
+import { onDoubleClick } from "./util/onDoubleClick";
+import { createNewNode } from "./ui/NodeSelectionModal";
 
 type MouseInfo = {
     clientX:number, clientY:number
@@ -26,6 +28,9 @@ type OuletCandidate = {
     alignmentScore:number
 }
 
+/**
+ * I'm the editor. I show the nodes, and run the ThreeJs background scene. 
+ */
 export class Editor {
     private _ctx:CanvasRenderingContext2D;
     private mouseDrag = false;
@@ -73,6 +78,9 @@ export class Editor {
         
         // fix aspect ratio...
         this.ctx.scale(1, this.aspectCorrection) ;
+
+        // Double Click
+        onDoubleClick(canvas, ev=>this.showNodeCreationMenu(ev));
         
         //#region MOUSE WHEEL
         const mouseWheelCaptured = (obj:LayoutElement, globalMouse:Vector2Like, delta:number) => obj.traverse( elem=>{
@@ -690,5 +698,18 @@ export class Editor {
         ctx.restore() 
 
         requestAnimationFrame(()=>this.start());
+    }
+
+    protected showNodeCreationMenu( ev:MouseEvent ) {
+        const at = this.getCanvasMousePosition(this.mouse ); ;
+
+        createNewNode( ev.clientX, ev.clientY, newNode => {
+ 
+            newNode.x = at.x;
+            newNode.y = at.y;
+
+            this.add( newNode );
+
+        });
     }
 }

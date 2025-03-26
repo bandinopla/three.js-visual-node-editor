@@ -1,0 +1,42 @@
+.root {
+    max-height: 300px;
+    width: 300px;
+    background-color: black;
+    position: fixed;
+    overflow-y: auto;
+    z-index: 9;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.root ul {
+    margin: 0px;
+    padding: 0px;
+    list-style-type: none;
+}
+.root li {
+    cursor: pointer;
+    padding: 2px;
+}
+.root li:hover {
+    background-color: rgba(255,255,255,0.1);
+     
+    
+}
+
+.groupTitle {
+    padding: 3px 10px;
+    font-size: 0.8em;
+    display: inline-block;
+    border-radius: 5px;
+}
+
+.root > input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.hide {
+    display: none;
+}
