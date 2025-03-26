@@ -1,5 +1,5 @@
 import { FillStyle, Theme } from "../colors/Theme";
-import { IOutlet } from "../core/IOutlet";
+import { IOutlet, OutletSize } from "../core/IOutlet";
 import { LayoutElement } from "../layout/LayoutElement";
 import { Node } from "../nodes/Node";
 
@@ -11,15 +11,27 @@ export class OutletProperty extends LayoutElement implements IOutlet
     private _globalX = 0;
     private _globalY = 0;
     private _isInput = true;
+    private _size = 1;
 
     get isInput() { return this._isInput; } 
     get globalX() { return this._globalX; }
-    get globalY() { return this._globalY; } 
+    get globalY() { return this._globalY; }  
 
-    constructor( inputType:boolean, protected dotColor:FillStyle )
+    readonly color:FillStyle;
+
+    constructor( inputType:boolean, readonly size:OutletSize )
     {
         super();
         this._isInput = inputType;  
+        
+        this.color = [
+            "black",
+            Theme.config.vec1,
+            Theme.config.vec2,
+            Theme.config.vec3,
+            Theme.config.vec4,
+            Theme.config.materialOutputSocketColor,
+        ][ size ]
     }
 
     connectedTo?: IOutlet | undefined;
@@ -33,7 +45,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
         //render circle...
         ctx.save()
         ctx.translate( this.isInput? 0 : maxWidth, maxHeight/2);
-        this.drawCircle(ctx, 0, 0, 5, this.dotColor, Theme.config.borderColor, 1);
+        this.drawCircle(ctx, 0, 0, 5, this.color, Theme.config.borderColor, 1);
 
         //
         // obtain the global position of the outlet

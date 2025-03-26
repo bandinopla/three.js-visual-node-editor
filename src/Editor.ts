@@ -443,23 +443,29 @@ export class Editor {
         return screenPoint; 
     }
 
-    protected drawConnectionPipes( ctx:CanvasRenderingContext2D )
+    /**
+     * Draw the connection pipes
+     * @param ctx 
+     * @param theConnectedOnes which ones? the ones with both ends connected or the ones following the mouse?
+     */
+    protected drawConnectionPipes( ctx:CanvasRenderingContext2D, theConnectedOnes = true )
     {
         let connectioDirStrength = 50;  
 
         //#region draw connections 
-        this.connections.forEach( connection=>{
+        this.connections.forEach( connection=>{ 
 
             const from = this.global2canvas({x:connection.from.globalX, y:connection.from.globalY });
-
-            ctx.beginPath();
-            ctx.moveTo( from.x  , from.y );
- 
  
             let outDir = connection.from.isInput? -1 : 1;
 
             if( isOutlet(connection.to) )
             {
+                if( !theConnectedOnes ) return; 
+
+                ctx.beginPath();
+                ctx.moveTo( from.x  , from.y );
+
                 let to = this.global2canvas({x:connection.to.globalX, y:connection.to.globalY });
 
                 ctx.bezierCurveTo(
@@ -472,21 +478,46 @@ export class Editor {
                     to.x, 
                     to.y , 
                     );
+                    
+                if( connection.from.size!=connection.to.size )
+                {
+                    const gradient = ctx.createLinearGradient(
+                        from.x, from.y,  
+                        to.x, to.y
+                    );
+                        gradient.addColorStop(0, connection.from.color as string);
+                        gradient.addColorStop(1, connection.to.color as string );
+                        ctx.strokeStyle = gradient;
+                }
+                else 
+                {
+                    ctx.strokeStyle = connection.from.color;
+                } 
+                    
             } 
             else 
-            {
+            { 
+                if( theConnectedOnes ) return;
+
+                ctx.beginPath();
+                ctx.moveTo( from.x  , from.y );
+
                 let to = this.global2canvas( connection.to );
  
                 ctx.lineTo( 
                     to.x, 
                     to.y 
                     );
+
+                ctx.setLineDash([5, 5]);
+                ctx.strokeStyle = connection.from.color;
             }
             
 
-            ctx.strokeStyle = '#63c763';
+            
             ctx.lineWidth = 3;
             ctx.stroke();
+            ctx.setLineDash([]);
 
         })
 
@@ -499,7 +530,9 @@ export class Editor {
      */
     protected drawAvailableConnectionPipes( ctx:CanvasRenderingContext2D ) 
     {
-        if(!this.selectedOutlet) return;
+        if(!this.selectedOutlet) return; 
+
+        this.drawConnectionPipes( ctx, false )
 
         this.chosenOutlet.length = 0;
 
@@ -522,6 +555,8 @@ export class Editor {
  
         
         const v:Vector2 = new Vector2(); 
+
+        const options : { outlet:IOutlet, score:number, origin:Vector2Like, dir:Vector2Like, grab:boolean }[] = []
  
 
         //
@@ -545,8 +580,7 @@ export class Editor {
             // if cursor is at reach....
             //
             if( distanceToCursor < maxReachDistance )
-            { 
-                const dir2cursor = v.normalize();
+            {  
 
                 // 3. Calculate the dot product
                 const alignment = calculateDirectionAlignment(-dir.x, -dir.y, origin.x, origin.y, position.x, position.y);
@@ -559,43 +593,67 @@ export class Editor {
                 const alignmentScore = ( alignment-alignmentThreshold ) / (1-alignmentThreshold) ;
 
                 // not cut the length based on the distance...
-                v.setLength( Math.min( distanceToCursor, (maxReachDistance-distanceToCursor) ) * alignmentScore )
-
-
-                ctx.beginPath();
-                ctx.moveTo( position.x, position.y );
-                ctx.lineTo( position.x + v.x, position.y + v.y)
-
-                ctx.stroke();
+                v.setLength( Math.min( distanceToCursor, (maxReachDistance-distanceToCursor) ) * alignmentScore );
  
-                //
-                // Draw the hand icon
-                // 
 
-                ctx.save(); 
-                ctx.translate( position.x+ v.x, position.y + v.y);
-                ctx.rotate( Math.atan2(v.y, v.x)+Math.PI/2 );
+                const outletGrabbed = v.clone().set(cursor.x - (position.x+v.x), cursor.y - (position.y+v.y)).length()<distToPlug;
 
-                // distance from cursor to the current icon...
-                v.set(
-                    cursor.x - (position.x+v.x),
-                    cursor.y - (position.y+v.y),
-                );
-
-                const outletGrabbed = v.length()<distToPlug;
-
-                if( outletGrabbed )
-                {
-                    this.chosenOutlet.push( { outlet, alignmentScore } );
-                }
-
-                this.handIcon.drawSprite(ctx, outletGrabbed ?"grab" : "reach");
-                ctx.restore(); 
+                options.push({
+                    outlet,
+                    origin: position,
+                    dir: v.clone(),
+                    score: alignmentScore,
+                    grab: outletGrabbed
+                }); 
  
             } 
             
 
         });
+
+        //
+        // sort based on score : Higher score wins...
+        //
+        options.sort((a,b)=>b.score-a.score);
+
+        //
+        // only draw 1...
+        // as suggested by : https://x.com/KennedyRichard/status/1904915424866681301
+        // makes sense... to reduce visual noise. Just draw the most likely connection candidate.
+        //
+        if( options.length )
+        {
+            options.length=1;
+
+            options.forEach( candidate => {
+
+                ctx.beginPath();
+                //ctx.setLineDash([5, 5]);
+                ctx.moveTo( candidate.origin.x, candidate.origin.y );
+                ctx.lineTo( candidate.origin.x + candidate.dir.x, candidate.origin.y + candidate.dir.y); 
+                ctx.strokeStyle = candidate.outlet.color;
+                ctx.stroke();
+                //ctx.setLineDash([]);
+
+                //
+                // Draw the hand icon
+                // 
+
+                ctx.save(); 
+                ctx.translate( candidate.origin.x + candidate.dir.x, candidate.origin.y + candidate.dir.y );
+                ctx.rotate( Math.atan2(candidate.dir.y, candidate.dir.x)+Math.PI/2 );
+
+                if( candidate.grab )
+                {
+                    this.chosenOutlet.push( { outlet:candidate.outlet, alignmentScore: candidate.score } );
+                }
+
+                this.handIcon.drawSprite(ctx, candidate.grab ?"grab" : "reach");
+                ctx.restore(); 
+
+            });
+        }
+
 
         
     } 

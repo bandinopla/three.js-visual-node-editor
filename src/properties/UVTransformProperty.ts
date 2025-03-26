@@ -4,7 +4,7 @@ import { Input } from "./Input";
 export class UVTransformProperty extends Input
 {
     constructor() {
-        super( Theme.config.vec2 )  
+        super( 2 )  
     }
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {

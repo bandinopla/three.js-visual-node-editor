@@ -1,8 +1,9 @@
 import { FillStyle } from "../colors/Theme"; 
+import { OutletSize } from "../core/IOutlet";
 import { OutletProperty } from "./OutletProperty";
 
 export class Input extends OutletProperty {
-    constructor(dotColor:FillStyle) {
-        super(true, dotColor);
+    constructor( size:OutletSize) {
+        super(true, size);
     }
 }

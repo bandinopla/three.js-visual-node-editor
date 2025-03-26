@@ -17,7 +17,7 @@ export class TextureProperty extends Input {
 
 
     constructor() {
-        super( Theme.config.vec4 )
+        super( 4 )
 
         //"row", "start", "stretch",
         this.initial = new Layout( [

@@ -6,7 +6,7 @@ import { Input } from "./Input";
 export class UVChannelProperty extends Input
 {
     constructor() {
-        super( Theme.config.vec1 ) 
+        super( 1 ) 
  
         //"column","space-around","stretch",
         this.layout = new Layout([

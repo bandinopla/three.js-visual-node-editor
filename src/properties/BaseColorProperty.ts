@@ -8,7 +8,7 @@ export class BaseColorProperty extends Input {
  
 
     constructor() {
-        super(Theme.config.vec3); 
+        super(3); 
 
         this.layout = new Layout([
             new TextLabel("Base Color"), 
