@@ -4,7 +4,7 @@ import { InteractiveLayoutElement } from "../layout/InteractiveLayoutElement";
 
 export class DraggableValue extends InteractiveLayoutElement {
 
-    protected _value = .75;  
+    protected _value = 0;  
     private dragOriginX = 0; 
 
     constructor( readonly name:string, readonly usesBar:boolean, readonly min:number, readonly max:number, protected step:number, protected onChange?:( percent:number, value:number )=>void )
@@ -20,7 +20,7 @@ export class DraggableValue extends InteractiveLayoutElement {
         
         if( this.step )
         {
-            return v.toFixed(2) ;
+            return Math.round(this.step)==this.step? v.toString() : v.toFixed(2) ;
         }
 
         return v.toFixed(2);
