@@ -7,11 +7,22 @@ export type LayoutJustify = "start" | "end" | "space-around" | "space-between";
 export type LayoutAlign = "start" | "end" | "center" | "stretch" ;
 
 
-type LayoutConfig = {
+export type LayoutConfig = {
     direction: LayoutDirection,
+
+    /**
+     * Align on the MAIN-AXIS direction
+     */
     justify: LayoutJustify,
+
+    /**
+     * Align on the CROSS-AXIS direction
+     */
     align:LayoutAlign
     gap:number 
+    width?:number,
+    lineHeight?:number,
+    bgColor?:FillStyle
 }
 
 export class Layout extends LayoutElement {
@@ -31,8 +42,14 @@ export class Layout extends LayoutElement {
             ...config
         };
 
-        const cfg = this.config;
- 
+        if( this.config.lineHeight )
+        {
+            this.rowHeight = this.config.lineHeight;
+        }
+
+        if( this.config.bgColor ) this.backgroundColor = this.config.bgColor;
+
+        const cfg = this.config; 
 
         childs.forEach( child=>child.parent=this );
 
@@ -109,16 +126,34 @@ export class Layout extends LayoutElement {
     }
 
     override width(ctx: CanvasRenderingContext2D) {
+
+        if( this.config.width ) return this.config.width;
+
         if( this.config.direction=="column" )
         {
-            return 0 //this.enabledChilds.reduce( (max, child)=>Math.max( max, child.width(ctx) ), 0);
+            //el tema es que si el parent es row... hay que pasarle un ancho fijo...
+
+            //return 0 //this.enabledChilds.reduce( (max, child)=>Math.max( max, child.width(ctx) ), 0);
+            return this.enabledChilds.reduce( (max, child)=>Math.max( max, child.width(ctx) ), 0);
         }
     
+        return this.getChildsWidth(ctx) ;
+    }
+
+    protected getChildsWidth(ctx: CanvasRenderingContext2D) {
         return this.enabledChilds.reduce( (total, child)=>total+child.width(ctx), 0) + this.config.gap*this.childs.length + this.config.gap;
     }
 
-    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+        if( !maxWidth )
+        {
+            maxWidth = this.getChildsWidth(ctx)
+        }
+        super.render(ctx, maxWidth, maxHeight)
+    }
 
+    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+ 
         ctx.save(); 
         this.renderer.render(ctx, this.enabledChilds, maxWidth, maxHeight ); 
         ctx.restore()
@@ -140,5 +175,25 @@ export class Layout extends LayoutElement {
             const childResult = child.traverse(visitor);
             if( childResult ) return childResult;
         }
+    }
+}
+
+export class Row extends Layout
+{
+    constructor( childs:LayoutElement[], config?:Partial<Omit<LayoutConfig, "direction">> ){
+        super( childs, {
+            direction:"row",
+            ...config
+        })
+    }
+}
+
+export class Column extends Layout
+{
+    constructor( childs:LayoutElement[], config?:Partial<Omit<LayoutConfig, "direction">> ){
+        super( childs, {
+            direction:"column",
+            ...config
+        })
     }
 }

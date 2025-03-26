@@ -5,7 +5,7 @@ export class Button extends InteractiveLayoutElement
 {
     private xpadding = 5;
 
-    constructor( protected label:string , protected onClick?:VoidFunction )
+    constructor( protected _label:string , protected onClick?:VoidFunction )
     {
         super();
     }
@@ -31,5 +31,13 @@ export class Button extends InteractiveLayoutElement
 
     override onMouseDown(cursorX: number, cursorY: number): void {
         this.onClick?.();
+    }
+
+    get label() {
+         return this._label;
+    }
+
+    set label( newLabel:string ) {
+        this._label = newLabel;
     }
 }

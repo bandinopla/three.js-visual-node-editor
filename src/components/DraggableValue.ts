@@ -4,14 +4,13 @@ import { InteractiveLayoutElement } from "../layout/InteractiveLayoutElement";
 
 export class DraggableValue extends InteractiveLayoutElement {
 
-    protected value = .75; 
-    private _width = 0;
-    private isDragging = false; 
-    private dragOriginX = 0;
+    protected _value = .75;  
+    private dragOriginX = 0; 
 
-    constructor( readonly name:string, readonly usesBar:boolean, readonly min:number, readonly max:number, protected step:number, protected onChange?:( newValue:number)=>void )
+    constructor( readonly name:string, readonly usesBar:boolean, readonly min:number, readonly max:number, protected step:number, protected onChange?:( percent:number, value:number )=>void )
     {
         super(); 
+        this.xPadding=10
     } 
 
     get stringValue() {
@@ -21,20 +20,29 @@ export class DraggableValue extends InteractiveLayoutElement {
         
         if( this.step )
         {
-            return v.toString();
+            return v.toFixed(2) ;
         }
 
         return v.toFixed(2);
     } 
 
-    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+    /**
+     * The percent value from 0 to 1
+     */
+    get value() {
+        return this._value;
+    }
+    set value( v:number ) { 
+
+        this._value = clamp( v , 0, 1);  
+
+    }
+
+    override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+          
+        ctx.save();  
         
-        this._width = maxWidth;
-
-        ctx.save(); 
-
-        let padding = 10;
-        this.roundedRect(ctx, padding,0, maxWidth-padding*2, maxHeight , 3); 
+        this.roundedRect(ctx, 0,0, maxWidth, maxHeight , 3); 
 
         ctx.clip(); // Create the clipping region.
 
@@ -46,29 +54,34 @@ export class DraggableValue extends InteractiveLayoutElement {
         {
             // Draw the progress bar fill.
             ctx.fillStyle = Theme.config.barFillColor;
-            ctx.fillRect(0, 0, maxWidth* this.value, maxHeight); 
+            ctx.fillRect(0, 0, maxWidth * this.value, maxHeight); 
         }
         
         ctx.restore();  
 
-        this.writeText( ctx, this.name, this.fontSize, padding*2, this.rowHeight,  Theme.config.barTextColor, "left");
-        this.writeText( ctx, this.stringValue, this.fontSize, maxWidth-padding*2, this.rowHeight,  Theme.config.barTextColor, "right"); 
-
-        //hit area...
-        super.render(ctx, maxWidth, maxHeight);
+        this.writeText( ctx, this.name, this.fontSize, this.xPadding, this.rowHeight,  Theme.config.barTextColor, "left");
+        this.writeText( ctx, this.stringValue, this.fontSize, maxWidth-this.xPadding, this.rowHeight,  Theme.config.barTextColor, "right"); 
+ 
     }
 
     override onMouseMove(deltaX: number, deltaY: number): void {
         this.dragOriginX += deltaX;
-        this.value = this.dragOriginX / this._width ;
+
+        const oldValue = this._value;
+
+        this.value = this.dragOriginX / this.hitArea.w  ;
+
+        if( oldValue!=this._value )
+            this.onChange?.( this._value, this.min + Math.floor((this.max-this.min)/this.step)*this.step );
+
     }
     override onMouseDown(cursorX: number, cursorY: number): void {
-        this.isDragging = true;
+        //this.isDragging = true;
         this.dragOriginX = cursorX;
     }
-    override onMouseUp(): void {
-        this.isDragging = false;
-    }
+    // override onMouseUp(): void {
+    //     this.isDragging = false;
+    // }
     override onMouseWheel(deltaY: number): void {
 
         const inc = this.step? this.step / (this.max-this.min) : 0.01;

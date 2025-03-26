@@ -55,12 +55,12 @@ export class LayoutElement extends CanvasElement {
      */
     height( ctx:CanvasRenderingContext2D ):number
     { 
-        if( this._layout ) return this._layout.height(ctx);
-        return this.singleLine? Theme.config.nodeRowHeight : 0;
+        //if( this._layout ) return this._layout.height(ctx);
+        return this.singleLine? this.rowHeight : 0;
     }
 
     width( ctx:CanvasRenderingContext2D ):number {
-        if( this._layout ) return this._layout.width(ctx) ;
+        //if( this._layout ) return this._layout.width(ctx) ;
         return 0;
     }
 

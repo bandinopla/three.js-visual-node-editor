@@ -1,6 +1,7 @@
  
 import { Editor } from './Editor';  
 import { UVNode } from './nodes/attribute/UVNode';
+import { MeshStandardNode } from './nodes/shader/MeshStandardNode';
 import { ImageTextureNode } from './nodes/texture/ImageTextureNode'; 
 import './style.css' 
 
@@ -21,7 +22,7 @@ win3.x = 500;
 editor.add( win1 ); 
 editor.add( win3 );
 
-let win4 = new ImageTextureNode();
+let win4 = new MeshStandardNode();
 win4.x =500;
 win4.y = 200;
 editor.add( win4 );

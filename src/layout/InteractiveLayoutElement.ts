@@ -8,6 +8,9 @@ import { LayoutElement } from "./LayoutElement";
  */
 export class InteractiveLayoutElement extends LayoutElement implements IHandlesMouse {
 
+    private pressX:number = 0;
+    private pressY:number = 0;
+
     /**
      * For mouse interaction
      */
@@ -23,11 +26,23 @@ export class InteractiveLayoutElement extends LayoutElement implements IHandlesM
     onMouseWheel(deltaY: number): void { 
     }
     onMouseMove(deltaX: number, deltaY: number): void { 
+        this.pressX += deltaX;
+        this.pressY += deltaY;
+        this.callCursorUV();
     }
     onMouseDown(cursorX: number, cursorY: number): void { 
+        this.pressX = cursorX;
+        this.pressY = cursorY;
+        this.callCursorUV();
     }
     onMouseUp(): void { 
     } 
+
+    private callCursorUV() {
+        this.onCursorUV( this.pressX/this.hitArea.w, this.pressY/this.hitArea.h );
+    }
+
+    protected onCursorUV( u:number, v:number ) {}
 
     intersects(mouse: Vector2Like): boolean {
         return mouse.x>this.hitArea.x && mouse.x<this.hitArea.x+this.hitArea.w && 
@@ -47,7 +62,7 @@ export class InteractiveLayoutElement extends LayoutElement implements IHandlesM
     }
 
     override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
-        this.defineHitArea(ctx, 0,0,maxWidth,maxHeight); 
+        this.defineHitArea(ctx, this.xPadding,0,maxWidth-this.xPadding*2,maxHeight); 
         super.render( ctx,maxWidth,maxHeight );
     }
 

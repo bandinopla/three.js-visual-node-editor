@@ -23,6 +23,7 @@ export class Theme {
     readonly vec3 : FillStyle = "#c7c729";
     readonly vec1 : FillStyle = "#cccccc";
     readonly vec2 : FillStyle = "#6363c7";
+    readonly materialOutputSocketColor:FillStyle = "#bf4a06";
 
     readonly groupTexture : FillStyle = "#79461d";
     readonly groupVector : FillStyle = "#3c3c83";
@@ -30,6 +31,7 @@ export class Theme {
     readonly groupInput : FillStyle = "#83314a";
     readonly groupOutput : FillStyle = "#3c1d26";
     readonly groupAttribute:FillStyle = "#83314a";
+    readonly groupShader:FillStyle = "#2b652b";
 
     readonly barBgColor : FillStyle = "#545454";
     readonly barFillColor : FillStyle = "#4772b3";

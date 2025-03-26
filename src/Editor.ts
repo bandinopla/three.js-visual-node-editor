@@ -75,10 +75,26 @@ export class Editor {
         this.ctx.scale(1, this.aspectCorrection) ;
         
         //#region MOUSE WHEEL
+        const mouseWheelCaptured = (obj:LayoutElement, globalMouse:Vector2Like, delta:number) => obj.traverse( elem=>{
+
+            if( isMouseHandler(elem) && elem.intersects(globalMouse) )
+            {
+                elem.onMouseWheel( delta );
+                return true;
+            }
+
+        });
+
         canvas.addEventListener("wheel", ev=>{ 
  
             const cursor = this.getMousePos( ev );
             const pos = this.getCanvasMousePosition(cursor );
+
+            if( this.overlay )
+            { 
+                if( mouseWheelCaptured(this.overlay.overlayBody, cursor, ev.deltaY) )
+                    return;
+            }
 
             if( this.eventsHandler )
             {
@@ -90,16 +106,17 @@ export class Editor {
             // check if some prop wants to handle the wheel...
             // 
             for (const obj of this.objs) { 
-                if( obj.traverse( elem=>{
+                if( mouseWheelCaptured(obj, cursor, ev.deltaY) )
+                    return;
+                // if( obj.traverse( elem=>{ 
+                //     if( isMouseHandler(elem) && elem.intersects(cursor) )
+                //     {
+                //         elem.onMouseWheel( ev.deltaY );
+                //         return true;
+                //     }
 
-                    if( isMouseHandler(elem) && elem.intersects(cursor) )
-                    {
-                        elem.onMouseWheel( ev.deltaY );
-                        return true;
-                    }
-
-                })) 
-                return;
+                // })) 
+                // return;
             } 
 
             //
@@ -122,8 +139,8 @@ export class Editor {
             const mousePos = this.getMousePos( event); 
             const canvasPos = this.getCanvasMousePosition(mousePos);
 
-            const sx = ( mousePos.x - this.mouse.x ) / scale;
-            const sy = ( mousePos.y - this.mouse.y ) / scale / this.aspectCorrection;
+            let sx = ( mousePos.x - this.mouse.x )  ;
+            let sy = ( mousePos.y - this.mouse.y ) ;
 
             this.mouse = mousePos;
             
@@ -132,6 +149,9 @@ export class Editor {
                 this.eventsHandler.onMouseMove( sx, sy );
                 return;
             }
+
+            sx /= scale;
+            sy = sy / scale / this.aspectCorrection;
         
             if( this.mouseDrag )
             {
