@@ -41,6 +41,7 @@ export class Editor {
     private handIcon : HandIcon;
 
     protected objs:Node[] = [];
+    protected zSortedObjs:Node[] = [];
     readonly connections:Connection[] = [];
 
     /**
@@ -217,12 +218,12 @@ export class Editor {
 
                 this.selectedOutlet = undefined;
                 this.eventsHandler = undefined;
-
+  
                 //
                 // let's see if some canvas element wants to capture the mouse....
                 //
-                for (const obj of this.objs) {   
-
+                for (const obj of this.zSortedObjs) {    
+                    console.log( obj)
                     //#region OUTLET
                     //
                     // check if mouse if over an outlet to create/delete a connection
@@ -269,12 +270,15 @@ export class Editor {
                     //#endregion
 
                     //
+                    // CURSOR IS INSIDE THE WINDOW NODE
                     // default: mouse down on the node window.
                     //
                     if( cursor.x>obj.x && cursor.x<obj.x+obj.width(this.ctx) && cursor.y>obj.y && cursor.y<obj.y+obj.height(this.ctx) )
                     {    
                         // default... will make the object move...
                         this.focusedChild = obj; 
+                        this.bingToTop(obj);
+                        break; //<-- to avoid processing childrens under us....
                     }
         
                 };
@@ -386,9 +390,25 @@ export class Editor {
         return this._ctx;
     }
 
+    protected bingToTop( node:Node ) {
+        const nodeIndexZ = this.zSortedObjs.indexOf(node);
+        const nodeIndex = this.objs.indexOf(node);
+    
+        if (nodeIndexZ !== -1) {
+            this.zSortedObjs.splice(nodeIndexZ, 1);
+            this.zSortedObjs.unshift(node);
+        }
+    
+        if (nodeIndex !== -1) {
+            this.objs.splice(nodeIndex, 1);
+            this.objs.push(node);
+        }
+    }
+
     add( node:Node ) {
         node.editor = this;
         this.objs.push( node );
+        this.zSortedObjs.unshift(node);
     }
 
     protected clickElementAt( globalPos:Vector2Like, root:LayoutElement )
