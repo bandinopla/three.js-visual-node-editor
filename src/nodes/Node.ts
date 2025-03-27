@@ -10,6 +10,11 @@ export class Node extends LayoutElement {
 
     editor!:Editor;
     canBeDeleted = true;
+    
+    /**
+     * Mostly used to visually show a sign that this node is selected
+     */
+    selected = false;
 
     x = 0
     y = 0
@@ -74,8 +79,8 @@ export class Node extends LayoutElement {
         //ctx.shadowColor = 'transparent'; //Or, you can reset all shadow properties.
         this.boxShadow(ctx, 0);
 
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = this.selected? Theme.config.selectionBoxColor : 'black';
+        ctx.lineWidth = this.selected? 1 : 0.5;
         ctx.stroke();
     }
 

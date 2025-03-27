@@ -15,6 +15,8 @@ export class Theme {
     readonly nodeRowHeight = 20;
     readonly nodeBorderRadius = 5;
 
+    readonly selectionBoxColor = "white";
+
     readonly fontFamily:string = "Arial"; //https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
 
     readonly nodeWinBgColor : FillStyle = "#303030";

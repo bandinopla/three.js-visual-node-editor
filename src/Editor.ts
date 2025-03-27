@@ -47,6 +47,16 @@ export class Editor {
     readonly scene:ThreeScene;
 
     /**
+     * Start of a box selection. In canva's coordinate.
+     */
+    private boxSelectionStart?:Vector2Like;
+
+    /**
+     * Nodes selected...
+     */
+    private selectedNodes:Node[]=[]
+
+    /**
      * An object that will intercept and handle the mouse events.
      */
     protected eventsHandler?:IHandlesMouse;
@@ -141,6 +151,12 @@ export class Editor {
             const mousePos = this.getMousePos( event); 
             const canvasPos = this.getCanvasMousePosition(mousePos);
 
+            // if( this.boxSelectionStart )
+            // {
+            //     this.selectNodesInsideBoxSelection(this.boxSelectionStart, canvasPos);
+            //     return;
+            // }
+
             let sx = ( mousePos.x - this.mouse.x )  ;
             let sy = ( mousePos.y - this.mouse.y ) ;
 
@@ -161,8 +177,21 @@ export class Editor {
             }
             else if( this.focusedChild )
             {
-                this.focusedChild.x += sx;
-                this.focusedChild.y += sy;
+                //this.focusedChild.x += sx;
+                //this.focusedChild.y += sy;
+
+                // move the selection
+                this.selectedNodes.forEach(node=>{
+                    node.x += sx;
+                    node.y += sy;
+                })
+            }
+            else if( this.boxSelectionStart )
+            {
+                //
+                // update box selection
+                //
+                this.selectNodesInsideBoxSelection(this.boxSelectionStart, canvasPos);
             }
             else 
             {
@@ -189,11 +218,12 @@ export class Editor {
             // main mouse button to move stuff arround...
             else if( ev.button==0 )
             {
-                const cursor = this.getCanvasMousePosition(this.mouse ); 
-
+                const cursor = this.getCanvasMousePosition(this.mouse );  
 
                 if( this.overlay )
                 {
+                    this.clearBoxSelection();
+
                     if( this.clickElementAt( this.mouse, this.overlay.overlayBody ) )
                     { 
                         return;
@@ -248,7 +278,10 @@ export class Editor {
 
                     });
 
-                    if( this.selectedOutlet ) continue;
+                    if( this.selectedOutlet ) {
+                        this.clearBoxSelection(); 
+                        break;
+                    }
                     //#endregion
   
                     //#region Click on element...
@@ -268,14 +301,17 @@ export class Editor {
                     // default: mouse down on the node window.
                     //
                     if( cursor.x>obj.x && cursor.x<obj.x+obj.width(this.ctx) && cursor.y>obj.y && cursor.y<obj.y+obj.height(this.ctx) )
-                    {    
+                    {      
                         // default... will make the object move...
                         this.focusedChild = obj; 
                         this.bingToTop(obj);
+                        
+                        
+
                         break; //<-- to avoid processing childrens under us....
-                    }
+                    } 
         
-                };
+                }; 
 
                 //
                 // if we clicked an outlet, we need to know which of the available outlets are valid to be connected to...
@@ -295,6 +331,31 @@ export class Editor {
                     });
                 } 
 
+                //
+                // if we selected a child...
+                //
+                else
+                { 
+                    if( this.focusedChild )
+                    { 
+                        if( !this.selectedNodes.includes(this.focusedChild) )
+                        {
+                            this.clearBoxSelection()
+                            this.selectedNodes.push(this.focusedChild); 
+                        }  
+
+                        return;
+                    }  
+                    else 
+                    {
+                        this.clearBoxSelection();
+                    }
+
+                    this.boxSelectionStart = cursor;
+                    
+                    console.log("START SELECTION")
+                }
+
             }
         });
         //#endregion
@@ -303,6 +364,8 @@ export class Editor {
         canvas.addEventListener("mouseup", ev=>{ 
 
             const cursor = this.getCanvasMousePosition( this.mouse );
+
+            this.boxSelectionStart = undefined;
 
             if( this.eventsHandler )
             {
@@ -686,6 +749,64 @@ export class Editor {
         
     } 
 
+    protected drawBoxSelection( ctx:CanvasRenderingContext2D ) {
+        if(!this.boxSelectionStart) return;
+
+        const cursor = this.getCanvasMousePosition(this.mouse );  
+
+        ctx.save();
+        ctx.beginPath()
+
+        ctx.rect(this.boxSelectionStart.x,this.boxSelectionStart.y,
+            cursor.x-this.boxSelectionStart.x,
+            cursor.y-this.boxSelectionStart.y
+        ); 
+        
+        ctx.lineWidth = 2
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = Theme.config.selectionBoxColor;
+        ctx.stroke(); 
+        ctx.restore()
+    }
+
+    protected clearBoxSelection() {
+        this.selectedNodes.length=0; 
+    }
+
+    /**
+     * Select the nodes inside the box...
+     * @param poin1 In canva's coordinate
+     * @param point2  In canva's coordinate
+     */
+    protected selectNodesInsideBoxSelection( point1:Vector2Like, point2:Vector2Like )
+    {
+        // reset
+        this.selectedNodes.length = 0;
+
+        const left = Math.min(point1.x, point2.x);
+        const right = Math.max(point1.x, point2.x);
+        const top = Math.min(point1.y, point2.y);
+        const bottom = Math.max(point1.y, point2.y);
+ 
+        const ctx = this._ctx;
+
+        this.objs.forEach( node => {
+
+            const objLeft = node.x;
+            const objRight = node.x + node.width(ctx);
+            const objTop = node.y;
+            const objBottom = node.y + node.height(ctx);
+
+            const overlaps =  (left <= objRight && 
+                                right >= objLeft && 
+                                top <= objBottom && 
+                                bottom >= objTop);
+
+            if( overlaps ) this.selectedNodes.push(node);
+            
+        });
+    }
+
     start() { 
 
         this.scene.render()
@@ -704,13 +825,15 @@ export class Editor {
 
             ctx.save();
 
+            obj.selected = this.selectedNodes.includes(obj)
             obj.draw(ctx);
 
             ctx.restore();
 
         });
 
-        this.drawAvailableConnectionPipes(ctx);
+        this.drawAvailableConnectionPipes(ctx); 
+        this.drawBoxSelection(ctx);
 
         ctx.save()
         this.overlay?.renderOverlay(ctx);
