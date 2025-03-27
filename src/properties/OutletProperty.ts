@@ -12,6 +12,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
     private _globalY = 0;
     private _isInput = true;
     private _size = 1;
+    private _connectedTo:IOutlet | undefined;
 
     get isInput() { return this._isInput; } 
     get globalX() { return this._globalX; }
@@ -37,8 +38,26 @@ export class OutletProperty extends LayoutElement implements IOutlet
     isCompatible(other: IOutlet): boolean {
         return this.size == 5 || other.size==5? this.size==other.size : true
     }
+ 
+    get connectedTo(){ return this._connectedTo; }
+    set connectedTo( other:IOutlet|undefined) {
+        const oldOther = this._connectedTo;
+        const changed = oldOther!==other;
+        this._connectedTo = other; 
+        if( changed ) {
+            if( other ) 
+            {
+                this.onConnected( other );
+            }
+            else 
+            {
+                if( oldOther ) this.onDisconnected( oldOther )
+            }
+        }
+    }
 
-    connectedTo?: IOutlet | undefined;
+    protected onConnected( to:IOutlet ) {}
+    protected onDisconnected( from:IOutlet ){}
 
     get owner(): Node {
         return this.root as Node;

@@ -2,14 +2,17 @@
 import { Theme } from "../colors/Theme";
 import { Button } from "../components/Button";
 import { ImagePreview } from "../components/ImagePreview";
-import { Layout } from "../layout/Layout";
+import { TextLabel } from "../components/TextLabel";
+import { IOutlet } from "../core/IOutlet";
+import { Layout, Row } from "../layout/Layout";
 import { LayoutElement } from "../layout/LayoutElement";
 import { Input } from "./Input"; 
 
 export class TextureProperty extends Input {
 
     private initial : Layout;
-    private _imageDisplayLayout : Layout;
+    private overwritten : Layout;
+    private _imageDisplayLayout : Layout; 
  
     private _fileName?:string; 
 
@@ -49,6 +52,12 @@ export class TextureProperty extends Input {
             direction:"column",
             align:"stretch"
         });
+
+        this.overwritten = new Row([
+            new TextLabel("Texture Data")
+        ] );
+
+        this.overwritten.xPadding = 10
 
         this.initial.parent = this; 
         this._imageDisplayLayout.parent = this;
@@ -98,6 +107,14 @@ export class TextureProperty extends Input {
         };
 
         reader.readAsDataURL(file);
+    }
+
+    protected override onConnected(to: IOutlet): void {
+        this.layout = this.overwritten; 
+    }
+
+    protected override onDisconnected(from: IOutlet): void {
+        this.layout = this.initial;
     }
 
     protected reset() {

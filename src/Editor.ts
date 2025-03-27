@@ -13,20 +13,13 @@ import { IOverlayRenderer } from "./layout/IOverlayRenderer";
 import { LayoutElement } from "./layout/LayoutElement";
 import { onDoubleClick } from "./util/onDoubleClick";
 import { createNewNode } from "./ui/NodeSelectionModal";
+import { Connection, ConnectionsArray, OuletCandidate } from "./core/Connection";
 
 type MouseInfo = {
     clientX:number, clientY:number
 } 
 
-type Connection = {
-    from:IOutlet
-    to:IOutlet|Vector2Like
-}
 
-type OuletCandidate = {
-    outlet:IOutlet
-    alignmentScore:number
-}
 
 /**
  * I'm the editor. I show the nodes, and run the ThreeJs background scene. 
@@ -42,7 +35,7 @@ export class Editor {
 
     protected objs:Node[] = [];
     protected zSortedObjs:Node[] = [];
-    readonly connections:Connection[] = [];
+    readonly connections:ConnectionsArray = new ConnectionsArray();
 
     /**
      * Available outlets to connect the current "open" connection to...
@@ -176,7 +169,8 @@ export class Editor {
                 //
                 // update tail of "open" connections
                 //
-                this.connections.filter(c=>!( isOutlet(c.to) )).forEach( c=>c.to=mousePos);  
+                ///this.connections.filter(c=>!( isOutlet(c.to) )).forEach( c=>c.to=mousePos);  
+                this.connections.setOrphansTarget( mousePos );
             } 
             
         });
@@ -223,7 +217,7 @@ export class Editor {
                 // let's see if some canvas element wants to capture the mouse....
                 //
                 for (const obj of this.zSortedObjs) {    
-                    console.log( obj)
+                    
                     //#region OUTLET
                     //
                     // check if mouse if over an outlet to create/delete a connection
@@ -362,25 +356,29 @@ export class Editor {
                         this.chosenOutlet.sort((a,b)=>b.alignmentScore-a.alignmentScore);
 
 
-                    this.destroyConnectionsUsing( this.chosenOutlet[0].outlet )
+                    this.destroyConnectionsUsing( this.chosenOutlet[0].outlet );
+ 
+                    this.connections.setOrphansTarget( this.chosenOutlet[0].outlet );
 
-                    this.connections.forEach( connection => { 
+                    console.log("CONNECT",  this.chosenOutlet[0].outlet)
+                    // this.connections.forEach( connection => { 
 
-                        if( !("owner" in connection.to))
-                        {
-                            connection.to = this.chosenOutlet[0].outlet;
-                        }
+                    //     if( !("owner" in connection.to))
+                    //     {
+                    //         connection.to = this.chosenOutlet[0].outlet;
+                    //     }
 
-                    }); 
+                    // }); 
                 }
 
                 this.chosenOutlet.length=0;
                 this.availableOutlets.length=0;
 
                 //remove connections with no end...
-                let clean = this.connections.filter( c=>"owner" in c.to);
-                this.connections.length=0;
-                this.connections.push(...clean)
+                this.connections.purge( c=>isOutlet(c.to) )
+                // let clean = this.connections.filter( c=>"owner" in c.to);
+                // this.connections.length=0;
+                // this.connections.push(...clean)
             }
         });
         //#endregion
@@ -456,12 +454,13 @@ export class Editor {
 
     protected destroyConnectionsUsing( outlet:IOutlet )
     {
-        const clean = this.connections.filter( c=>( c.from!==outlet )
-            && ( c.to !==outlet )
-        );
+        this.connections.purge( connection=>connection.from!==outlet && (!isOutlet(connection.to) || connection.to!==outlet) )
+        // const clean = this.connections.filter( c=>( c.from!==outlet )
+        //     && ( c.to !==outlet )
+        // );
 
-        this.connections.length = 0;
-        this.connections.push( ...clean );
+        // this.connections.length = 0;
+        // this.connections.push( ...clean );
     }
 
     protected global2canvas( position:Vector2Like ) {
