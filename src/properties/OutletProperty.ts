@@ -2,11 +2,12 @@ import { FillStyle, Theme } from "../colors/Theme";
 import { IOutlet, OutletSize } from "../core/IOutlet";
 import { LayoutElement } from "../layout/LayoutElement";
 import { Node } from "../nodes/Node";
+import { WinNodeProperty } from "./WinNodeProperty";
 
 /**
  * A property that renders a tiny colored dot indicating a place to plug a pipe to connect nodes.
  */
-export class OutletProperty extends LayoutElement implements IOutlet
+export class OutletProperty extends WinNodeProperty implements IOutlet
 {
     private _globalX = 0;
     private _globalY = 0;

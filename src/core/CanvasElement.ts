@@ -70,5 +70,12 @@ export class CanvasElement {
             ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; // Color of the shadow (semi-transparent black)
         }
     }
- 
+
+    serialize():Record<string, any> {
+        return {}
+    }
+    
+    unserialize( data:Record<string, any> ) {
+
+    }
 }

@@ -20,4 +20,13 @@ export class WinNode extends Node {
             direction:"column"
         })); 
     }
+
+    /**
+     * Call this when the node had something changed or needs to be udated 
+     */
+    update() {
+        console.log("UPDATE NODE")
+        //... update and...
+        this.somethingChanged();
+    }
 }

@@ -10,7 +10,7 @@ type Constructor<T extends WinNode> = new (...args: any[]) => T;
 export type NodeGroupType = {
     group:string
     color:string
-    nodes:{ TypeClass:Constructor<WinNode>, name:string }[]
+    nodes:{ TypeClass:Constructor<WinNode>, name:string, id:string }[]
 }
 
 export const NodeTypes : NodeGroupType[] = [
@@ -18,21 +18,21 @@ export const NodeTypes : NodeGroupType[] = [
         group:"Attribute",
         color:Theme.config.groupAttribute as string,
         nodes:[
-            { TypeClass:UVNode, name:"UV" }
+            { TypeClass:UVNode, name:"UV", id:"uv" }
         ]
     },
     {
         group:"Shader",
         color:Theme.config.groupShader as string,
         nodes:[
-            { TypeClass:MeshStandardNode, name:"Mesh Standard"}
+            { TypeClass:MeshStandardNode, name:"Mesh Standard", id:"mesh-standard-shader"}
         ]
     }, 
     {
         group:"Texture",
         color:Theme.config.groupTexture as string,
         nodes:[
-            { TypeClass:ImageTextureNode, name:"Image Texture"}
+            { TypeClass:ImageTextureNode, name:"Image Texture", id:"image-texture"}
         ]
     }
 ]

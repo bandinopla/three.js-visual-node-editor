@@ -34,7 +34,10 @@ export class DraggableValue extends InteractiveLayoutElement {
     }
     set value( v:number ) { 
 
+        const oldValue = this._value;
         this._value = clamp( v , 0, 1);  
+        if( oldValue!=this._value )
+            this.onChange?.( this._value, this.min + Math.floor(((this.max-this.min)*this._value)/this.step)*this.step );
 
     }
 
@@ -66,13 +69,9 @@ export class DraggableValue extends InteractiveLayoutElement {
 
     override onMouseMove(deltaX: number, deltaY: number): void {
         this.dragOriginX += deltaX;
-
-        const oldValue = this._value;
-
+ 
         this.value = this.dragOriginX / this.hitArea.w  ;
-
-        if( oldValue!=this._value )
-            this.onChange?.( this._value, this.min + Math.floor(((this.max-this.min)*this._value)/this.step)*this.step );
+ 
 
     }
     override onMouseDown(cursorX: number, cursorY: number): void {

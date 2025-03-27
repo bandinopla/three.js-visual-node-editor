@@ -9,6 +9,18 @@
     border-radius: 5px;
 }
 
+.groupLabel {
+    display: none;
+    margin-right: 10px;
+}
+
+.root.term .groupTitle, .root ul .groupTitle {
+    display: none;
+}
+.root.term .groupLabel, .root.term ul .groupTitle {
+    display: inline;
+}
+
 .root ul {
     margin: 0px;
     padding: 0px;
@@ -27,7 +39,7 @@
 .groupTitle {
     padding: 3px 10px;
     font-size: 0.8em;
-    display: inline-block;
+    display: inline;
     border-radius: 5px;
 }
 

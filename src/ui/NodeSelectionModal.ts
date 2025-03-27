@@ -28,7 +28,16 @@ class NodeSelector {
 
         this.div.addEventListener("mousedown", ev=>{
             ev.stopImmediatePropagation()
-        })
+        });
+
+        //
+        // Autocomplete
+        //
+        let autocompleteIntrv = 0; 
+        this.input.addEventListener("keyup", ev=>{ 
+            clearInterval(autocompleteIntrv);
+            autocompleteIntrv = setTimeout(()=>this.filterList(),300);
+        });
 
         // render types!
         //#region Node Types
@@ -46,7 +55,17 @@ class NodeSelector {
  
                 const li = ul.appendChild( document.createElement("li"));
 
-                li.innerText = "→" + node.name;
+                li.setAttribute("node-id", node.id);
+                li.setAttribute("node-name", node.name);
+
+                const groupLabel = li.appendChild( document.createElement("div") );
+                const label = li.appendChild( document.createElement("span") );
+                label.innerText = "→" + node.name;
+
+                groupLabel.classList.add(styles.groupTitle)
+                groupLabel.style.backgroundColor = groupType.color;
+                groupLabel.innerText = groupType.group;
+
                 li.addEventListener("click", ev=>this.addNewNode(new node.TypeClass))
 
             });
@@ -62,6 +81,19 @@ class NodeSelector {
 
     get visible() {
         return !this.div.classList.contains(styles.hide)
+    }
+
+    private filterList() {
+        const term = this.input.value.toLowerCase();
+        this.div.classList.remove( styles.term );
+        if( term!=="" ) this.div.classList.add( styles.term );
+        this.div.querySelectorAll("li").forEach( li => {
+            const match = term=="" || li.getAttribute("node-name")?.toLowerCase().includes(term);
+            li.classList.remove(styles.hide);
+            if(!match){
+                li.classList.add( styles.hide )
+            }
+        })
     }
 
     private addNewNode( node:WinNode )
@@ -83,6 +115,7 @@ class NodeSelector {
 
         this.input.value="";
         this.input.focus()
+        this.filterList()
 
         this._onCreated = onCreated;
     }
