@@ -54,6 +54,13 @@ export class Node extends LayoutElement implements IScript {
         // render each child...
         this.render( ctx, this.width(ctx), height ); 
 
+        this.recalculateOutlets();
+    }
+
+    /**
+     * based on the current state of the node (it's layout) scan for the outlets available.
+     */
+    recalculateOutlets() {
         //
         // collect outlets... because they can be enabled or disabled, who knows... every render we re-collect.
         //
@@ -89,9 +96,19 @@ export class Node extends LayoutElement implements IScript {
         ctx.stroke();
     }
 
-    forEachOutlet( visitor:(outlet:IOutlet, index: number)=>void )
+    /**
+     * Iterate over each outlet in this node (being IN or OUT sockets)
+     * Optionally, if the `visitor` returns something, return whatever it returned on the first truthy return.
+     */
+    forEachOutlet<R>( visitor:(outlet:IOutlet, index: number)=>R ):R|void
     {
-        this._outlets.forEach(visitor);
+        //this._outlets.forEach(visitor);
+        for (let i = 0; i < this._outlets.length; i++) {
+            const outlet = this._outlets[i];
+            const result = visitor( outlet, i );
+            console.log("RESULT = ", result)
+            if( result !== null && result !== undefined ) return result; 
+        }
     }
 
     /**
@@ -144,5 +161,24 @@ export class Node extends LayoutElement implements IScript {
 
     writeScript( script:Script ):string {
         throw new Error(`Someone forgot to implement meeeeeeeee... and it was not meeeeeee.....`)
+    }
+
+    /**
+     * return an object that will be JSON serialized that represent the current state of this node.
+     */
+    serialize():Record<string, any> {
+        return { x:this.x, y:this.y }
+    }
+    
+    /**
+     * Restore the state of the object from data previusly created from calling `serialize()`
+     */
+    unserialize( data:Record<string, any> ) {
+        this.x = data.x;
+        this.y = data.y;
+    }
+
+    onRemoved() {
+        
     }
 }

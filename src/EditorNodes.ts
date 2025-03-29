@@ -10,6 +10,7 @@ type Constructor<T extends WinNode> = new (...args: any[]) => T;
 export type NodeGroupType = {
     group:string
     color:string
+    exportsScript?:boolean,
     nodes:{ TypeClass:Constructor<WinNode>, name:string, id:string }[]
 }
 
@@ -24,6 +25,7 @@ export const NodeTypes : NodeGroupType[] = [
     {
         group:"Shader",
         color:Theme.config.groupShader as string,
+        exportsScript: true,
         nodes:[
             { TypeClass:MeshStandardNode, name:"Mesh Standard", id:"mesh-standard-shader"}
         ]

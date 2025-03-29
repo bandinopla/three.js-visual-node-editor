@@ -10,7 +10,7 @@ export class Script {
 
     protected imports:Record<string, Set<string>>;  
     protected definitions:[ name:string, value:string][] ; 
-    protected imagePaths:[ path:string, previewUrl:string, textureSetup?:( refName:string)=>string ][] ; 
+    protected imagePaths:[ path:string, previewImage?:string, textureSetup?:( refName:string)=>string ][] ; 
     protected moduleName2Ref:Record<string, unknown>; 
 
     constructor( ) { 
@@ -58,7 +58,7 @@ export class Script {
      * Tells that the script will need this texture loaded before even running...
      * @param imagePath 
      */
-    loadTexture( imagePath?:string, imageSrcForPreview?:string, textureSetup?:( refName:string)=>string )
+    loadTexture( imagePath?:string, previewImageSrc?:string, textureSetup?:( refName:string)=>string )
     {
         if( !imagePath )
         {
@@ -82,25 +82,25 @@ export class Script {
             return "no_texture";
         }
 
-        let index = this.imagePaths.findIndex( paths=>paths[1]==imageSrcForPreview );
+        let index = this.imagePaths.findIndex( paths=>paths[1]==previewImageSrc );
 
         if( index<0 )
-            index = this.imagePaths.push([ imagePath, imageSrcForPreview!, textureSetup ])-1;
+            index = this.imagePaths.push([ imagePath, previewImageSrc!, textureSetup ])-1;
 
         return `textureLoader${ index }`; 
     }
 
     toString( lastExpression:string="", forExport = false ) {
  
-        let output = "";
+        let output = ``;
 
         if( forExport )
-        {
+        { 
             //
             // Imports...
             //
             for( const module in this.imports )  
-                output += `import {${ [...this.imports[module]].join(",") }} from '${module}';
+                output += `\nimport {${ [...this.imports[module]].join(",") }} from '${module}';
                 `; 
         }
         else 
@@ -109,7 +109,7 @@ export class Script {
             // since the script will be evaluated we will need to be injected by the evaluator...
             //
             for( const module in this.imports )  
-                output += `const {${ [...this.imports[module]].join(",") }} = fromModule('${module}');
+                output += `\nconst {${ [...this.imports[module]].join(",") }} = fromModule('${module}');
                 `; 
         }
 
@@ -121,7 +121,7 @@ export class Script {
             //
             // utility function to load the texture...
             //
-            output += `const loadTexture = url => new THREE.TextureLoader().load(url);
+            output += `\nconst loadTexture = url => new THREE.TextureLoader().load(url);
             `;
 
             //
@@ -129,7 +129,7 @@ export class Script {
             //
             this.imagePaths.forEach( ([ path, previewUrl, setupTexture ], index)=>{
 
-                output += `const textureLoader${ index } = loadTexture('${ forExport? path : previewUrl }');
+                output += `\nconst textureLoader${ index } = loadTexture('${ forExport? path : previewUrl }');
                 ${ setupTexture? setupTexture(`textureLoader${ index }`) :"" }
                 `;
 
@@ -141,14 +141,13 @@ export class Script {
         // Dependecies definitions
         //  
         this.definitions.forEach( ([name, value])=>{
-            output += `const ${name} = ${value};
+            output += `\nconst ${name} = ${value};
             `;
         }); 
 
-        return output + `
-        ${lastExpression};`;
+        return output + `\n${lastExpression};`;
 
-    }
+    } 
 
     eval( returnThisRef:string )
     {

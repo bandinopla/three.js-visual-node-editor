@@ -89,6 +89,10 @@ export class ConnectionsArray<T extends Connection=Connection> {
         return filtered;
     }
 
+    map<B>( mapper:(connection:T, index:number, connections:T[])=>B) :B[] {
+        return this._array.map(mapper);
+    }
+
     purge( judge:( connection:T )=>boolean ){
         this._array = this._array.filter( con=> {
 
@@ -122,6 +126,10 @@ export class ConnectionsArray<T extends Connection=Connection> {
   
     get length(): number {
       return this._array.length;
+    }
+
+    reset() {
+        while( this.pop() ) { }
     }
    
   }

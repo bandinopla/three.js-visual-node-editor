@@ -40,6 +40,10 @@ export class TextureMappingModeProperty extends LayoutElement
         return this.modes[ this.combo.index ][0];
     }
 
+    set mappingType( mapping:string ) {
+        this.combo.index = this.modes.findIndex(m=>m[0]==mapping);
+    }
+
     protected onComboChange( i:number )
     { 
         this.root.update()

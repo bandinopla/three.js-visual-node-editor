@@ -1,3 +1,4 @@
+import { Color } from "three";
 import { Theme } from "../colors/Theme";
 import { ColorPicker } from "../components/ColorPicker";
 import { TextLabel } from "../components/TextLabel";
@@ -24,6 +25,14 @@ export class BaseColorProperty extends Input {
 
         //this.xPadding = 10; 
     } 
+
+    get baseColor() {
+        return this.colorPicker.color;
+    }
+
+    set baseColor( newColor:Color ) {
+        this.colorPicker.color = newColor;
+    }
 
     override writeScript(script: Script): string {
 

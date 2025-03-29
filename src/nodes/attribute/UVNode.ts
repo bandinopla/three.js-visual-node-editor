@@ -29,4 +29,17 @@ export class UVNode extends AttributeTypeNode {
         return script.define(this.nodeName, `uv(${uvChannel})`);
 
     }
+
+    override serialize(): Record<string, any> {
+        const out = super.serialize();
+
+        out.channel = this.uvChannel.value;
+
+        return out;
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        this.uvChannel.value = data.channel;
+        super.unserialize( data );
+    }
 }

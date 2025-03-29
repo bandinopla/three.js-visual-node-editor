@@ -14,6 +14,9 @@ import { LayoutElement } from "./layout/LayoutElement";
 import { onDoubleClick } from "./util/onDoubleClick";
 import { createNewNode } from "./ui/NodeSelectionModal";
 import { Connection, ConnectionsArray, OuletCandidate } from "./core/Connection";
+import { NodeTypes } from "./EditorNodes";
+import { ScenePreviewNode } from "./nodes/preview/ScenePreview";
+import { Script } from "./export/Script";
 
 type MouseInfo = {
     clientX:number, clientY:number
@@ -34,8 +37,20 @@ export class Editor {
 
     private handIcon : HandIcon;
 
+    /**
+     * The nodes
+     */
     protected objs:Node[] = [];
+
+    /**
+     * objs in render order. Last = on top.
+     */
     protected zSortedObjs:Node[] = [];
+
+    /**
+     * This holds the connections between nodes. Each object in this array represents a connection between 2 nodes.
+     * If the connection is connected to a "Vec2Like" it means it is following the mouse and the user is about to create a new connection.
+     */
     readonly connections:ConnectionsArray = new ConnectionsArray();
 
     /**
@@ -43,6 +58,10 @@ export class Editor {
      */
     private availableOutlets:IOutlet[] = [];
     private selectedOutlet?:IOutlet;
+
+    /**
+     * Outlets that have potential to be a connection. Realistcally only the closest one to the cursor will...
+     */
     private chosenOutlet:OuletCandidate[] = [];
 
     readonly scene:ThreeScene;
@@ -69,8 +88,7 @@ export class Editor {
 
     constructor( readonly canvas:HTMLCanvasElement )
     {
-        this.handIcon = new HandIcon();
-        
+        this.handIcon = new HandIcon(); 
 
         this.scene = new ThreeScene();
         document.body.prepend( this.scene.renderer.domElement );
@@ -79,9 +97,7 @@ export class Editor {
         this._ctx.font = Theme.config.fontSize+'px '+Theme.config.fontFamily;
 
         this.canvasAspect = this.canvas.width / this.canvas.height;
-        this.aspectCorrection = ( this.canvas.offsetWidth/this.canvas.offsetHeight )*this.canvasAspect;
-         
-        this.ctx.scale(1, this.aspectCorrection) ;
+        this.reset();
 
         window.addEventListener("resize", this.onResize.bind(this)); 
         
@@ -391,14 +407,67 @@ export class Editor {
   
                 }
 
-                this.chosenOutlet.length=0;
-                this.availableOutlets.length=0;
-
-                //remove connections with no end...
-                this.connections.purge( c=>isOutlet(c.to) ) 
+                this.clearOutletSelection(); 
             }
         });
         //#endregion
+    
+        //#region KEYBOARD
+        document.addEventListener('keydown', (event: KeyboardEvent) => { 
+            const isSaveShortcut = (event.shiftKey) ;
+            const key = event.key.toLowerCase();
+            if( isSaveShortcut )
+            {
+                switch( key )
+                {
+                    case "s":
+                        this.save();
+                        break;
+
+                    case "a":
+                        this.open();
+                        break;
+                } 
+            }
+            else 
+            {
+                if( ["x","backspace","delete"].includes(key) )
+                {
+                    this.deleteSelected();
+                }
+            }
+           
+        });
+        //#endregion
+    } 
+
+    reset() {
+        this.aspectCorrection = ( this.canvas.offsetWidth/this.canvas.offsetHeight )*this.canvasAspect; 
+
+        this.ctx.reset()
+        this.ctx.scale(1, this.aspectCorrection) ; 
+
+        this.clearBoxSelection()
+        this.clearOutletSelection();
+
+        this.eventsHandler = undefined;
+        this.overlay = undefined;
+        this.focusedChild = undefined;
+
+        this.connections.reset();
+
+        this.objs.length = 0;
+        this.zSortedObjs.length = 0;
+
+        //
+        // add fixed nodes...
+        //
+        const previewNode = new ScenePreviewNode( this.scene );
+        this.add( previewNode );
+
+        previewNode.x = this.canvas.width/2 - previewNode.width( this.ctx )/2;
+        previewNode.y = ( this.canvas.height/2/ this.aspectCorrection - previewNode.height( this.ctx )/2  ) ;
+
     } 
 
     protected onResize() { 
@@ -421,19 +490,66 @@ export class Editor {
     
         if (nodeIndexZ !== -1) {
             this.zSortedObjs.splice(nodeIndexZ, 1);
-            this.zSortedObjs.unshift(node);
+            this.zSortedObjs.push(node);
         }
     
-        if (nodeIndex !== -1) {
-            this.objs.splice(nodeIndex, 1);
-            this.objs.push(node);
-        }
+        // if (nodeIndex !== -1) {
+        //     this.objs.splice(nodeIndex, 1);
+        //     this.objs.push(node);
+        // }
     }
 
-    add( node:Node ) {
+    add( node:Node|string ) {
+
+        if( typeof node=="string" )
+        {
+            const referencedNode = NodeTypes.flatMap( group=>group.nodes ).find( n=>n.id==node );
+            if(!referencedNode )
+            {
+                throw new Error(`Trying to create a node with id:${node} that doesn't exist.`);
+            }
+            node = new referencedNode.TypeClass();
+        }
+
         node.editor = this;
         this.objs.push( node );
         this.zSortedObjs.unshift(node);
+
+        return node;
+    }
+
+    remove( node:Node ){ 
+        this.clearBoxSelection();
+        this.clearOutletSelection();
+
+        this.objs.splice( this.objs.indexOf(node), 1);
+        this.zSortedObjs.splice( this.zSortedObjs.indexOf(node), 1);
+
+        // delete connections if any
+        this.connections.purge( connection=> {
+            return connection.from.owner!==node && (!isOutlet(connection.to) || connection.to.owner!==node)
+        });
+
+        node.onRemoved();
+    }
+
+    deleteSelected() {
+
+        const nodes2delete = this.selectedNodes.filter( node=>node.canBeDeleted );
+
+        if( !nodes2delete.length ) return;
+        if( !confirm("Delete currently selected nodes?")) return;
+
+        this.clearOutletSelection();
+
+        while( nodes2delete.length )
+        {
+            const node = nodes2delete.pop()!
+            this.remove( node );
+        }
+
+        this.clearBoxSelection()
+
     }
 
     protected clickElementAt( globalPos:Vector2Like, root:LayoutElement )
@@ -488,6 +604,16 @@ export class Editor {
 
         // this.connections.length = 0;
         // this.connections.push( ...clean );
+    }
+
+    protected clearOutletSelection() {
+
+        this.selectedOutlet = undefined;
+        this.availableOutlets.length = 0;
+        this.chosenOutlet.length = 0; 
+
+        //remove connections with no end...
+        this.connections.purge( c=>isOutlet(c.to) );
     }
 
     protected global2canvas( position:Vector2Like ) {
@@ -785,7 +911,7 @@ export class Editor {
 
         this.drawConnectionPipes(ctx); 
 
-        this.objs.forEach( obj=>{ 
+        this.zSortedObjs.forEach( obj=>{ 
 
             ctx.save();
 
@@ -818,4 +944,231 @@ export class Editor {
 
         });
     }
+
+    //#region SAVE / OPEN 
+    /**
+     * Save current layout as JSON embeded in a comment and export all the material nodes as javascript to be used as-is.
+     */
+    save() {
+        const formatVersion = "0.0.1";
+        const signature = `//
+// ▗▄▄▄▖▗▖ ▗▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖   ▗▖ ▗▄▄▖
+//   █  ▐▌ ▐▌▐▌ ▐▌▐▌   ▐▌      ▐▌▐▌   
+//   █  ▐▛▀▜▌▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘   ▐▌ ▝▀▚▖
+//   █  ▐▌ ▐▌▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖▗▄▄▞▘▗▄▄▞▘
+//   ThreeJs TSL Visual Node Editor v${formatVersion}
+// 
+`;
+ 
+        const nodes = this.objs;
+ 
+        const zOrder = this.zSortedObjs.map( node=>nodes.indexOf(node) )
+
+        //
+        // Serialize each node....
+        //
+        const layout = nodes.map( o=>({
+            //
+            // the node type id...
+            //
+            type: NodeTypes.flatMap(g=>g.nodes).find( n=> o instanceof n.TypeClass )?.id ?? "default", 
+
+            //
+            // node specific data
+            //
+            ...o.serialize()
+        }) );
+
+        //
+        // Save the canva's transform...
+        //
+        const transform = this.ctx.getTransform(); 
+
+        const canvasMatrix = {
+            a: transform.a,    // horizontal scaling
+            b: transform.b,    // vertical skewing
+            c: transform.c,    // horizontal skewing
+            d: transform.d,    // vertical scaling
+            e: transform.e,    // horizontal translation
+            f: transform.f     // vertical translation
+        }; 
+
+        //
+        // Save the connections...
+        // 
+        this.clearOutletSelection();
+
+        // [ FROMnodeIndex, FROMoutletIndex, TOnodeIndex, TOoutletIndex ]
+        const connections = this.connections.map( con => [
+            /* FROM NODE INDEX */ nodes.indexOf( con.from.owner ),  
+            /* FROM OUTLET INDEX */con.from.owner.forEachOutlet( (outlet,i)=>outlet===con.from? i : null ), // coming out of this outlet...
+            /* TO NODE INDEX */nodes.indexOf( (con.to as IOutlet).owner ), // to this node
+            /* FROM OUTLET INDEX */(con.to as IOutlet).owner.forEachOutlet( (outlet,i)=>outlet===con.to? i : null ) // coming out of this outlet...
+        ]);
+        
+        const payload = {
+            layout, 
+            zOrder,
+            canvasMatrix,
+            connections,
+            format: formatVersion,
+            date: new Date()
+        }
+
+        //
+        // collect scripts...
+        //
+        const script = new Script();
+        const materials :string[] = [];
+
+        NodeTypes.filter( group=>group.exportsScript ).flatMap( group=>group.nodes ).forEach( node => {
+            layout.forEach( (obj, index)=> {
+                if( obj.type==node.id )
+                {
+                    materials.push( this.objs[ index ].writeScript(script) );
+                }
+            })
+        });
+
+        const js = materials.length? script.toString(`export const materials = [${ materials.map( m=>m+"()").join(",") } ];`,true) : "";
+        
+
+        //
+        // Build the file...
+        //
+        const blob = new Blob([`${signature}/**LAYOUT** ${JSON.stringify(payload) } **LAYOUT**/ ${js}`], { type: 'application/javascript' });
+        const url = window.URL.createObjectURL(blob);
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = "layout.js";
+        
+        // Programmatically click the link to trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        // save layout
+        // export all materials
+    }
+
+    /**
+     * Open a .js file previously saved vía de `save()` method.
+     * Will reset the scene.
+     */
+    open() {
+        // Create input element
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.js'; // Restrict to JS files
+
+        input.onchange = (event: Event) => {
+            const target = event.target as HTMLInputElement;
+            const file = target.files?.[0];
+            
+            if (!file) { 
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = () => {
+                const content = reader.result as string; 
+                const reg = /\*\*LAYOUT\*\*(.*)\*\*LAYOUT\*\*/m;
+                const match = content.match( reg );
+                if( match ) {
+                    let data:any;
+
+                    try 
+                    {
+                        data = JSON.parse( match[1].trim() ) ; 
+                    }
+                    catch( error ) {
+                        console.error( error );
+                        alert("Error parsing file...");
+                        return;
+                    }
+
+                    this.restore( data );
+                }
+            };
+            
+            reader.onerror = () => alert('Error reading file') ;
+            
+            reader.readAsText(file);
+        };
+
+        // Trigger file selection
+        input.click();
+    }
+
+    /**
+     * Restore a previously saved data created by `save()`
+     * @param data 
+     */
+    protected restore( data:any )
+    { 
+        // reset stage...
+        this.reset();
+
+        //
+        // restore canvas matrix (position, zoom...)
+        //
+        const layoutMatrix = data.canvasMatrix as DOMMatrix;
+
+        this.ctx.setTransform(
+            layoutMatrix.a,
+            layoutMatrix.b,
+            layoutMatrix.c,
+            layoutMatrix.d,
+            layoutMatrix.e,
+            layoutMatrix.f
+        );
+
+        //
+        // recreate nodes
+        //
+        data.layout.forEach( ( nodeData:any, i:number ) => {
+
+            const node = this.objs[i] ?? this.add( nodeData.type );
+
+            node.unserialize( nodeData );
+
+        });
+
+        //
+        // create connections
+        //
+        data.connections?.forEach( (connection:any) => {
+
+            const [
+                fromNodeIndex, 
+                fromOutletIndex, 
+                toNodeIndex, 
+                toOutletIndex
+            ] = connection;
+
+            const fromNode = this.objs[ fromNodeIndex ];
+                  fromNode.recalculateOutlets();
+
+            const from = fromNode.forEachOutlet((outlet, i)=>i==fromOutletIndex? outlet : null);
+
+            const toNode = this.objs[ toNodeIndex ];
+                  toNode.recalculateOutlets();
+
+            const to = toNode.forEachOutlet((outlet, i)=>i==toOutletIndex? outlet : null);
+ 
+
+            if( isOutlet(from) && isOutlet(to) )
+                this.connections.push({
+                    from, to
+                });
+
+        });
+
+    }
+
+    //#endregion
 }

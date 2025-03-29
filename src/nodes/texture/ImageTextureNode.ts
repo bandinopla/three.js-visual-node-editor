@@ -50,4 +50,23 @@ export class ImageTextureNode extends TextureTypeNode {
         return script.define( this.nodeName, `texture( ${map}, ${uv} )`);
 
     }
+
+    override serialize(): Record<string, any> {
+        return {
+            ...super.serialize(),
+            src: this.imageProp.isFromDisk? "" : this.imageProp.imageSrc,
+            extension: this.extensionPolicy.extensionMode,
+            mapping: this.mappingPolicy.mappingType
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
+
+        if( data.src !="" )
+            this.imageProp.src = data.src;
+
+        this.extensionPolicy.extensionMode = data.extension;
+        this.mappingPolicy.mappingType = data.mapping;
+    }
 }

@@ -108,7 +108,7 @@ export class ColorPicker extends InteractiveLayoutElement  implements IOverlayRe
     }
 
     get color() { return this._color }
-    protected set color( newColor:Color ) 
+    set color( newColor:Color ) 
     {
         const c = this._color;
 

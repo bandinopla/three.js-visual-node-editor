@@ -1,3 +1,4 @@
+import { Color } from "three";
 import { Theme } from "../../colors/Theme";
 import { Script } from "../../export/Script"; 
 import { BaseColorProperty } from "../../properties/BaseColorProperty";
@@ -29,5 +30,17 @@ export class MeshStandardNode extends WinNode {
             material.colorNode = ${colorNode};
             return material;
         }` );
+    }
+
+    override serialize(): Record<string, any> {
+        return {
+            ...super.serialize(),
+            baseColor: "#"+this.colorProperty.baseColor.getHexString()
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
+        if( data.baseColor ) this.colorProperty.baseColor = new Color( data.baseColor );
     }
 }

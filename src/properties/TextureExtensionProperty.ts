@@ -34,6 +34,10 @@ export class TextureExtensionProperty extends LayoutElement
         return this.modes[ this.combo.index ][0]
     }
 
+    set extensionMode( value:string ) {
+        this.combo.index = this.modes.findIndex( m=>m[0]==value );
+    }
+
     protected onComboChange( i:number )
     {
         // todo: do somehting.

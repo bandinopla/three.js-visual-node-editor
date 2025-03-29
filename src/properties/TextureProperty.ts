@@ -30,6 +30,9 @@ export class TextureProperty extends LayoutElement {
     }
 
     get imageSrc() { return this._imageSrc; }
+    set src( imageSrc:string ) {
+        this.loadImage( imageSrc )
+    }
 
 
     constructor() {
@@ -38,7 +41,7 @@ export class TextureProperty extends LayoutElement {
         //"row", "start", "stretch",
         this.initial = new Layout( [
             new Button("+ File", ()=>this.onSelectFileFromDisk().then( file=>file && this.onFileSelected(file)) ),
-            new Button("+ URL" ), 
+            new Button("+ URL", ()=>this.askUserForUrl() ), 
         ], {
             gap:0,
             justify:"space-around" 
@@ -130,6 +133,19 @@ export class TextureProperty extends LayoutElement {
         this.singleLine = false;
 
         this.root.update()
+    }
+
+    protected askUserForUrl() {
+        const url = prompt("Paste image url to load from... Beware of CORS policy: If the other domain doesn't allow it the image will look black.","http://");
+
+        if(!url || url=="") return;
+
+        //TODO: Valudate url....
+
+        this._isFromDisk = true;
+        this._filePath = url; 
+
+        this.loadImage( url );
     }
  
 

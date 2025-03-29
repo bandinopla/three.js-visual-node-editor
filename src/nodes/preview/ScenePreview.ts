@@ -9,14 +9,17 @@ import { ComboBox } from "../../components/ComboBox";
 
 export class ScenePreviewNode extends WinNode {
 
-    protected materialSlots:MaterialProperty[];
+    protected materialSlots:MaterialProperty[]; 
+
+    protected ambientLightSlider:DraggableValue;
+    protected rotationSpeedSlider:DraggableValue;
+    protected objTypeCombo:ComboBox;
 
     constructor( protected scene:ThreeScene ) { 
  
         const ambientLightSlider = new DraggableValue("Ambient light", true, 0, 3, 0.1, value =>this.onAmbientLightSlider(value) );
         const rotationSpeedSlider = new DraggableValue("Rotation speed", true, 0, 2, 0.1, value =>scene.rotationSpeed=value);
         const objType = new ComboBox("Wrapping mode", scene.meshes.map(m=>m.name), value=>scene.currentObjectIndex=value  );
-              //objType.xPadding = 10;
 
         const materialSlots = [
             new MaterialProperty(0),
@@ -28,17 +31,21 @@ export class ScenePreviewNode extends WinNode {
             ambientLightSlider,
             rotationSpeedSlider,
             objType,
+             
             ...materialSlots
         ]); 
 
         this.canBeDeleted = false; 
         this.materialSlots = materialSlots;
 
+        this.ambientLightSlider = ambientLightSlider;
+        this.rotationSpeedSlider = rotationSpeedSlider;
+        this.objTypeCombo = objType;
+
         ambientLightSlider.value = this.scene.ambientLight.intensity;
         rotationSpeedSlider.value = this.scene.rotationSpeed;
-        objType.index = this.scene.currentObjectIndex;
+        objType.index = this.scene.currentObjectIndex;  
 
-        console.log("SPEED", this.scene.rotationSpeed)
     }
 
     protected onAmbientLightSlider( intensity:number ) {
@@ -66,8 +73,28 @@ export class ScenePreviewNode extends WinNode {
 
         const materialRef = slot.writeScript( script );
 
+        console.log( script.toString("", false ))
+
         const material = script.eval( materialRef+"()" );
 
         this.scene.setMaterial( materialIndex, material );
     }
+
+    override serialize(): Record<string, any> {
+        return {
+            ...super.serialize(), 
+            ambientLight: this.ambientLightSlider.value,
+            rotationSpeed: this.rotationSpeedSlider.value,
+            objType: this.objTypeCombo.index
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
+
+        this.ambientLightSlider.value = data.ambientLight ?? 1;
+        this.rotationSpeedSlider.value = data.rotationSpeed ?? 1;
+        this.objTypeCombo.index = data.objType ?? 0;
+    }
 }
+
