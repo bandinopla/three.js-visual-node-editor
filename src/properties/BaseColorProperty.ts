@@ -13,7 +13,7 @@ export class BaseColorProperty extends Input {
     constructor() {
         super(3); 
 
-        this.colorPicker = new ColorPicker(()=>this.root.update());
+        this.colorPicker = new ColorPicker(()=>this.root.update(), false); 
 
         this.layout = new Layout([
             new TextLabel("Base Color"), 
@@ -23,25 +23,20 @@ export class BaseColorProperty extends Input {
         }); 
 
         this.xPadding = 10; 
-    }
-
-    protected override onConnected(to: IOutlet): void {
-        this.colorPicker.enabled = false
-    }
-
-    protected override onDisconnected(from: IOutlet): void {
-        this.colorPicker.enabled = true
-    }
+    } 
 
     override writeScript(script: Script): string {
+
+        let baseColor = `color(0x${ this.colorPicker.color.getHexString() })`;
+
         if( this.connectedTo )
         {
-            return super.writeScript(script);
+            baseColor = baseColor + `.mul(${ this.connectedTo.writeScript( script ) })`;
         }
 
         script.importModule("color");
 
-        return script.define( this.outletName, `color(0x${ this.colorPicker.color.getHexString() })` )
+        return script.define( this.outletName, baseColor )
     } 
 
 }

@@ -32,13 +32,14 @@ export class ColorPicker extends InteractiveLayoutElement  implements IOverlayRe
 
     private hsl:HSL = {h:0, s:0, l:0};
 
-    constructor( private onColorChange?:(color:Color, opacity:number)=>void ) {
+    constructor( private onColorChange?:(color:Color, opacity:number)=>void, transparent=true ) {
         super();
         this.backgroundColor = "black";
 
         this.colorWheel = new ColorWheel(this.onColorWheel.bind(this)); 
         this.colorSwatch = new ColorSwatch();
         this.alphaSlider = new DraggableValue("Alpha", true, 0, 1, 0.01, this.onAlphaSlider.bind(this));
+        this.alphaSlider.enabled = transparent;
 
         this.RGBSliders = ["R","G","B"].map((name,i)=>new DraggableValue(name, true, 0.001, 1, 0.01, this.onRGBSlider.bind(this, i)))
         this.HSLSliders = ["H","S","L"].map((name,i)=>new DraggableValue(name, true, 0.001, 1, 0.01, this.onHSLSlider.bind(this, i)))
@@ -85,7 +86,7 @@ export class ColorPicker extends InteractiveLayoutElement  implements IOverlayRe
         //
         this.opacity = 1;
         this.saturation = 1;
-        this.color = new Color("black");  
+        this.color = new Color("white");  
     }
 
     get opacity() { return this._opacity; }
