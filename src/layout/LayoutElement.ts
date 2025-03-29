@@ -9,6 +9,7 @@ export class LayoutElement extends CanvasElement {
     private _fontColor? :FillStyle;
     private _rowHeight? :number ;
     private _layout?:Layout;
+    private _xMargin?:number;
 
     /**
      * Used to return the height of this element to the layout. If true it will return the nodeRowHeight defined in the theme, else
@@ -49,6 +50,11 @@ export class LayoutElement extends CanvasElement {
     set rowHeight( rowHeight:number ) { this._rowHeight = rowHeight }
     get rowHeight() { return this._rowHeight ?? this._parent?.rowHeight ?? Theme.config.nodeRowHeight }
 
+    set xMargin( newxMargin:number ) { this._xMargin = newxMargin }
+    /**
+     * Side space. Custom or inherited by a parent...
+     */
+    get xMargin() { return this._xMargin ?? this._parent?.xMargin ?? 0 }
 
     /**
      * Return the size...
@@ -77,12 +83,14 @@ export class LayoutElement extends CanvasElement {
             ctx.fillRect(0,0,maxWidth, maxHeight);
         }
 
-        if( this.xPadding )
+        const xSpacing = this.xPadding  ;
+
+        if( xSpacing )
         {
-            ctx.translate(this.xPadding, 0)
+            ctx.translate(xSpacing, 0)
         }
 
-        this.renderContents( ctx, maxWidth-this.xPadding*2, maxHeight ); 
+        this.renderContents( ctx, maxWidth-xSpacing*2, maxHeight ); 
 
         this.boxShadow(ctx, 0);
     }

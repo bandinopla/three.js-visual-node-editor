@@ -18,10 +18,11 @@ export class Button extends InteractiveLayoutElement
     override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
         
         //background
+        this.boxShadow(ctx, 2)
         this.roundedRect(ctx, 0,0, maxWidth, maxHeight, 2);
         ctx.fillStyle = Theme.config.btnBgColor;
         ctx.fill();  
-
+        this.boxShadow(ctx, 0)
         //text
         this.writeText(ctx, this.label, this.fontSize, maxWidth/2, maxHeight, Theme.config.btnTextColor, "center");
 

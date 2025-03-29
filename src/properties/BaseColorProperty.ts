@@ -22,7 +22,7 @@ export class BaseColorProperty extends Input {
             justify:"space-between"
         }); 
 
-        this.xPadding = 10; 
+        //this.xPadding = 10; 
     } 
 
     override writeScript(script: Script): string {

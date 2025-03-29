@@ -12,7 +12,7 @@ export class DraggableValue extends InteractiveLayoutElement {
     constructor( readonly name:string, readonly usesBar:boolean, readonly min:number, readonly max:number, protected step:number, protected onChange?:( value:number, percent:number )=>void )
     {
         super(); 
-        this.xPadding=10
+        //this.xPadding=10
         this.size = max-min;
     } 
 
@@ -61,6 +61,9 @@ export class DraggableValue extends InteractiveLayoutElement {
         
         ctx.restore();  
 
+        ctx.translate(5, 0);
+        maxWidth-= 10;
+        
         this.writeText( ctx, this.name, this.fontSize, this.xPadding, this.rowHeight,  Theme.config.barTextColor, "left");
         this.writeText( ctx, this.stringValue, this.fontSize, maxWidth-this.xPadding, this.rowHeight,  Theme.config.barTextColor, "right"); 
  

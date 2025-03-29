@@ -18,7 +18,7 @@ export class TextureExtensionProperty extends LayoutElement
     constructor() {
         super();
 
-        this.xPadding = 10;  
+        //this.xPadding = 10;  
 
         this.combo = new ComboBox("Wrapping mode", this.modes.map(m=>m[1]), this.onComboChange.bind(this));
 

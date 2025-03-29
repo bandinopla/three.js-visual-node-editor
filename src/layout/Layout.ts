@@ -23,6 +23,7 @@ export type LayoutConfig = {
     width?:number,
     lineHeight?:number,
     bgColor?:FillStyle
+    xPadding?:number
 }
 
 export class Layout extends LayoutElement {
@@ -41,6 +42,8 @@ export class Layout extends LayoutElement {
             gap: 0,
             ...config
         };
+
+        this.xPadding = this.config.xPadding ?? 0;
 
         if( this.config.lineHeight )
         {

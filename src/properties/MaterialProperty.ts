@@ -10,7 +10,7 @@ export class MaterialProperty extends Input {
         this.layout = new Row([
             new TextLabel( `.material # ${index}  ` ),  
         ] ); 
-        this.xPadding = 10; 
+        //this.xPadding = 10; 
     }  
 
     getMaterial() {

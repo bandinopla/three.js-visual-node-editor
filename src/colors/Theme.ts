@@ -14,6 +14,7 @@ export class Theme {
     readonly fontSize = 12;
     readonly nodeRowHeight = 20;
     readonly nodeBorderRadius = 5;
+    readonly nodeMargin = 10;
 
     readonly selectionBoxColor = "white";
 

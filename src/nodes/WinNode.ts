@@ -1,4 +1,4 @@
-import { FillStyle } from "../colors/Theme";
+import { FillStyle, Theme } from "../colors/Theme";
 import { HeaderElement } from "../components/Header";
 import { Layout } from "../layout/Layout";
 import { LayoutElement } from "../layout/LayoutElement";
@@ -21,7 +21,8 @@ export class WinNode extends Node {
 
             new Layout( childs, {
                 direction:"column",
-                gap: 5
+                gap: 5,
+                xPadding: Theme.config.nodeMargin
             })
             
         ], {

@@ -21,7 +21,7 @@ export class TextureMappingModeProperty extends LayoutElement
     constructor() {
         super();
 
-        this.xPadding = 10;  
+        //this.xPadding = 10;  
 
         this.combo = new ComboBox("Mapping mode", this.modes.map(m=>m[1]), this.onComboChange.bind(this));
 

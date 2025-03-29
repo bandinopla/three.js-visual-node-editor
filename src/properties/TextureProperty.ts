@@ -40,8 +40,8 @@ export class TextureProperty extends LayoutElement {
             new Button("+ File", ()=>this.onSelectFileFromDisk().then( file=>file && this.onFileSelected(file)) ),
             new Button("+ URL" ), 
         ], {
-            gap:10,
-            align:"stretch"
+            gap:0,
+            justify:"space-around" 
         });
 
         this.imgPreview = new ImagePreview();
@@ -70,7 +70,7 @@ export class TextureProperty extends LayoutElement {
             new TextLabel("Texture Data")
         ] );
 
-        this.overwritten.xPadding = 10
+        //this.overwritten.xPadding = 10
 
         this.initial.parent = this; 
         this._imageDisplayLayout.parent = this;

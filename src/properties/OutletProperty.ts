@@ -85,7 +85,10 @@ export class OutletProperty extends LayoutElement implements IOutlet
    
         //render circle...
         ctx.save()
-        ctx.translate( this.isInput? 0 : maxWidth, maxHeight/2);
+
+        const margin = Theme.config.nodeMargin;
+
+        ctx.translate( this.isInput? -margin : maxWidth+margin, maxHeight/2);
         this.drawCircle(ctx, 0, 0, 5, this.color, Theme.config.borderColor, 1);
 
         //
@@ -98,6 +101,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
 
         ctx.restore(); 
 
+        ctx.translate( this.isInput? 0 : margin, 0);
         super.render(ctx, maxWidth,maxHeight)
         
     }
