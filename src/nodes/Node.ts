@@ -1,12 +1,13 @@
-import { Theme } from "../colors/Theme";
-import { CanvasElement } from "../core/CanvasElement";
+import { Theme } from "../colors/Theme"; 
 import { IOutlet } from "../core/IOutlet";
 import { isOutlet } from "../core/isOutlet";
 import { Editor } from "../Editor";
+import { IScript } from "../export/IScript";
+import { Script } from "../export/Script"; 
 import { Layout } from "../layout/Layout"; 
 import { LayoutElement } from "../layout/LayoutElement";
 
-export class Node extends LayoutElement { 
+export class Node extends LayoutElement implements IScript { 
 
     editor!:Editor;
     canBeDeleted = true;
@@ -18,6 +19,10 @@ export class Node extends LayoutElement {
 
     x = 0
     y = 0
+
+    get nodeName():string {
+        throw new Error("Not implemented...")
+    }
     
     override width(ctx: CanvasRenderingContext2D): number {
         return 150;
@@ -126,13 +131,18 @@ export class Node extends LayoutElement {
 
     /**
      * Inform our output nodes that something has changed...
+     * when overriding this, call super.update at the end...
      */
-    protected somethingChanged() {
+    override update() {
         this.forEachOutlet( outlet => {
             if( !outlet.isInput && isOutlet(outlet.connectedTo) )
             {
-                outlet.connectedTo.owner.somethingChanged();
+                outlet.connectedTo.owner.update();
             }
         })
+    }
+
+    writeScript( script:Script ):string {
+        throw new Error(`Someone forgot to implement meeeeeeeee... and it was not meeeeeee.....`)
     }
 }

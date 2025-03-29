@@ -3,14 +3,14 @@ import { Layout } from "../layout/Layout";
 import { LayoutElement } from "../layout/LayoutElement";
 import { ComboBox } from "../components/ComboBox";
 
-type Mode = [ Wrapping, string ]
+type Mode = [ string, string ]
 
 export class TextureExtensionProperty extends LayoutElement
 {
     private modes :Mode[] = [
-        [ RepeatWrapping, "Repeat" ],
-        [ ClampToEdgeWrapping, "Clamp" ],
-        [ MirroredRepeatWrapping, "Mirror" ]
+        [ "THREE.RepeatWrapping", "Repeat" ],
+        [ "THREE.ClampToEdgeWrapping", "Clamp" ],
+        [ "THREE.MirroredRepeatWrapping", "Mirror" ]
     ];
 
     private combo:ComboBox;
@@ -30,8 +30,13 @@ export class TextureExtensionProperty extends LayoutElement
         });
     }
 
+    get extensionMode() {
+        return this.modes[ this.combo.index ][0]
+    }
+
     protected onComboChange( i:number )
     {
         // todo: do somehting.
+        this.root.update();
     }
 }

@@ -3,17 +3,17 @@ import { Layout } from "../layout/Layout";
 import { LayoutElement } from "../layout/LayoutElement";
 import { ComboBox } from "../components/ComboBox";
 
-type Mode = [ AnyMapping, string ]
+type Mode = [ string, string ]
 
 export class TextureMappingModeProperty extends LayoutElement
 {
     private modes :Mode[] = [
-        [ UVMapping, "UV" ], 
-        [ CubeReflectionMapping, "Cube Reflection" ], 
-        [ CubeRefractionMapping, "Cube Refraction" ], 
-        [ CubeUVReflectionMapping, "Cube UV Reflection" ], 
-        [ EquirectangularReflectionMapping, "Equirectangular Reflection" ], 
-        [ EquirectangularRefractionMapping, "Equirectangular Refraction" ], 
+        [ "THREE.UVMapping", "UV" ], 
+        [ "THREE.CubeReflectionMapping", "Cube Reflection" ], 
+        [ "THREE.CubeRefractionMapping", "Cube Refraction" ], 
+        [ "THREE.CubeUVReflectionMapping", "Cube UV Reflection" ], 
+        [ "THREE.EquirectangularReflectionMapping", "Equirectangular Reflection" ], 
+        [ "THREE.EquirectangularRefractionMapping", "Equirectangular Refraction" ], 
     ];
 
     private combo:ComboBox;
@@ -33,8 +33,15 @@ export class TextureMappingModeProperty extends LayoutElement
         });
     }
 
+    /**
+     * The type of UV mapping the object should have...
+     */
+    get mappingType() {
+        return this.modes[ this.combo.index ][0];
+    }
+
     protected onComboChange( i:number )
-    {
-        // todo: do somehting.
+    { 
+        this.root.update()
     }
 }

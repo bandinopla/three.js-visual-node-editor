@@ -111,8 +111,7 @@ export class ColorWheel extends InteractiveLayoutElement {
 
     set color( c:Color ) {
         this._color = c;
-        const saturation = this.hsl.s;
-
+        const saturation = this.hsl.s; 
         c.getHSL(this.hsl); 
         this.hsl.s = saturation;
     }

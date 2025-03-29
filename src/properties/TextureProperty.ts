@@ -8,19 +8,32 @@ import { Layout, Row } from "../layout/Layout";
 import { LayoutElement } from "../layout/LayoutElement";
 import { Input } from "./Input"; 
 
-export class TextureProperty extends Input {
+export class TextureProperty extends LayoutElement {
 
     private initial : Layout;
     private overwritten : Layout;
     private _imageDisplayLayout : Layout; 
  
-    private _fileName?:string; 
+    /**
+     * The path/url used to load the image. In case of a file selected from disk this will only be the filename.
+     */
+    private _filePath?:string; 
+
+    private _imageSrc?:string;
+    private _isFromDisk = false;
+    get isFromDisk() { return this._isFromDisk }
 
     private imgPreview:ImagePreview;
 
+    get imagePath() {
+        return this._filePath;
+    }
+
+    get imageSrc() { return this._imageSrc; }
+
 
     constructor() {
-        super( 4 )
+        super()
 
         //"row", "start", "stretch",
         this.initial = new Layout( [
@@ -51,7 +64,7 @@ export class TextureProperty extends Input {
             gap: 10,
             direction:"column",
             align:"stretch"
-        });
+        }); 
 
         this.overwritten = new Row([
             new TextLabel("Texture Data")
@@ -63,6 +76,7 @@ export class TextureProperty extends Input {
         this._imageDisplayLayout.parent = this;
 
         this.layout = this.initial; 
+        this.singleLine=true
     } 
 
     protected async onSelectFileFromDisk() { 
@@ -94,32 +108,37 @@ export class TextureProperty extends Input {
 
     protected onFileSelected( file:File )
     {
-        this._fileName = file.name;
+        this._isFromDisk = true;
+        this._filePath = file.name;
  
         const reader = new FileReader();
 
         reader.onload = e => {
             const dataURL = e.target!.result as string; // dataURL is a string 
             
-            this.imgPreview.show( dataURL );
-            this.layout = this._imageDisplayLayout;
-    
+            this.loadImage( dataURL );
         };
 
         reader.readAsDataURL(file);
     }
 
-    protected override onConnected(to: IOutlet): void {
-        this.layout = this.overwritten; 
-    }
+    protected loadImage( url:string ) {
 
-    protected override onDisconnected(from: IOutlet): void {
-        this.layout = this.initial;
+        this._imageSrc = url;
+        this.imgPreview.show( url );
+        this.layout = this._imageDisplayLayout;
+        this.singleLine = false;
+
+        this.root.update()
     }
+ 
 
     protected reset() {
         this.imgPreview.reset();
         this.layout = this.initial;
+        this.singleLine = true;
+
+        this.root.update()
     }
  
 }

@@ -125,7 +125,7 @@ export class ColorPicker extends InteractiveLayoutElement  implements IOverlayRe
         const rgb = [c.r, c.g, c.b];
         this.RGBSliders.forEach( (slider,i)=>slider.value = rgb[i]);
 
-        const hsl:number[] = Object.values( c.getHSL( this.hsl ) );
+        const hsl:number[] = Object.values( this.hsl );// c.getHSL( this.hsl ) );
 
         this.HSLSliders.forEach( (slider, i)=>slider.value=hsl[i])
 

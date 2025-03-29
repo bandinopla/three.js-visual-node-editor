@@ -1,22 +1,28 @@
-import * as THREE from 'three';
+import { clamp } from 'three/src/math/MathUtils.js';
+import * as THREE from 'three/webgpu';
+import { WebGPURenderer } from 'three/webgpu';
 
 export class ThreeScene {
     readonly scene:THREE.Scene;
     readonly camera:THREE.PerspectiveCamera;
-    readonly renderer:THREE.WebGLRenderer;
+    readonly renderer:WebGPURenderer;
     readonly objHolder:THREE.Object3D;
     private clock:THREE.Clock;
     readonly ambientLight:THREE.AmbientLight;
+    readonly directionalLight:THREE.DirectionalLight;
     private objs:THREE.Mesh[]=[]
     readonly pointLight:THREE.PointLight;
     private mouse:THREE.Vector2 = new THREE.Vector2();
     rotationSpeed = 1;
+    protected _currentObjectIndex = 0; 
+
+    private materialNotSet = new THREE.MeshStandardMaterial({ color: 0xcccccc });
 
     constructor() {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new WebGPURenderer();
         this.renderer.setSize( window.innerWidth, window.innerHeight ); 
         this.renderer.setClearColor(0x1d1d1d)
 
@@ -25,6 +31,8 @@ export class ThreeScene {
 
         this.ambientLight = new THREE.AmbientLight(0xffffff,0.1);
         this.pointLight = new THREE.PointLight(0xffffff,5,15);
+        this.directionalLight = new THREE.DirectionalLight()
+        
 
         window.addEventListener('mousemove', (event) => {
             // Normalize mouse coordinates to [-1, 1]
@@ -32,29 +40,49 @@ export class ThreeScene {
             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         });
 
+        window.addEventListener("resize", ev=>{
+            // Update camera aspect ratio
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+
+            // Update renderer size
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        })
+
         this.buildScene()
     }
 
-    protected buildScene() {
-        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        const material = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
-        const cube = new THREE.Mesh( geometry, material ); 
+    protected buildScene() { 
+        const material = this.materialNotSet;
 
-        this.objHolder.add(cube);
+        //
+        // dummy objects
+        //
+        const cube = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ), material ); 
+              cube.name="Cube"; 
+              this.objs.push( cube );
+              this.objHolder.add(cube);
+
+        const sphere = new THREE.Mesh( new THREE.SphereGeometry(1), material ); 
+              sphere.name="Sphere"; 
+              sphere.visible = false;
+              this.objs.push( sphere );
+              this.objHolder.add( sphere );
+
+
         this.scene.add( this.objHolder )
 
         this.camera.position.z = 4;
-        this.camera.position.x = -4;
+        this.camera.position.x = -3;
 
         this.scene.add( this.ambientLight );
-        this.objs.push( cube );
+        this.scene.add( this.directionalLight );
 
-        const dirLight = new THREE.DirectionalLight()
-        this.scene.add( dirLight );
+
 
         this.scene.add( this.pointLight );
 
-        this.pointLight.intensity = 3
+        this.pointLight.intensity = 15
         this.pointLight.position.z = 3
     }
 
@@ -69,7 +97,7 @@ export class ThreeScene {
         const dir = vector.sub(this.camera.position).normalize();
     
         // We want the light to be at a fixed Z in world space (e.g., Z = 2)
-        const fixedZ = 2;
+        const fixedZ = 2
     
         // Calculate the distance from the camera to the plane at fixedZ
         const distance = (fixedZ - this.camera.position.z) / dir.z;
@@ -79,6 +107,18 @@ export class ThreeScene {
     
         // Update the light's position
         this.pointLight.position.set(pos.x, pos.y, fixedZ);
+      
+    }
+
+    get meshes() { return this.objs }
+
+    get currentObjectIndex() {
+        return this._currentObjectIndex;
+    }
+
+    set currentObjectIndex(index:number) {
+        this._currentObjectIndex = clamp( index, 0, this.objs.length-1 );
+        this.objs.forEach( (obj,i)=>obj.visible = i==index )
     }
 
     render() {
@@ -89,4 +129,36 @@ export class ThreeScene {
         this.objHolder.rotateX(delta*this.rotationSpeed)
         this.renderer.render( this.scene, this.camera );
     }
+
+    setMaterial(index: number, material?: THREE.Material) {
+
+        material ??= this.materialNotSet;
+
+        this.objs.forEach((obj: THREE.Mesh) => {
+          if (Array.isArray(obj.material)) {
+            // Object has multiple materials
+            if (index < obj.material.length) {
+              obj.material[index] = material;
+            } else {
+              // Create missing material slots
+              while (obj.material.length <= index) {
+                obj.material.push(this.materialNotSet);
+              }
+              obj.material[index] = material;
+            }
+          } else {
+            // Object has a single material
+            if (index === 0) {
+              obj.material = material;
+            } else {
+              // Change to an array of materials
+              obj.material = [obj.material];
+              while (obj.material.length <= index) {
+                obj.material.push(this.materialNotSet);
+              }
+              obj.material[index] = material;
+            }
+          }
+        });
+      }
 }

@@ -26,14 +26,23 @@ export class ConnectionsArray<T extends Connection=Connection> {
         {
             connection.from.connectedTo = other;
             other.connectedTo = connection.from;
+
+            //signal the node to update itself ( this will triger a domino effect )
+            connection.from.owner.update()
         } 
     }
 
     private disconnect( connection:Connection ) { 
         if( isOutlet( connection.to ) )
         {
+            const inputNode = connection.to;
             connection.to.connectedTo = undefined;
             connection.from.connectedTo = undefined;
+
+            //
+            // when we unplug from a node, that node will lose an input, so it needs to be updated.
+            //
+            inputNode.owner.update()
         }  
     }
   

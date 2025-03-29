@@ -55,7 +55,7 @@ export class LayoutElement extends CanvasElement {
      */
     height( ctx:CanvasRenderingContext2D ):number
     { 
-        //if( this._layout ) return this._layout.height(ctx);
+        if( this._layout && this._layout.direction=="column" ) return this._layout.height(ctx);
         return this.singleLine? this.rowHeight : 0;
     }
 
@@ -112,5 +112,10 @@ export class LayoutElement extends CanvasElement {
 
         if( this._layout ) return this._layout.traverse( visitor );
     }
+
+    /**
+     * Call this when the element has changed and needs to be updated in some way...
+     */
+    update() {}
     
 }

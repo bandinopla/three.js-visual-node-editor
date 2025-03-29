@@ -2,6 +2,9 @@ import { FillStyle, Theme } from "../colors/Theme";
 
 export class CanvasElement {
 
+    /**
+     * If it should be rendered or not
+     */
     enabled = true;
     
     protected roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {

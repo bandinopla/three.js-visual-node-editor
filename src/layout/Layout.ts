@@ -111,6 +111,8 @@ export class Layout extends LayoutElement {
         }
     } 
 
+    get direction(){ return this.config.direction; }
+
     get enabledChilds() {
         return this.childs.filter(c=>c.enabled);
     }
@@ -118,10 +120,16 @@ export class Layout extends LayoutElement {
     override height(ctx: CanvasRenderingContext2D) {
 
         if( this.config.direction=="row" )
-        {
+        { 
+            //
+            // if we are a row, calculate the max height 
+            //
             return this.enabledChilds.reduce( (max, child)=>Math.max( max, child.height(ctx) ), 0);
-        }
- 
+        } 
+
+        //
+        // if we are a column, we add up all heights.
+        //
         return this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0)  + this.config.gap*this.childs.length + this.config.gap;
     }
 

@@ -1,13 +1,32 @@
  
-import { UVAttributeProperty } from "../../properties/UVAttributeProperty";
-import { UVChannelProperty } from "../../properties/UVChannelProperty";
+import { DraggableValue } from "../../components/DraggableValue";
+import { Script } from "../../export/Script";
+import { UVAttributeProperty } from "../../properties/UVAttributeProperty"; 
 import { AttributeTypeNode } from "./AttributeTypeNode";
 
 export class UVNode extends AttributeTypeNode {
-    constructor() {
+ 
+    private uvChannel:DraggableValue;
+
+    constructor() { 
+
+        const uvChannel = new DraggableValue("UV Channel", false, 0, 5, 1, ()=>this.update())
+
         super([
             new UVAttributeProperty(),
-            new UVChannelProperty(),
+            uvChannel,
         ]); 
+
+        this.uvChannel = uvChannel; 
+    }
+
+    override writeScript(script: Script): string {
+         
+        const uvChannel = this.uvChannel.stringValue;
+
+        script.importModule("uv");
+
+        return script.define(this.nodeName, `uv(${uvChannel})`);
+
     }
 }

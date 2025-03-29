@@ -30,6 +30,7 @@ export class Editor {
     private focusedChild :Node|undefined;
     private mouse:Vector2Like = {x:0, y:0}
     private aspectCorrection = 1; 
+    private canvasAspect:number;
 
     private handIcon : HandIcon;
 
@@ -77,11 +78,13 @@ export class Editor {
         this._ctx = canvas.getContext('2d')!; //TODO:handle error
         this._ctx.font = Theme.config.fontSize+'px '+Theme.config.fontFamily;
 
-        const aspect = canvas.width / canvas.height;
-        this.aspectCorrection = ( canvas.offsetWidth/canvas.offsetHeight )*aspect
-        
-        // fix aspect ratio...
+        this.canvasAspect = this.canvas.width / this.canvas.height;
+        this.aspectCorrection = ( this.canvas.offsetWidth/this.canvas.offsetHeight )*this.canvasAspect;
+         
         this.ctx.scale(1, this.aspectCorrection) ;
+
+        window.addEventListener("resize", this.onResize.bind(this)); 
+        
 
         // Double Click
         onDoubleClick(canvas, ev=>this.showNodeCreationMenu(ev));
@@ -149,13 +152,7 @@ export class Editor {
         canvas.addEventListener('mousemove', (event) => {
             let scale = this.ctx.getTransform().a; // Get the current scale (assuming uniform scaling)
             const mousePos = this.getMousePos( event); 
-            const canvasPos = this.getCanvasMousePosition(mousePos);
-
-            // if( this.boxSelectionStart )
-            // {
-            //     this.selectNodesInsideBoxSelection(this.boxSelectionStart, canvasPos);
-            //     return;
-            // }
+            const canvasPos = this.getCanvasMousePosition(mousePos); 
 
             let sx = ( mousePos.x - this.mouse.x )  ;
             let sy = ( mousePos.y - this.mouse.y ) ;
@@ -197,8 +194,7 @@ export class Editor {
             {
                 //
                 // update tail of "open" connections
-                //
-                ///this.connections.filter(c=>!( isOutlet(c.to) )).forEach( c=>c.to=mousePos);  
+                // 
                 this.connections.setOrphansTarget( mousePos );
             } 
             
@@ -270,6 +266,7 @@ export class Editor {
                             });
  
                             this.selectedOutlet = outlet;
+                            this.clearBoxSelection(); 
                         }
                         else 
                         {
@@ -278,10 +275,9 @@ export class Editor {
 
                     });
 
-                    if( this.selectedOutlet ) {
-                        this.clearBoxSelection(); 
-                        break;
-                    }
+                    if( this.selectedOutlet ) 
+                        continue; //<------------------ we continue because we want to keep looping to collect all outlets.
+                    
                     //#endregion
   
                     //#region Click on element...
@@ -305,9 +301,7 @@ export class Editor {
                         // default... will make the object move...
                         this.focusedChild = obj; 
                         this.bingToTop(obj);
-                        
-                        
-
+                         
                         break; //<-- to avoid processing childrens under us....
                     } 
         
@@ -328,7 +322,7 @@ export class Editor {
                                 && this.selectedOutlet!.isCompatible( outlet )
                                 && ( outlet.owner !== this.selectedOutlet!.owner )
                                 ; // TODO: check for outlet TYPE compatibility 
-                    });
+                    }); 
                 } 
 
                 //
@@ -383,35 +377,7 @@ export class Editor {
                 this.focusedChild = undefined;
             }
             else 
-            {
-
-                // check if we are on top of an oulet...
-                
-                // this.objs.forEach( obj=>{
-
-                //     //
-                //     // create a connection between the current compatible outlets...
-                //     //
-                //     if( obj.pressetOutlet( cursor.x-obj.x, cursor.y-obj.y, outlet =>{  
-
-                //         this.destroyConnectionsUsing( outlet )
-                        
-                //         //
-                //         // filer valid outlets
-                //         //
-                //         const outlets = this.connections.filter( c=>
-                //             !("child" in c.to) //must not have an ending
-                //             && c.from.isInput!=outlet.isInput //oposite kind (input->output)
-                //         );
-
-                //         outlets.forEach( c => {
-                //             c.to = outlet;
-                //         })
-                       
-
-                //     } )) return;
-
-                // }); 
+            { 
                  
                 if( this.chosenOutlet.length )
                 { 
@@ -422,30 +388,28 @@ export class Editor {
                     this.destroyConnectionsUsing( this.chosenOutlet[0].outlet );
  
                     this.connections.setOrphansTarget( this.chosenOutlet[0].outlet );
-
-                    console.log("CONNECT",  this.chosenOutlet[0].outlet)
-                    // this.connections.forEach( connection => { 
-
-                    //     if( !("owner" in connection.to))
-                    //     {
-                    //         connection.to = this.chosenOutlet[0].outlet;
-                    //     }
-
-                    // }); 
+  
                 }
 
                 this.chosenOutlet.length=0;
                 this.availableOutlets.length=0;
 
                 //remove connections with no end...
-                this.connections.purge( c=>isOutlet(c.to) )
-                // let clean = this.connections.filter( c=>"owner" in c.to);
-                // this.connections.length=0;
-                // this.connections.push(...clean)
+                this.connections.purge( c=>isOutlet(c.to) ) 
             }
         });
         //#endregion
     } 
+
+    protected onResize() { 
+        const newAspectCorrection = ( this.canvas.offsetWidth/this.canvas.offsetHeight )*this.canvasAspect;
+
+        const xChange = this.aspectCorrection/newAspectCorrection;
+
+        this.aspectCorrection = newAspectCorrection;
+
+        this.ctx.scale(xChange, 1) ; 
+    }
 
     get ctx() {
         return this._ctx;

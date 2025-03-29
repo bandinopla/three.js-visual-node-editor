@@ -11,11 +11,7 @@ export class MaterialProperty extends Input {
             new TextLabel( `.material # ${index}  ` ),  
         ] ); 
         this.xPadding = 10; 
-    } 
-
-    override height(ctx: CanvasRenderingContext2D): number {
-        return Theme.config.nodeRowHeight*0.5
-    }
+    }  
 
     getMaterial() {
         // pull data from the input socket....
