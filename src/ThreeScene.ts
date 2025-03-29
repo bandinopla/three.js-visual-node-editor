@@ -58,7 +58,7 @@ export class ThreeScene {
         //
         // dummy objects
         //
-        const cube = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ), material ); 
+        const cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), material ); 
               cube.name="Cube"; 
               this.objs.push( cube );
               this.objHolder.add(cube);

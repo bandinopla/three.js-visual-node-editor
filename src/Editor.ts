@@ -1093,6 +1093,10 @@ export class Editor {
 
                     this.restore( data );
                 }
+                else 
+                {
+                    alert("The selected file is not compatible or what not made by this app.")
+                }
             };
             
             reader.onerror = () => alert('Error reading file') ;

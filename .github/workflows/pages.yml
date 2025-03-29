@@ -1,0 +1,62 @@
+name: Deploy app to girhub pages
+
+# Trigger the workflow on push to the main branch
+on:
+  push:
+    branches:
+      - main  # Change this if your default branch is different (e.g., 'master')
+
+# Permissions for deploying to gh-pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Jobs to run
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Set up Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # Use the Node version compatible with your project
+          cache: 'pnpm'       # Cache pnpm dependencies for faster builds
+
+      # Install PNPM
+      - name: Install PNPM
+        run: npm install -g pnpm  # Installs pnpm globally
+
+      # Install dependencies with PNPM
+      - name: Install Dependencies
+        run: pnpm install  # Uses pnpm to install project dependencies
+
+      # Build the Vite project with PNPM
+      - name: Build
+        run: pnpm run build  # Assumes your package.json has "build": "vite build"
+
+      # Configure GitHub Pages deployment
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      # Upload the built files (Vite outputs to 'dist' by default)
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist  # Vite's default output directory
+
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+# Optional: Concurrency to avoid multiple deployments running at once
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
