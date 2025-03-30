@@ -2,9 +2,9 @@
 import { DraggableValue } from "../../components/DraggableValue";
 import { Script } from "../../export/Script";
 import { UVAttributeProperty } from "../../properties/UVAttributeProperty"; 
-import { AttributeTypeNode } from "./AttributeTypeNode";
+import { BaseAttributeNode } from "./BaseAttributeNode";
 
-export class UVNode extends AttributeTypeNode {
+export class UVNode extends BaseAttributeNode {
  
     private uvChannel:DraggableValue;
 

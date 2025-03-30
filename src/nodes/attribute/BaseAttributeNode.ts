@@ -5,7 +5,7 @@ import { WinNode } from "../WinNode";
 /**
  * Base class to every node in this category
  */
-export class AttributeTypeNode extends WinNode {
+export class BaseAttributeNode extends WinNode {
     constructor( childs:LayoutElement[]) {
         super( "Attribute", Theme.config.groupAttribute, childs ); 
     }

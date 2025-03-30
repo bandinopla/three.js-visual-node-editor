@@ -4,10 +4,8 @@ import { Vector1Output } from '../../properties/Vector1Output';
 import { TextureExtensionProperty } from "../../properties/TextureExtensionProperty";
 import { TextureMappingModeProperty } from "../../properties/TextureMappingModeProperty";
 import { UVTransformProperty } from "../../properties/UVTransformProperty";
-import { TextureTypeNode } from "./TextureTypeNode";
+import { TextureTypeNode } from "./BaseTextureNode";
 import { Script } from '../../export/Script';
-import { texture } from 'three/tsl';
-
 export class ImageTextureNode extends TextureTypeNode {
  
     private imageProp:TextureProperty;
