@@ -20,3 +20,11 @@ These are the nodes currently "done" (room for improvement)...
 - Scene Preview
 - (incomplete) MeshStandardNode shader node. ( only colorNode property )
 - Image texture node
+- Some math operations: 
+    - \+
+    - \-
+    - \*
+    - \/
+    - \%
+    - \=\=
+    - != 
