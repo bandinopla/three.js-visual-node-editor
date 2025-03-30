@@ -96,7 +96,16 @@ export class Editor {
         this._ctx = canvas.getContext('2d')!; //TODO:handle error
         this._ctx.font = Theme.config.fontSize+'px '+Theme.config.fontFamily;
 
-        this.canvasAspect = this.canvas.width / this.canvas.height;
+        const dpr = window.devicePixelRatio || 1;
+
+        this.canvas.width = window.innerWidth * dpr;
+        this.canvas.height = window.innerHeight * dpr;
+
+        // Set CSS size (for display)
+        this.canvas.style.width = `${window.innerWidth}px`;
+        this.canvas.style.height = `${window.innerHeight}px`;
+
+        this.canvasAspect = this.canvas.height / this.canvas.width;
         this.reset();
 
         window.addEventListener("resize", this.onResize.bind(this)); 
