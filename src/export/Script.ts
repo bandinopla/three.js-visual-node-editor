@@ -153,6 +153,8 @@ export class Script {
     {
         const fromModule = ( modulePath:string ) => this.moduleName2Ref[ modulePath ]; 
 
+        fromModule(""); //Uff... i'll see how to improve this later.
+
         return eval( this.toString( returnThisRef, false ) );
     }
 }
