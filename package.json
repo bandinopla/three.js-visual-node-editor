@@ -1,13 +1,40 @@
 {
   "name": "tsl-nodes",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "hhttps://github.com/bandinopla/three.js-visual-node-editor"
+  },
+  "bugs": {
+    "url": "https://github.com/bandinopla/three.js-visual-node-editor/issues"
+  },
+  "author": "bandinopla",
+  "license": "MIT",
+
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "keywords": [
+    "three",
+    "three.js",
+    "javascript",
+    "typescript",
+    "3d",
+    "nodes",
+    "shader",
+    "shader-editor",
+    "webgl",
+    "webgl2",
+    "webgpu",
+    "webxr",
+    "canvas",
+    "svg",
+    "html5"
+  ], 
   "devDependencies": {
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
