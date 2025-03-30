@@ -26,8 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # Use the Node version compatible with your project
-          cache: 'pnpm'       # Cache pnpm dependencies for faster builds
+          node-version: '20'  # Use the Node version compatible with your project 
 
       # Install PNPM
       - name: Install PNPM
