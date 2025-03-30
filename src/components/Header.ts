@@ -2,11 +2,10 @@ import { FillStyle, Theme } from "../colors/Theme";
 import { LayoutElement } from "../layout/LayoutElement";
 
 export class HeaderElement extends LayoutElement {
-    constructor( protected title:string, protected bgColor:FillStyle )
+    constructor( public title:string, protected bgColor:FillStyle )
     {
         super(); 
     }
- 
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
         

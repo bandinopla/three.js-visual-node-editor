@@ -8,6 +8,7 @@ export class DraggableValue extends InteractiveLayoutElement {
     protected _percent = 0;
     private dragOriginX = 0; 
     private size = 0;
+    private promptValueOnMouseUp = false;
 
     constructor( readonly name:string, readonly usesBar:boolean, readonly min:number, readonly max:number, protected step:number, protected onChange?:( value:number, percent:number )=>void )
     {
@@ -20,7 +21,7 @@ export class DraggableValue extends InteractiveLayoutElement {
         let v = this.value;
         
   
-        return Math.round(this.step)==this.step? v.toString() : v.toFixed(2) ;
+        return Math.round(v)==v? v.toString() : v.toFixed(2) ;
     } 
 
     /**
@@ -72,17 +73,36 @@ export class DraggableValue extends InteractiveLayoutElement {
     override onMouseMove(deltaX: number, deltaY: number): void {
         this.dragOriginX += deltaX;
  
-        this.value = this.min + (this.dragOriginX / this.hitArea.w) * this.size  ;
- 
+        if( this.usesBar )
+        {
+            this.value = this.min + (this.dragOriginX / this.hitArea.w) * this.size  ;
+        }
+        else 
+        {
+            this.value += this.step * deltaX>0? 1 : -1
+        }  
 
+        this.promptValueOnMouseUp = false;
     }
-    override onMouseDown(cursorX: number, cursorY: number): void {
-        //this.isDragging = true;
+
+    override onMouseDown(cursorX: number, cursorY: number): void { 
         this.dragOriginX = cursorX;
+        this.promptValueOnMouseUp = true;
     }
-    // override onMouseUp(): void {
-    //     this.isDragging = false;
-    // }
+
+    override onMouseUp(): void { 
+        if( this.promptValueOnMouseUp )
+        {
+
+            const val = prompt("Enter the new value...", this._value.toString() );
+            if( val && !isNaN( Number(val) ) )
+            {
+                this.value = Number(val) ;
+            }
+
+        } 
+    }
+
     override onMouseWheel(deltaY: number): void {
 
         const inc = this.step;

@@ -1,5 +1,6 @@
 import { FillStyle, Theme } from "./colors/Theme";
 import { UVNode } from "./nodes/attribute/UVNode";
+import { MathNode } from "./nodes/operators/MathNode";
 import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
 import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
 import { WinNode } from "./nodes/WinNode";
@@ -22,6 +23,13 @@ export const NodeTypes : NodeGroupType[] = [
             { TypeClass:UVNode, name:"UV", id:"uv" }
         ]
     },
+    {
+        group:"Math",
+        color:Theme.config.groupMath as string, 
+        nodes:[
+            { TypeClass:MathNode, name:"Operation", id:"math-operation"}
+        ]
+    }, 
     {
         group:"Shader",
         color:Theme.config.groupShader as string,

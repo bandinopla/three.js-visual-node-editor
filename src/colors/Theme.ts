@@ -51,4 +51,7 @@ export class Theme {
     readonly comboboxOptionsBgColor : FillStyle = "#181818"
     readonly comboSelectedItemBgColor : FillStyle = "#4772b3"
     readonly comboSelectedItemTextColor : FillStyle = "white"
+
+    readonly inputTextBg :FillStyle = "#545454";
+    readonly inputTextColor :FillStyle = "white";
 }

@@ -3,7 +3,7 @@ import { IScript } from "../export/IScript";
 import { Script } from "../export/Script";
 import { Node } from "../nodes/Node"
 
-export type OutletSize = 1|2|3|4|5;
+export type OutletSize = 0|1|2|3|4|5; //<---- 0=any type except type 5...
 
 export interface IOutlet extends IScript {
     isInput:boolean 

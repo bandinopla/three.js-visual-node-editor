@@ -43,7 +43,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
         this._isInput = inputType;  
         
         this.color = [
-            "black",
+            "white",
             Theme.config.vec1,
             Theme.config.vec2,
             Theme.config.vec3,

@@ -2,7 +2,7 @@ import { Node } from "../nodes/Node";
 import { IOutlet, OutletSize } from "./IOutlet";
 
 function isOutletSize(value: unknown): value is OutletSize {
-    return typeof value === 'number' && [1, 2, 3, 4, 5].includes(value);
+    return typeof value === 'number' && [0, 1, 2, 3, 4, 5].includes(value);
 }
 
 

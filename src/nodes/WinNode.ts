@@ -12,13 +12,15 @@ const nameCount :Record<string, number> = {};
 
 export class WinNode extends Node {
     private _nodeName:string;
+    protected header:HeaderElement;
 
     constructor(protected title:string, groupColor:FillStyle, protected childs:LayoutElement[] )
     {
+        const header = new HeaderElement(title, groupColor);
+
         super(new Layout( [
  
-            new HeaderElement(title, groupColor),
-
+            header, 
             new Layout( childs, {
                 direction:"column",
                 gap: 5,
@@ -43,11 +45,17 @@ export class WinNode extends Node {
         }
 
         this._nodeName = name;
+        this.header = header;
         //#endregion
     } 
 
-    protected getChildOfType<T>(constructor: new (...args: any[]) => T): T | undefined {
-        return this.childs.find((child) => child instanceof constructor) as T | undefined;
+    protected setTitle( newTitle:string ){
+        this.header.title = newTitle;
+    }
+
+    protected getChildOfType<T>( constructor: new (...args: any[]) => T, pos=0 ): T | undefined {
+        const matches = this.childs.filter((child) => child instanceof constructor);
+        return matches[pos] as T | undefined;
     }
     
     override get nodeName(): string {

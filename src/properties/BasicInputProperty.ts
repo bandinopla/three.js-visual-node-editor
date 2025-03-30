@@ -17,6 +17,7 @@ export class BasicInputProperty extends Input {
     }
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+        if( this.layout ) return super.renderContents( ctx, maxWidth, maxHeight);
         this.writeText(ctx, this.label, this.fontSize, 0, maxHeight, this.fontColor);
     }
 
