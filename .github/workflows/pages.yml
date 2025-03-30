@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main  # Change this if your default branch is different (e.g., 'master')
+    paths-ignore:
+      - 'README.md'  # Ignore changes to the README file
 
 # Permissions for deploying to gh-pages
 permissions:
