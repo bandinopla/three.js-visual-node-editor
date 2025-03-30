@@ -126,7 +126,7 @@ export class ThreeScene {
         const delta = this.clock.getDelta()
         this.updateLightPosition();
         this.objHolder.rotateY(delta*this.rotationSpeed)
-        this.objHolder.rotateX(delta*this.rotationSpeed)
+        this.objHolder.rotateX(-delta*this.rotationSpeed)
         this.renderer.render( this.scene, this.camera );
     }
 
