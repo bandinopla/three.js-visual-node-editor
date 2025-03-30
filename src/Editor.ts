@@ -632,6 +632,7 @@ export class Editor {
     protected drawConnectionPipes( ctx:CanvasRenderingContext2D, theConnectedOnes = true )
     {
         let connectioDirStrength = 50;  
+        let dotPos:Vector2Like|undefined;
 
         //#region draw connections 
         this.connections.forEach( connection=>{ 
@@ -692,6 +693,8 @@ export class Editor {
 
                 ctx.setLineDash([5, 5]);
                 ctx.strokeStyle = connection.from.color;
+
+                dotPos = to; 
             }
             
 
@@ -700,9 +703,16 @@ export class Editor {
             ctx.stroke();
             ctx.setLineDash([]);
 
-        })
-
+        });
         //#endregion
+
+        if( dotPos && this.selectedOutlet )
+        {
+            ctx.beginPath();
+            ctx.arc(dotPos.x, dotPos.y, 5, 0, 2 * Math.PI); // Create a circle path.
+            ctx.fillStyle = this.selectedOutlet.color;
+            ctx.fill(); // Fill the circle.
+        }
     }
 
     /**
