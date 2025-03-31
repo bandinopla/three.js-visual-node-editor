@@ -1,6 +1,9 @@
 import * as TSL from 'three/tsl';
 import * as THREE from 'three/webgpu'; 
 
+
+export type UniformType = "boolean" | "number" | "Color" | "Vector2" | "Vector3" | "Vector4" | "Matrix3" | "Matrix4";
+
 /**
  * Handles the creation of the TSL output string
  */
@@ -10,6 +13,12 @@ export class Script {
 
     protected imports:Record<string, Set<string>>;  
     protected definitions:[ name:string, value:string][] ; 
+
+    /**
+     * array of [ index the definition in the definitions array, the variable type of the uniform ]
+     */
+    protected uniforms:[ name:string, type:UniformType, initialValue:string ][]=[];
+
     protected imagePaths:[ path:string, previewImage?:string, textureSetup?:( refName:string)=>string ][] ; 
     protected moduleName2Ref:Record<string, unknown>; 
 
@@ -37,6 +46,25 @@ export class Script {
         if( !this.definitions.find(def=>def[0]==varName ))
              this.definitions.push( [ varName, String( varValue ) ] );
         return varName;
+    }
+
+    /**
+     * Defines a uniform variable.
+     * 
+     * 
+     * @see https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language#uniform
+     * @param varName 
+     * @param initialValue must ve a valid uniform value.
+     * @returns the name of the variable holding the uniform.
+     */
+    defineUniform( varName:string, type:UniformType, initialValue:string ) {
+         
+        if( !this.uniforms.find( u=>u[0]==varName) )
+        {
+            this.uniforms.push( [ varName, type, initialValue ] );
+        }
+
+        return "$uniforms."+varName;
     }
 
     /**
@@ -92,10 +120,12 @@ export class Script {
 
     toString( lastExpression:string="", forExport = false ) {
  
-        let output = ``;
+        let output = `\n`;
 
         if( forExport )
         { 
+            output += "import * as THREE from 'three/webgpu';\n";
+
             //
             // Imports...
             //
@@ -112,6 +142,13 @@ export class Script {
                 output += `\nconst {${ [...this.imports[module]].join(",") }} = fromModule('${module}');
                 `; 
         }
+
+        //
+        // uniforms
+        //
+        output += "\n" + (forExport?"export":"") + " const $uniforms = {\n" +
+        this.uniforms.map( uniform => `${uniform[0]} : uniform( ${uniform[2]} )`).join(",")
+        +"\n}\n";
 
         //
         // image loaders...
@@ -156,5 +193,29 @@ export class Script {
         fromModule(""); //Uff... i'll see how to improve this later.
 
         return eval( this.toString( returnThisRef, false ) );
+    }
+
+    public static makeValidVariableName(input:string) {
+        // Return empty string if input is not a string or is empty
+        if (typeof input !== 'string' || input.trim() === '') {
+            return 'foo';
+        }
+    
+        let str = input.trim();
+    
+        // Remove or replace invalid characters
+        str = str.replace(/[^a-zA-Z0-9_$]/g, '_');
+        
+        // If starts with a number, prepend an underscore
+        if (/^\d/.test(str)) {
+            str = '_' + str;
+        }
+        
+        // If empty after cleaning or starts with invalid character, use default name
+        if (!str || !/^[a-zA-Z_$]/.test(str)) {
+            return 'validVar';
+        } 
+        
+        return "$"+str;
     }
 }

@@ -1041,7 +1041,7 @@ export class Editor {
      * Save current layout as JSON embeded in a comment and export all the material nodes as javascript to be used as-is.
      */
     save() {
-        const formatVersion = "0.0.1";
+        const formatVersion = import.meta.env.APP_VERSION;
         const signature = `//
 // ▗▄▄▄▖▗▖ ▗▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖   ▗▖ ▗▄▄▖
 //   █  ▐▌ ▐▌▐▌ ▐▌▐▌   ▐▌      ▐▌▐▌   

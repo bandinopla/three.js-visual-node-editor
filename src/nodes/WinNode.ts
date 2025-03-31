@@ -37,7 +37,7 @@ export class WinNode extends Node {
         if( nameCount[name] )
         {
             // increment counter and append the trailing count to make the name unique...
-            name += (++nameCount[name]).toString().padEnd(4,"0");
+            name += (++nameCount[name]).toString().padStart(3,"0");
         }
         else 
         {

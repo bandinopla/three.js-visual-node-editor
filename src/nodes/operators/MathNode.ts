@@ -67,6 +67,10 @@ export class MathNode extends WinNode {
         this.onComboChange(0)
     }
 
+    override width(ctx: CanvasRenderingContext2D): number {
+        return 100
+    }
+
     protected onComboChange( newIndex:number ) 
     {
         const op = this.operators[newIndex];

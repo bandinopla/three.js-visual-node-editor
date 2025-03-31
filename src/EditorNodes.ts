@@ -26,10 +26,10 @@ export const NodeTypes : NodeGroupType[] = [
         ]
     }, 
     {
-        group:"Math",
+        group:"Operators",
         color:Theme.config.groupMath as string, 
         nodes:[
-            { TypeClass:MathNode, name:"Operation", id:"math-operation"}
+            { TypeClass:MathNode, name:"Math", id:"math-operation"}
         ]
     }, 
     {

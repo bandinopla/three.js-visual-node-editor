@@ -2,13 +2,24 @@ import { DraggableNumber } from "../../components/DraggableNumber";
 import { DraggableValue } from "../../components/DraggableValue";
 import { Output } from "../../properties/Output";
 import { InputBaseNode } from "./InputBaseNode";
+import { UniformBaseNode } from "./UniformBaseNode";
 
-export class ValueNode extends InputBaseNode {
+/**
+ * A number, either a float or an int...
+ */
+export class ValueNode extends UniformBaseNode {
+
+    protected inputValue: DraggableNumber;
+
     constructor() {
 
-        super("Value", [
-            new Output("Value", 1),
-            new DraggableNumber()
-        ]);
+        super("number", [ new DraggableNumber("", () => this.update())]);
+
+        this.inputValue = this.getChildOfType(DraggableNumber)!;
+    }
+
+
+    protected override getUniformJsValue(): string {
+        return this.inputValue.stringValue;
     }
 }

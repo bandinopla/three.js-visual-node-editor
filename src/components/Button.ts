@@ -1,18 +1,27 @@
 import { Theme } from "../colors/Theme";
 import { InteractiveLayoutElement } from "../layout/InteractiveLayoutElement"; 
 
+type ButtonOptions = {
+    fullWidth?:boolean
+}
+
 export class Button extends InteractiveLayoutElement
 {
     private xpadding = 5;
+    protected options:ButtonOptions;
 
-    constructor( protected _label:string , protected onClick?:VoidFunction )
+    constructor( protected _label:string , protected onClick?:VoidFunction, options?:Partial<ButtonOptions> )
     {
         super();
+        this.options = {
+            fullWidth:false,
+            ...options
+        };
     }
 
     override width(ctx: CanvasRenderingContext2D): number {
       
-        return ctx.measureText(this.label).width + this.xpadding*2;
+        return this.options.fullWidth? 0 : ctx.measureText(this.label).width + this.xpadding*2;
     }
 
     override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
