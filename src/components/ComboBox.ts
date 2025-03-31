@@ -69,6 +69,10 @@ export class ComboBox extends InteractiveLayoutElement implements IOverlayRender
         ctx.fillStyle = Theme.config.comboboxBgColor;
         ctx.fill() 
 
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = Theme.config.comboStrokeColor;
+        ctx.stroke();
+
         //#region chevron
         const iconH = 3;
         const s = 3;
