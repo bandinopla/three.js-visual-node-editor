@@ -20,11 +20,29 @@ These are the nodes currently "done" (room for improvement)...
 - Scene Preview
 - (incomplete) MeshStandardNode shader node. ( only colorNode property )
 - Image texture node
-- Some math operations: 
-    - \+
-    - \-
-    - \*
-    - \/
-    - \%
-    - \=\=
-    - != 
+- Operations: 
+    - .add
+    - .sub
+    - .mul
+    - .div
+    - .assign
+    - .mod
+    - .equal
+    - .notEqual
+    - .lessThan
+    - .greaterThan
+    - .lessThanEqual
+    - .greaterThanEqual
+    - .and
+    - .or
+    - .not
+    - .xor
+    - .bitAnd
+    - .bitNot
+    - .bitOr
+    - .bitXor
+    - .shiftLeft
+    - .shiftRight
+
+
+- Value Node

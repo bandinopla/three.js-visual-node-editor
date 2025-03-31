@@ -23,7 +23,10 @@ export type LayoutConfig = {
     width?:number,
     lineHeight?:number,
     bgColor?:FillStyle
-    xPadding?:number
+    xPadding?:number,
+    overflowHidden?:boolean,
+    maxHeight?:number,
+    scrollYSpeed:number
 }
 
 export class Layout extends LayoutElement {
@@ -31,6 +34,20 @@ export class Layout extends LayoutElement {
     private renderer :LayoutSorter;
     private config: LayoutConfig ;
 
+    /**
+     * The last known height given to us by the render function.
+     */
+    private renderedHeight = 0;
+
+    /**
+     * Height of the childrens. Calculated by the last call to `.height()`
+     */
+    private _childsHeight = 0;
+
+    /**
+     * Offset to render the contents...
+     */
+    private _offsetY = 0;
 
     constructor( readonly childs:LayoutElement[], config:Partial<LayoutConfig> ) {
         super();
@@ -40,6 +57,7 @@ export class Layout extends LayoutElement {
             justify:"start",
             align:"start",
             gap: 0,
+            scrollYSpeed: 1,
             ...config
         };
 
@@ -122,18 +140,30 @@ export class Layout extends LayoutElement {
 
     override height(ctx: CanvasRenderingContext2D) {
 
+        let height = 0;
+
         if( this.config.direction=="row" )
         { 
             //
             // if we are a row, calculate the max height 
             //
-            return this.enabledChilds.reduce( (max, child)=>Math.max( max, child.height(ctx) ), 0);
+            height = this.enabledChilds.reduce( (max, child)=>Math.max( max, child.height(ctx) ), 0);
         } 
+        else 
+        {
+            //
+            // if we are a column, we add up all heights.
+            //
+            height = this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0)  + this.config.gap*this.childs.length + this.config.gap;
+        }
 
-        //
-        // if we are a column, we add up all heights.
-        //
-        return this.enabledChilds.reduce( (total, child)=>total+child.height(ctx), 0)  + this.config.gap*this.childs.length + this.config.gap;
+        this._childsHeight = height;
+
+        if( this.config.maxHeight )
+            height = Math.min( this.config.maxHeight, height );
+
+        return height;
+        
     }
 
     override width(ctx: CanvasRenderingContext2D) {
@@ -156,17 +186,31 @@ export class Layout extends LayoutElement {
     }
 
     override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
+ 
         if( !maxWidth )
         {
             maxWidth = this.getChildsWidth(ctx)
         }
+
+        if( this.config.overflowHidden )
+        {
+            ctx.beginPath();
+            ctx.rect(0,0,maxWidth, maxHeight);
+            ctx.clip()
+        }
+
+        this.renderedHeight = maxHeight;
+        
         super.render(ctx, maxWidth, maxHeight)
     }
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
  
         ctx.save(); 
+
+        ctx.translate(0, this._offsetY);
         this.renderer.render(ctx, this.enabledChilds, maxWidth, maxHeight ); 
+
         ctx.restore()
     }
 
@@ -185,6 +229,25 @@ export class Layout extends LayoutElement {
         for (const child of this.enabledChilds) {
             const childResult = child.traverse(visitor);
             if( childResult ) return childResult;
+        }
+    }
+
+    scrollContent( deltaY:number )
+    {
+        this._offsetY += (deltaY>0? -1 : 1)*10*this.config.scrollYSpeed;
+
+        if( this.renderedHeight )
+        {
+            // minimum value
+            const minY = -this._childsHeight + this.renderedHeight;
+
+            if( this._offsetY<minY ) {
+                this._offsetY = minY;
+            }
+            else if ( this._offsetY>0 ) 
+            {
+                this._offsetY = 0;
+            }
         }
     }
 }

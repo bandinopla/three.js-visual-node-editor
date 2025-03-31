@@ -11,7 +11,7 @@ export class ListItem extends InteractiveLayoutElement
         this.fontColor = yep? Theme.config.comboSelectedItemTextColor : Theme.config.comboboxTextColor;
     }
 
-    constructor( protected label:string, protected isHeader:boolean = false, protected onClick?:VoidFunction ){
+    constructor( protected label:string, protected isHeader:boolean = false, protected onClick?:VoidFunction, protected onScroll?:(deltaY:number)=>void ){
         super(); 
         this.isLocked = isHeader;
         this.xPadding = 5;
@@ -23,5 +23,9 @@ export class ListItem extends InteractiveLayoutElement
 
     override onMouseDown(cursorX: number, cursorY: number): void {
         this.onClick?.();
+    }
+
+    override onMouseWheel(deltaY: number): void {
+        this.onScroll?.(deltaY);
     }
 }

@@ -23,14 +23,38 @@ export class MathNode extends WinNode {
             ["/","div"],
             ["%","mod"],
             ["==","equal"],
-            ["!=","notEqual"]
+            ["!=","notEqual"],
             // TODO: Add more....
+
+            
+            ["<", "lessThan"],       // Comparison: Less than
+            [">", "greaterThan"],    // Comparison: Greater than
+            ["<=", "lessThanEqual"], // Comparison: Less than or equal to
+            [">=", "greaterThanEqual"],// Comparison: Greater than or equal to
+            ["&&", "and"],           // Logical: AND
+            ["||", "or"],            // Logical: OR
+            ["!", "not"],            // Logical: NOT
+
+            // Note on 'xor': Logical XOR often doesn't have a dedicated standard symbol
+            // like && or ||. It's equivalent to '!=' for booleans, which you already
+            // have mapped to 'notEqual'. '^' is standard for bitwise XOR ('bitXor').
+            // If you need a distinct entry for logical XOR, you might need a non-standard
+            // symbol or handle it differently depending on your specific context.
+            // For now, I'll map '^' to 'bitXor' as that's the most common usage.
+
+            ["&", "bitAnd"],         // Bitwise: AND
+            ["~", "bitNot"],         // Bitwise: NOT (often '~' in languages like C++, Java, JS, Python)
+            ["|", "bitOr"],          // Bitwise: OR
+            ["^", "bitXor"],        // Bitwise: XOR
+            ["<<", "shiftLeft"],     // Bitwise: Left Shift
+            [">>", "shiftRight"]     // Bitwise: Right Shift
+
         ]
 
         super("Math Operator", Theme.config.groupMath, [
             new Output("Result", 0),
             new InputOrValue(0, "A", ()=>this.update()),
-            new ComboBox("Operator", operators.map(o=>o[0]), i=>this.onComboChange(i)),
+            new ComboBox("Operator", operators.map(o=>o[0]+" "+o[1]), i=>this.onComboChange(i)),
             new InputOrValue(0, "B", ()=>this.update()),
         ]);
 

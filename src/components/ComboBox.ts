@@ -3,7 +3,7 @@ import { Theme } from "../colors/Theme";
 import { InteractiveLayoutElement } from "../layout/InteractiveLayoutElement";
 import { Node } from "../nodes/Node";
 import { IOverlayRenderer } from "../layout/IOverlayRenderer";
-import { Layout } from "../layout/Layout";
+import { Column, Layout } from "../layout/Layout";
 import { Button } from "./Button";
 import { HeaderElement } from "./Header";
 import { ListItem } from "./ListItem";
@@ -20,16 +20,21 @@ export class ComboBox extends InteractiveLayoutElement implements IOverlayRender
     private isOpen = false;
     private comboList :Layout;
     private listItems:ListItem[];
+    private listLayout:Layout;
 
     constructor( protected title:string, protected options:string[], protected onChange?:(i:number)=>void ) {
         super() 
 
-        this.listItems = options.map( (opt, i)=>new ListItem( opt, false, ()=>this.onOptionClicked(i)  ));
- 
+        this.listItems = options.map( (opt, i)=>new ListItem( opt, false, ()=>this.onOptionClicked(i), this.onScroll.bind(this)  ));
+        this.listLayout = new Column(this.listItems, {
+            maxHeight: Theme.config.nodeRowHeight*4.5,
+            overflowHidden:true
+        });
+
         this.comboList = new Layout([
 
             new ListItem( title, true ),
-            ...this.listItems
+            this.listLayout
         ], 
         {
             direction:"column",
@@ -38,6 +43,7 @@ export class ComboBox extends InteractiveLayoutElement implements IOverlayRender
 
         this.comboList.backgroundColor = Theme.config.comboboxOptionsBgColor;
         this.comboList.boxShadowLevel = 8;
+        this.comboList.parent = this;
         this.index = 0;
     }
 
@@ -87,11 +93,17 @@ export class ComboBox extends InteractiveLayoutElement implements IOverlayRender
 
         ctx.setTransform( this.myTransform );
         
-        this.comboList.render( ctx, this._width, this.comboList.height(ctx) ); 
+        const comboHeight = this.comboList.height(ctx); 
+
+        this.comboList.render( ctx, this._width, comboHeight ); 
+    }
+
+    protected onScroll(deltaY: number): void {
+        console.log( deltaY)
+        this.listLayout.scrollContent(deltaY);
     }
 
     override onMouseDown(cursorX: number, cursorY: number): void {
-          
         (this.root as Node).editor.overlay = this; 
     }
 
