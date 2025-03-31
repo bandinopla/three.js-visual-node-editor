@@ -1,5 +1,6 @@
 import { FillStyle, Theme } from "./colors/Theme";
 import { UVNode } from "./nodes/attribute/UVNode";
+import { ValueNode } from "./nodes/input/ValueNode";
 import { MathNode } from "./nodes/operators/MathNode";
 import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
 import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
@@ -16,6 +17,13 @@ export type NodeGroupType = {
 }
 
 export const NodeTypes : NodeGroupType[] = [
+    {
+        group:"Input",
+        color:Theme.config.groupInput as string,
+        nodes: [
+            { TypeClass:ValueNode, name:"Value", id:"input-value"}
+        ]
+    },
     {
         group:"Attribute",
         color:Theme.config.groupAttribute as string,

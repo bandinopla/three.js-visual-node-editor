@@ -64,9 +64,18 @@ export class DraggableValue extends InteractiveLayoutElement {
 
         ctx.translate(5, 0);
         maxWidth-= 10;
+
+        if( this.name=="" )
+        { 
+            this.writeText( ctx, this.stringValue, this.fontSize, maxWidth/2, this.rowHeight,  Theme.config.barTextColor, "center"); 
+        }
+        else 
+        {
+            this.writeText( ctx, this.name, this.fontSize, this.xPadding, this.rowHeight,  Theme.config.barTextColor, "left");
+            this.writeText( ctx, this.stringValue, this.fontSize, maxWidth-this.xPadding, this.rowHeight,  Theme.config.barTextColor, "right"); 
+        }
         
-        this.writeText( ctx, this.name, this.fontSize, this.xPadding, this.rowHeight,  Theme.config.barTextColor, "left");
-        this.writeText( ctx, this.stringValue, this.fontSize, maxWidth-this.xPadding, this.rowHeight,  Theme.config.barTextColor, "right"); 
+
  
     }
 
@@ -104,9 +113,7 @@ export class DraggableValue extends InteractiveLayoutElement {
     }
 
     override onMouseWheel(deltaY: number): void {
-
-        const inc = this.step;
-
-        this.value = clamp( this.value-inc*(deltaY>0?1:-1), 0, 1 );
+  
+        this.value = this.value-this.step*(deltaY>0?1:-1);
     }
 }
