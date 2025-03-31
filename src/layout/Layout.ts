@@ -192,6 +192,8 @@ export class Layout extends LayoutElement {
             maxWidth = this.getChildsWidth(ctx)
         }
 
+        ctx.save();
+
         if( this.config.overflowHidden )
         {
             ctx.beginPath();
@@ -201,7 +203,9 @@ export class Layout extends LayoutElement {
 
         this.renderedHeight = maxHeight;
         
-        super.render(ctx, maxWidth, maxHeight)
+        super.render(ctx, maxWidth, maxHeight);
+        
+        ctx.restore();
     }
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
