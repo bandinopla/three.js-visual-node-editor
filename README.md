@@ -7,6 +7,10 @@
 ## **[!] Work in progress | Alpha state** <br/>
 Visual node editor, inspired by [Blender's shader editor](https://www.blender.org/), is a tool to visually build [Three.js](https://threejs.org/) materials using [Three.js-Shading-Language](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language).  The socket proximity detection was inspired by [Kennedy Richard](https://x.com/KennedyRichard)'s [Nodezator's node editor](https://x.com/KennedyRichard/status/1823905562192449762)
 
+This node system outputs a single javascript file that contains the layout info (in case you want to re-edit it) and the actual exported materials:
+
+[![cover](output-format.png)](https://bandinopla.github.io/three.js-visual-node-editor/)
+
 ### :bookmark_tabs: Read the [WIKI / Documentation](https://github.com/bandinopla/three.js-visual-node-editor/wiki/three.js-TSL-Visual-Node-Editor) to collaborate!
 
 # Let's build this together!
