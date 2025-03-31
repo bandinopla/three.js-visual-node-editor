@@ -10,7 +10,7 @@ export class UVNode extends BaseAttributeNode {
 
     constructor() { 
 
-        const uvChannel = new DraggableValue("UV Channel", false, 0, 5, 1, ()=>this.update())
+        const uvChannel = new DraggableValue("Channel", false, 0, 5, 1, ()=>this.update())
 
         super([
             new UVAttributeProperty(),

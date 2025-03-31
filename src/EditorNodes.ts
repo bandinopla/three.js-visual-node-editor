@@ -21,16 +21,10 @@ export const NodeTypes : NodeGroupType[] = [
         group:"Input",
         color:Theme.config.groupInput as string,
         nodes: [
-            { TypeClass:ValueNode, name:"Value", id:"input-value"}
-        ]
-    },
-    {
-        group:"Attribute",
-        color:Theme.config.groupAttribute as string,
-        nodes:[
+            { TypeClass:ValueNode, name:"Value", id:"input-value"},
             { TypeClass:UVNode, name:"UV", id:"uv" }
         ]
-    },
+    }, 
     {
         group:"Math",
         color:Theme.config.groupMath as string, 
