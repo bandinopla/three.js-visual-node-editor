@@ -93,6 +93,15 @@ export class ConnectionsArray<T extends Connection=Connection> {
         return this._array.map(mapper);
     }
 
+    find( finder:( connection:T, index:number, connections:T[])=>boolean ) {
+        for (let i = 0; i < this._array.length; i++) {
+            const connection = this._array[i];
+            if( finder( connection, i, this._array )) {
+                return connection;
+            }
+        }
+    }
+
     purge( judge:( connection:T )=>boolean ){
         this._array = this._array.filter( con=> {
 

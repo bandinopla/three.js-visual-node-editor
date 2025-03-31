@@ -35,6 +35,10 @@ export class Editor {
     private aspectCorrection = 1; 
     private canvasAspect:number;
 
+    /**
+     * Used to be able to identify when a user just clicks ( a mouse up woth no mouse movement )
+     */
+    private mouseMoved = false;
     private handIcon : HandIcon;
 
     /**
@@ -175,6 +179,9 @@ export class Editor {
 
         //#region MOUSE MOVE
         canvas.addEventListener('mousemove', (event) => {
+
+            this.mouseMoved = true;
+
             let scale = this.ctx.getTransform().a; // Get the current scale (assuming uniform scaling)
             const mousePos = this.getMousePos( event); 
             const canvasPos = this.getCanvasMousePosition(mousePos); 
@@ -228,6 +235,8 @@ export class Editor {
 
         //#region MOUSE DOWN
         canvas.addEventListener("mousedown", ev=>{
+
+            this.mouseMoved = false;
             this.mouse = this.getMousePos( ev); 
         
             // middle mouse button to pan the workspace
@@ -277,10 +286,10 @@ export class Editor {
 
                         if( Math.abs( this.mouse.x - outlet.globalX )<=hitAreaRatio && Math.abs( this.mouse.y - outlet.globalY )<=hitAreaRatio )
                         {
-                            //
-                            // destroy any connectionusing this outlet...
-                            //
-                            this.destroyConnectionsUsing( outlet );
+                            // //
+                            // // destroy any connectionusing this outlet...
+                            // //
+                            // this.destroyConnectionsUsing( outlet );
 
                             //
                             // create a new "open" connection
@@ -336,7 +345,24 @@ export class Editor {
                 // if we clicked an outlet, we need to know which of the available outlets are valid to be connected to...
                 //
                 if( this.selectedOutlet )
-                { 
+                {      
+
+                    //@ts-ignore
+                    if( this.selectedOutlet.isInput )
+                    {
+                        //
+                        // in this case we will pretend that the connection was made by the other end of the connection if it was connected, to allow
+                        // for the visual impression of changing the endpoint of the connection that lead to us.
+                        //
+                        const oldOutlet = this.selectedOutlet;
+
+                        if( this.disolveSelectedOutlet() )
+                        {
+                            outlets.push( oldOutlet );
+                            outlets.splice( outlets.indexOf( this.selectedOutlet ), 1 );
+                        }
+                    }
+
                     //
                     // filter only outlet that we can connect to...
                     //
@@ -403,18 +429,8 @@ export class Editor {
             }
             else 
             { 
-                 
-                if( this.chosenOutlet.length )
-                { 
-                    if( this.chosenOutlet.length>1 )
-                        this.chosenOutlet.sort((a,b)=>b.alignmentScore-a.alignmentScore);
-
-
-                    this.destroyConnectionsUsing( this.chosenOutlet[0].outlet );
- 
-                    this.connections.setOrphansTarget( this.chosenOutlet[0].outlet );
-  
-                }
+                if( this.mouseMoved)
+                    this.createChosenConnections(); 
 
                 this.clearOutletSelection(); 
             }
@@ -604,15 +620,71 @@ export class Editor {
     
     }
 
-    protected destroyConnectionsUsing( outlet:IOutlet )
+    protected destroyConnectionsUsing( outlet:IOutlet, onlyIfConnected=false )
     {
-        this.connections.purge( connection=>connection.from!==outlet && (!isOutlet(connection.to) || connection.to!==outlet) )
-        // const clean = this.connections.filter( c=>( c.from!==outlet )
-        //     && ( c.to !==outlet )
-        // );
+        this.connections.purge( connection=>(( connection.from!==outlet ) || ( onlyIfConnected && !isOutlet(connection.to) )) && ( !isOutlet(connection.to) || connection.to!==outlet) ) ;
+    }
 
-        // this.connections.length = 0;
-        // this.connections.push( ...clean );
+    /**
+     * An input can only recieve 1 connection. The connection array will never have "to" repeated referencing the same outlet.
+     */
+    protected disolveSelectedOutlet() {
+        if( !this.selectedOutlet || !this.selectedOutlet.isInput ) return false;
+
+        const other = this.selectedOutlet.connectedTo;
+        if( other )
+        { 
+            //
+            // the first time we click an outlet a new connection if created with the "from" set to the clicked outlet and the "to" set to the mouse coordinates.
+            //
+            const openConnection = this.connections.find( c=>c.from==this.selectedOutlet && !isOutlet(c.to));
+
+            let target :Vector2Like | undefined;
+
+            if( openConnection )
+            {
+                target = openConnection.to as Vector2Like; //<--- mouse coordinates
+            }
+
+            this.destroyConnectionsUsing( this.selectedOutlet );
+
+            this.selectedOutlet = other;
+
+            if( target )
+                this.connections.push({
+                    from: other, 
+                    to: target
+                });
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * The user dragged the mouse out of an outlet aiming to create a new connection.
+     */
+    protected createChosenConnections() {
+
+        if( !this.chosenOutlet.length || !this.selectedOutlet ) return;
+
+        //
+        // pick the best one for the current one...
+        //
+        if( this.chosenOutlet.length>1 )
+            this.chosenOutlet.sort((a,b)=>b.alignmentScore-a.alignmentScore);
+
+
+        const chosenTarget = this.chosenOutlet[0].outlet;
+
+        if( this.selectedOutlet.isInput )
+            this.destroyConnectionsUsing( this.selectedOutlet, true );
+
+        //
+        // all the connections that were following the mouse will not have this outlet as their endpoint connection.
+        //
+        this.connections.setOrphansTarget( chosenTarget );
     }
 
     protected clearOutletSelection() {
