@@ -4,7 +4,7 @@
     background-color: black;
     position: fixed;
     overflow-y: auto;
-    z-index: 9;
+    z-index: 999;
     padding: 10px;
     border-radius: 5px;
 }

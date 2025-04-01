@@ -1,19 +1,27 @@
 import { FillStyle, Theme } from "./colors/Theme";
 import { UVNode } from "./nodes/attribute/UVNode";
 import { ValueNode } from "./nodes/input/ValueNode";
+import { Node } from "./nodes/Node";
+import { mathFunctions, mathOperations } from "./nodes/operators/list";
 import { MathNode } from "./nodes/operators/MathNode";
+import {  methodsDefinitions2NodeClassDefinitions } from "./nodes/operators/MethodCallNode";
 import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
 import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
 import { WinNode } from "./nodes/WinNode";
 
 // Define the type for class constructors that extend BaseType
-type Constructor<T extends WinNode> = new (...args: any[]) => T;
+type Constructor<T extends Node> = new (...args: any[]) => T;
  
 export type NodeGroupType = {
     group:string
     color:string
     exportsScript?:boolean,
-    nodes:{ TypeClass:Constructor<WinNode>, name:string, id:string }[]
+    nodes:{ 
+        TypeClass:Constructor<Node>, 
+        name:string, 
+        id:string,
+        constructorArgs?: unknown
+    }[]
 }
 
 export const NodeTypes : NodeGroupType[] = [
@@ -29,7 +37,9 @@ export const NodeTypes : NodeGroupType[] = [
         group:"Operators",
         color:Theme.config.groupMath as string, 
         nodes:[
-            { TypeClass:MathNode, name:"Math", id:"math-operation"}
+            //{ TypeClass:MathNode, name:"Math", id:"math-operation"}
+            ...methodsDefinitions2NodeClassDefinitions(mathOperations),
+            ...methodsDefinitions2NodeClassDefinitions(mathFunctions, true),
         ]
     }, 
     {
@@ -37,7 +47,7 @@ export const NodeTypes : NodeGroupType[] = [
         color:Theme.config.groupShader as string,
         exportsScript: true,
         nodes:[
-            { TypeClass:MeshStandardNode, name:"Mesh Standard", id:"mesh-standard-shader"}
+            { TypeClass:MeshStandardNode, name:"Mesh Standard Material", id:"mesh-standard-shader"}
         ]
     }, 
     {

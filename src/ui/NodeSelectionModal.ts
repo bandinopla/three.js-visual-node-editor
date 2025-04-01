@@ -1,8 +1,8 @@
 import { NodeTypes } from "../EditorNodes";
-import { WinNode } from "../nodes/WinNode";
+import { Node } from "../nodes/Node"; 
 import styles from "./NodeSelectionModal.module.css";
 
-type NodeHandler = (node:WinNode)=>void
+type NodeHandler = (node:Node)=>void
 
 class NodeSelector {
     private div:HTMLDivElement;
@@ -64,9 +64,21 @@ class NodeSelector {
 
                 groupLabel.classList.add(styles.groupTitle)
                 groupLabel.style.backgroundColor = groupType.color;
-                groupLabel.innerText = groupType.group;
+                groupLabel.innerText = groupType.group; 
 
-                li.addEventListener("click", ev=>this.addNewNode(new node.TypeClass))
+                li.addEventListener("click", ev=>{
+
+                    if( node.constructorArgs )
+                    {
+                        this.addNewNode(new node.TypeClass(...(Array.isArray(node.constructorArgs) ? node.constructorArgs : [node.constructorArgs])))
+                    }
+                    else 
+                    {
+                        this.addNewNode(new node.TypeClass)
+                    }
+                    
+
+                })
 
             });
 
@@ -96,7 +108,7 @@ class NodeSelector {
         })
     }
 
-    private addNewNode( node:WinNode )
+    private addNewNode( node:Node )
     {
         this._onCreated?.(node);
         this.hide();
