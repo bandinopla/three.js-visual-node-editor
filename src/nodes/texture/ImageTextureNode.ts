@@ -40,6 +40,8 @@ export class ImageTextureNode extends TextureTypeNode {
             ${texture}.wrapS = ${ this.extensionPolicy.extensionMode };
             ${texture}.wrapT = ${ this.extensionPolicy.extensionMode };
             ${texture}.mapping = ${ this.mappingPolicy.mappingType };
+            ${texture}.flipY = false; 
+
             ` ) ;
 
         const uv = this.uv.writeScript(script);

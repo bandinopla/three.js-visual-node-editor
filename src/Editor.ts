@@ -106,8 +106,8 @@ export class Editor {
         this.canvas.height = window.innerHeight * dpr;
 
         // Set CSS size (for display)
-        this.canvas.style.width = `${window.innerWidth}px`;
-        this.canvas.style.height = `${window.innerHeight}px`;
+        this.canvas.style.width = "100vw"; // `${window.innerWidth}px`;
+        this.canvas.style.height = "100vh"// `${window.innerHeight}px`;
 
         this.canvasAspect = this.canvas.height / this.canvas.width;
         this.reset();
@@ -496,6 +496,11 @@ export class Editor {
     } 
 
     protected onResize() { 
+        const dpr = window.devicePixelRatio || 1;
+
+        this.canvas.width = window.innerWidth * dpr;
+        this.canvas.height = window.innerHeight * dpr;
+        
         const newAspectCorrection = ( this.canvas.offsetWidth/this.canvas.offsetHeight )*this.canvasAspect;
 
         const xChange = this.aspectCorrection/newAspectCorrection;

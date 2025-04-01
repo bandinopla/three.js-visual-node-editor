@@ -16,8 +16,11 @@ export class Output extends OutletProperty {
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void { 
         
+        ctx.save();
+        ctx.rect(0,0,maxWidth, maxHeight);
+        ctx.clip();
         this.writeText(ctx, this.label, this.fontSize, maxWidth-10, maxHeight, this.fontColor, "right" );
- 
+        ctx.restore();
         
     }
 }

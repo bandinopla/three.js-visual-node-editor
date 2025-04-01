@@ -47,11 +47,30 @@ export class ComboBox extends InteractiveLayoutElement implements IOverlayRender
         this.index = 0;
     }
 
+    protected setListItems( items:string[] ) {
+        const uiItems = items.map( (opt, i)=>new ListItem( opt, false, ()=>this.onOptionClicked(i), this.onScroll.bind(this)  ));
+
+        if( this.listItems )
+        {
+            this.listItems.length = 0;
+            this.listItems.push( ...uiItems );
+
+            uiItems.forEach( item=>item.parent=this.listLayout );
+        }
+
+        return uiItems;
+    }
+
+    updateOptions( newOptions:string[] ) 
+    {
+        this.setListItems( newOptions );
+    }
+
     get overlayBody(){ return this.comboList }
 
     get index() { return this._index; }
     set index( i:number ) {
-        const newIndex = clamp( i, 0, this.options.length-1 );
+        const newIndex = clamp( i, 0, this.listItems.length-1 );
         const changed = newIndex!=this._index;
         this._index = newIndex; 
 
@@ -112,6 +131,7 @@ export class ComboBox extends InteractiveLayoutElement implements IOverlayRender
     }
 
     protected onOptionClicked( i:number ) {
+        console.log("CLICKED", i)
         this.index = i; 
         (this.root as Node).editor.overlay = undefined; 
     }

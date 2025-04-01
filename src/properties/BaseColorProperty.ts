@@ -11,19 +11,21 @@ export class BaseColorProperty extends Input {
  
     protected colorPicker:ColorPicker;
 
-    constructor() {
+    constructor( title="Base Color", defaultColor?:Color , protected multipliesInput = true) {
         super(3); 
 
         this.colorPicker = new ColorPicker(()=>this.root.update(), false); 
 
         this.layout = new Layout([
-            new TextLabel("Base Color"), 
+            new TextLabel(title), 
             this.colorPicker
         ],{
             justify:"space-between"
         }); 
 
         //this.xPadding = 10; 
+        if( defaultColor )
+            this.baseColor = defaultColor;
     } 
 
     get baseColor() {
@@ -40,7 +42,8 @@ export class BaseColorProperty extends Input {
 
         if( this.connectedTo )
         {
-            baseColor = baseColor + `.mul(${ this.connectedTo.writeScript( script ) })`;
+            const input = this.connectedTo.writeScript( script );
+            baseColor = ( this.multipliesInput? `${baseColor}.mul(${ input })` : input );
         }
 
         script.importModule("color");

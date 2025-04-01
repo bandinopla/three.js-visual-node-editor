@@ -21,7 +21,7 @@ export class ScenePreviewNode extends WinNode {
  
         const ambientLightSlider = new DraggableValue("Ambient light", true, 0, 3, 0.1, value =>this.onAmbientLightSlider(value) );
         const rotationSpeedSlider = new DraggableValue("Rotation speed", true, 0, 2, 0.1, value =>scene.rotationSpeed=value);
-        const objType = new ComboBox("Wrapping mode", scene.meshes.map(m=>m.name), value=>scene.currentObjectIndex=value  );
+        const objType = new ComboBox("Object", scene.meshes.map(m=>m.name), value=>scene.currentObjectIndex=value  );
 
         const materialSlots = [
             new MaterialProperty(0),
@@ -49,6 +49,10 @@ export class ScenePreviewNode extends WinNode {
         objType.index = this.scene.currentObjectIndex;  
 
         this.errorMaterial = new MeshBasicMaterial({ color:0xff0000 });
+
+        scene.addEventListener("modelLoaded", ()=> {
+            objType.updateOptions( scene.meshes.map(m=>m.name) );
+        });
 
     }
 
@@ -87,6 +91,7 @@ export class ScenePreviewNode extends WinNode {
         }
         catch( error )
         {
+            console.error( error )
             this.scene.setMaterial( materialIndex, this.errorMaterial );
         }
     }

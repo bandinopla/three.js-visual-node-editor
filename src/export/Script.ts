@@ -35,16 +35,25 @@ export class Script {
      * Defines a variable or function... if it is not already set. Else, it will not override.
      * @param varName 
      * @param varValue a valid js sintax string or an object that will be stringified to a JSON
+     * @param valueIsFunctionBody the contents of `varValue` will be put in the body of a self executing function.
      * @returns the name of the property passed.
      */
-    define( varName:string, varValue:string|Object ) {
+    define( varName:string, varValue:string|Object, valueIsFunctionBody = false ) {
         if( typeof varValue == "object" ) 
         {
             varValue = JSON.stringify(varValue);
-        } 
+            valueIsFunctionBody = false;
+        }  
+        else 
+        {
+            if( valueIsFunctionBody && !varValue.includes("return") )
+            {
+                throw new Error(`The value of script variable ${varName} MUST contain a return, since it is using valueIsFunctionBody=true`);
+            }
+        }
 
         if( !this.definitions.find(def=>def[0]==varName ))
-             this.definitions.push( [ varName, String( varValue ) ] );
+             this.definitions.push( [ varName, String( valueIsFunctionBody? `(()=>{${varValue}})()` : varValue ) ] );
         return varName;
     }
 

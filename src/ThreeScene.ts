@@ -1,8 +1,13 @@
 import { clamp } from 'three/src/math/MathUtils.js';
 import * as THREE from 'three/webgpu';
 import { WebGPURenderer } from 'three/webgpu';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-export class ThreeScene {
+type SceneEvents = {
+    modelLoaded: {}
+}
+
+export class ThreeScene extends THREE.EventDispatcher<SceneEvents>{
     readonly scene:THREE.Scene;
     readonly camera:THREE.PerspectiveCamera;
     readonly renderer:WebGPURenderer;
@@ -19,6 +24,8 @@ export class ThreeScene {
     private materialNotSet = new THREE.MeshStandardMaterial({ color: 0xcccccc });
 
     constructor() {
+        super();
+
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -68,6 +75,25 @@ export class ThreeScene {
               sphere.visible = false;
               this.objs.push( sphere );
               this.objHolder.add( sphere );
+
+        const loader = new GLTFLoader();
+
+        loader.load( import.meta.env.BASE_URL+'monkey.glb', ( gltf ) => {
+        
+            const monkey = gltf.scene.getObjectByName("monkey") as THREE.Mesh;
+            monkey.name = "Monkey";
+            monkey.visible = false;
+
+            this.objs.push( monkey)
+            this.objHolder.add( monkey );
+
+            this.dispatchEvent({ type:"modelLoaded" })
+        
+        }, undefined, function ( error ) {
+        
+            console.error( error );
+        
+        } );
 
 
         this.scene.add( this.objHolder )
@@ -119,6 +145,7 @@ export class ThreeScene {
     set currentObjectIndex(index:number) {
         this._currentObjectIndex = clamp( index, 0, this.objs.length-1 );
         this.objs.forEach( (obj,i)=>obj.visible = i==index )
+        console.log(index, this.objs )
     }
 
     render() {
@@ -126,7 +153,7 @@ export class ThreeScene {
         const delta = this.clock.getDelta()
         this.updateLightPosition();
         this.objHolder.rotateY(delta*this.rotationSpeed)
-        this.objHolder.rotateX(-delta*this.rotationSpeed)
+        //this.objHolder.rotateX(-delta*this.rotationSpeed)
         this.renderer.render( this.scene, this.camera );
     }
 

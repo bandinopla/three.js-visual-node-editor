@@ -14,7 +14,9 @@ export class HeaderElement extends LayoutElement {
         ctx.fillStyle = this.bgColor;
         ctx.fill()
  
-
+        ctx.save();
+        ctx.clip();
         this.writeText(ctx, this.title, this.fontSize, 10, maxHeight, this.fontColor );
+        ctx.restore();
     }
 }

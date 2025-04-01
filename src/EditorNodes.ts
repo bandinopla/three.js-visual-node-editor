@@ -7,6 +7,7 @@ import { mathFunctions, mathOperations } from "./nodes/operators/list";
 import {  methodsDefinitions2NodeClassDefinitions } from "./nodes/operators/MethodCallNode";
 import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
 import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
+import { NormalMapNode } from "./nodes/vector/NormalMapNode";
 
 // Define the type for class constructors that extend BaseType
 type Constructor<T extends Node> = new (...args: any[]) => T;
@@ -56,6 +57,13 @@ export const NodeTypes : NodeGroupType[] = [
         color:Theme.config.groupTexture as string,
         nodes:[
             { TypeClass:ImageTextureNode, name:"Image Texture", id:"image-texture"}
+        ]
+    },
+    {
+        group:"Vector",
+        color:Theme.config.groupVector as string,
+        nodes: [
+            { TypeClass:NormalMapNode, name: "Normal Map", id:"normal-map" }
         ]
     }
 ]

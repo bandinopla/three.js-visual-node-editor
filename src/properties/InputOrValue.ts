@@ -11,6 +11,7 @@ type Config = {
     step:number
     label:string
     asBar:boolean
+    defaultValue:number
 }
 
 export class InputOrValue extends BasicInputProperty 
@@ -18,7 +19,12 @@ export class InputOrValue extends BasicInputProperty
     protected notConnectedContent:Layout;
     protected valueSlider:DraggableValue;
 
-    constructor( size:OutletSize, label:string|Partial<Config>, protected onChange?:(v?:number)=>void ) {
+    /**
+     * If true, whatever input value will be multiplied by our value
+     */
+    multiplyInputWithValue = false;
+
+    constructor( size:OutletSize, label:string|Partial<Config>, protected onChangeListener?:(v?:number)=>void ) {
  
         const hasConfig = typeof label!="string";
 
@@ -28,6 +34,7 @@ export class InputOrValue extends BasicInputProperty
             step: 0.01,
             label: "",
             asBar: false,
+            defaultValue:0,
             ...( !hasConfig?{}:label )
         }
 
@@ -44,6 +51,21 @@ export class InputOrValue extends BasicInputProperty
         //this.notConnectedContent.parent = this;
         this.layout = this.notConnectedContent;
         
+        this.valueSlider.value = valConfig.defaultValue;
+    }
+
+    /**
+     * Inform the listner or if no listener was passed, then inform the top-most node that "something has changed"
+     */
+    protected onChange( val?:number ) {
+        if( this.onChangeListener )
+        {
+            this.onChangeListener( val );
+        }
+        else 
+        {
+            this.root.update();
+        }
     }
 
     get value() {
@@ -67,22 +89,31 @@ export class InputOrValue extends BasicInputProperty
     }
 
     protected override onConnected(to: IOutlet): void {
-        this.layout = undefined;
+        if( !this.multiplyInputWithValue )
+            this.layout = undefined;
+
         this.onChange?.();
     }
 
     protected override onDisconnected(from: IOutlet): void {
-        this.layout = this.notConnectedContent;
+        if( !this.multiplyInputWithValue )
+            this.layout = this.notConnectedContent;
+
         this.onChange?.( this.valueSlider.value );
     }
 
     override writeScript(script: Script): string {
+
+        script.importModule("float"); 
+
+        const val = `float(${ this.valueSlider.stringValue })`;
+
         if( this.connectedTo )
         {
-            return this.connectedTo.writeScript( script );
-        }
+            return this.connectedTo.writeScript( script ) + ( this.multiplyInputWithValue? `.mul(${val})` :"");
+        } 
+        
 
-        script.importModule("float");
-        return `float(${ this.valueSlider.stringValue })`
+        return val;
     }
 }
