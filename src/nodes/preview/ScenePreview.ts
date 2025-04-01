@@ -6,6 +6,7 @@ import { WinNode } from "../WinNode";
 import { ThreeScene } from "../../ThreeScene";
 import { Script } from "../../export/Script";
 import { ComboBox } from "../../components/ComboBox";
+import { MeshBasicMaterial } from "three";
 
 export class ScenePreviewNode extends WinNode {
 
@@ -14,6 +15,7 @@ export class ScenePreviewNode extends WinNode {
     protected ambientLightSlider:DraggableValue;
     protected rotationSpeedSlider:DraggableValue;
     protected objTypeCombo:ComboBox;
+    protected errorMaterial:MeshBasicMaterial;
 
     constructor( protected scene:ThreeScene ) { 
  
@@ -46,6 +48,8 @@ export class ScenePreviewNode extends WinNode {
         rotationSpeedSlider.value = this.scene.rotationSpeed;
         objType.index = this.scene.currentObjectIndex;  
 
+        this.errorMaterial = new MeshBasicMaterial({ color:0xff0000 });
+
     }
 
     protected onAmbientLightSlider( intensity:number ) {
@@ -71,13 +75,20 @@ export class ScenePreviewNode extends WinNode {
 
         const script = new Script();
 
-        const materialRef = slot.writeScript( script );
+        try
+        {
+            const materialRef = slot.writeScript( script );
 
-        console.log( script.toString("", false ))
+            console.log( script.toString("", false ))
 
-        const material = script.eval( materialRef+"()" );
+            const material = script.eval( materialRef+"()" );
 
-        this.scene.setMaterial( materialIndex, material );
+            this.scene.setMaterial( materialIndex, material );
+        }
+        catch( error )
+        {
+            this.scene.setMaterial( materialIndex, this.errorMaterial );
+        }
     }
 
     override serialize(): Record<string, any> {
