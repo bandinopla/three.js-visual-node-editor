@@ -1,5 +1,6 @@
 import { Theme } from "./colors/Theme";
-import { UVNode } from "./nodes/attribute/UVNode";
+import { UVNode } from "./nodes/attribute/UVNode"; 
+import { tslInputNodes } from "./nodes/input/TslInputNode";
 import { ValueNode } from "./nodes/input/ValueNode";
 import { Node } from "./nodes/Node";
 import { mathFunctions, mathOperations } from "./nodes/operators/list";
@@ -28,7 +29,9 @@ export const NodeTypes : NodeGroupType[] = [
         color:Theme.config.groupInput as string,
         nodes: [
             { TypeClass:ValueNode, name:"Value", id:"input-value"},
-            { TypeClass:UVNode, name:"UV", id:"uv" }
+            { TypeClass:UVNode, name:"UV", id:"uv" },
+            //{ TypeClass:PositionPropertiesNode, name:"Position", id:"position" },
+            ...tslInputNodes
         ]
     }, 
     {

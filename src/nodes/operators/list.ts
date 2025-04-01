@@ -92,5 +92,12 @@ export const mathFunctions :MethodCallDef[] = [
     { "name": "step", "params": 2, "desc": "Generate a step function by comparing two values." },
     { "name": "tan", "params": 1, "desc": "Return the tangent of the parameter." },
     { "name": "transformDirection", "params": 2, "desc": "Transform the direction of a vector by a matrix and then normalize the result." },
-    { "name": "trunc", "params": 1, "desc": "Truncate the parameter, removing the fractional part." }
+    { "name": "trunc", "params": 1, "desc": "Truncate the parameter, removing the fractional part." },
+
+    //blend modes
+    { "name": "blendBurn", "params": 2, "desc": "Returns the burn blend mode." },
+    { "name": "blendDodge", "params": 2, "desc": "Returns the dodge blend mode." },
+    { "name": "blendOverlay", "params": 2, "desc": "Returns the overlay blend mode." },
+    { "name": "blendScreen", "params": 2, "desc": "Returns the screen blend mode." },
+    { "name": "blendColor", "params": 2, "desc": "Returns the (normal) color blend mode." }
 ]

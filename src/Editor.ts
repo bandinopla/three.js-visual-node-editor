@@ -679,7 +679,9 @@ export class Editor {
         const chosenTarget = this.chosenOutlet[0].outlet;
 
         if( this.selectedOutlet.isInput )
-            this.destroyConnectionsUsing( this.selectedOutlet, true );
+            this.destroyConnectionsUsing( this.selectedOutlet, true ); 
+        else 
+            this.destroyConnectionsUsing( chosenTarget, true );
 
         //
         // all the connections that were following the mouse will not have this outlet as their endpoint connection.
