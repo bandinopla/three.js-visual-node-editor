@@ -1,13 +1,11 @@
-import { FillStyle, Theme } from "./colors/Theme";
+import { Theme } from "./colors/Theme";
 import { UVNode } from "./nodes/attribute/UVNode";
 import { ValueNode } from "./nodes/input/ValueNode";
 import { Node } from "./nodes/Node";
 import { mathFunctions, mathOperations } from "./nodes/operators/list";
-import { MathNode } from "./nodes/operators/MathNode";
 import {  methodsDefinitions2NodeClassDefinitions } from "./nodes/operators/MethodCallNode";
 import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
 import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
-import { WinNode } from "./nodes/WinNode";
 
 // Define the type for class constructors that extend BaseType
 type Constructor<T extends Node> = new (...args: any[]) => T;
