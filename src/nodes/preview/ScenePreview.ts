@@ -16,6 +16,7 @@ export class ScenePreviewNode extends WinNode {
     protected rotationSpeedSlider:DraggableValue;
     protected objTypeCombo:ComboBox;
     protected errorMaterial:MeshBasicMaterial;
+    protected updateWaitInterval = 0;
 
     constructor( protected scene:ThreeScene ) { 
  
@@ -25,8 +26,8 @@ export class ScenePreviewNode extends WinNode {
 
         const materialSlots = [
             new MaterialProperty(0),
-            new MaterialProperty(1),
-            new MaterialProperty(2),
+            // new MaterialProperty(1),
+            // new MaterialProperty(2),
         ]
 
         super("Scene Preview", Theme.config.groupOutput, [
@@ -62,9 +63,14 @@ export class ScenePreviewNode extends WinNode {
     } 
 
     override update(): void {
-        
-        this.compileMaterialAndAdd( 0 )
 
+        clearInterval( this.updateWaitInterval );
+
+        this.updateWaitInterval = setTimeout(()=>{
+
+            this.compileMaterialAndAdd( 0 )
+
+        }, 400);
     }
 
     protected compileMaterialAndAdd( materialIndex:number )
