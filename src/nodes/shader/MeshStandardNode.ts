@@ -18,11 +18,9 @@ export class MeshStandardNode extends WinNode {
     constructor() {
 
         const colorNodeInput = new BaseColorProperty();
-        const metallic = new InputOrValue(1, { label:"Metallic", min:0, max:1, asBar:true });
-              metallic.multiplyInputWithValue = true;
+        const metallic = new InputOrValue(1, { label:"Metallic", min:0, max:1, asBar:true }); 
 
-        const roughness = new InputOrValue(1, { label:"Roughness", min:0, max:1, asBar:true });
-              roughness.multiplyInputWithValue = true;
+        const roughness = new InputOrValue(1, { label:"Roughness", min:0, max:1, asBar:true }); 
 
         const normal = new BasicInputProperty(2, "Normal");
 

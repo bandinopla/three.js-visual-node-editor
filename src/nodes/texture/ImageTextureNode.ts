@@ -6,12 +6,14 @@ import { TextureMappingModeProperty } from "../../properties/TextureMappingModeP
 import { UVTransformProperty } from "../../properties/UVTransformProperty";
 import { TextureTypeNode } from "./BaseTextureNode";
 import { Script } from '../../export/Script';
+import { TextureColorSpaceProperty } from '../../properties/TextureColorSpaceProperty';
 export class ImageTextureNode extends TextureTypeNode {
  
     private imageProp:TextureProperty;
     private uv:UVTransformProperty;
     private extensionPolicy:TextureExtensionProperty;
     private mappingPolicy:TextureMappingModeProperty;
+    private colorSpace:TextureColorSpaceProperty;
 
     constructor() {
         super("Image Texture", 
@@ -21,6 +23,7 @@ export class ImageTextureNode extends TextureTypeNode {
                 new TextureProperty(),   
                 new TextureExtensionProperty(),
                 new TextureMappingModeProperty(),
+                new TextureColorSpaceProperty(),
                 new UVTransformProperty()
             ]
         ); 
@@ -29,6 +32,7 @@ export class ImageTextureNode extends TextureTypeNode {
         this.uv = this.getChildOfType(UVTransformProperty)!;
         this.extensionPolicy = this.getChildOfType(TextureExtensionProperty)!;
         this.mappingPolicy = this.getChildOfType(TextureMappingModeProperty)!;
+        this.colorSpace = this.getChildOfType(TextureColorSpaceProperty)!;
     }
 
     override writeScript(script: Script): string {
@@ -43,9 +47,10 @@ export class ImageTextureNode extends TextureTypeNode {
             
             
             texture => `
-${texture}.wrapS = ${ this.extensionPolicy.extensionMode };
-${texture}.wrapT = ${ this.extensionPolicy.extensionMode };
-${texture}.mapping = ${ this.mappingPolicy.mappingType };
+${texture}.wrapS = ${ this.extensionPolicy.value };
+${texture}.wrapT = ${ this.extensionPolicy.value };
+${texture}.mapping = ${ this.mappingPolicy.value };
+${texture}.colorSpace = ${ this.colorSpace.value };
 ${texture}.flipY = false;  
                         ` 
         ) ;
@@ -60,8 +65,9 @@ ${texture}.flipY = false;
         return {
             ...super.serialize(),
             src: this.imageProp.isFromDisk? "" : this.imageProp.imageSrc,
-            extension: this.extensionPolicy.extensionMode,
-            mapping: this.mappingPolicy.mappingType
+            extension: this.extensionPolicy.value,
+            mapping: this.mappingPolicy.value,
+            colorSpace: this.colorSpace.value
         }
     }
 
@@ -71,8 +77,9 @@ ${texture}.flipY = false;
         if( data.src !="" )
             this.imageProp.src = data.src;
 
-        this.extensionPolicy.extensionMode = data.extension;
-        this.mappingPolicy.mappingType = data.mapping;
+        this.extensionPolicy.value = data.extension;
+        this.mappingPolicy.value = data.mapping;
+        this.colorSpace.value = data.colorSpace;
     }
 
     override onRemoved(): void {
