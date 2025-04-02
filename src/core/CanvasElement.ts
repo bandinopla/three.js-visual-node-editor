@@ -65,4 +65,22 @@ export class CanvasElement {
         }
     }
 
+    /**
+     * Mask the draw to only be visible inside the square from 0,0 to width, height 
+     */
+    protected drawClipped(ctx: CanvasRenderingContext2D, width:number, height:number, draw:VoidFunction ){
+        ctx.save() 
+        
+        try {  
+
+            ctx.beginPath();
+            ctx.rect(0, 0, width, height);
+            ctx.clip();
+            draw();
+
+        } finally {
+            ctx.restore(); 
+        }
+    }
+
 }

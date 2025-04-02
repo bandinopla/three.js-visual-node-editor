@@ -4,10 +4,10 @@ import { LayoutElement } from "../layout/LayoutElement";
 export class TextLabel extends LayoutElement
 { 
 
-    constructor( protected label:string )
+    constructor( public label:string )
     {
         super();
-    }
+    } 
 
     override width(ctx: CanvasRenderingContext2D): number { 
         ctx.font = this.fontSize+'px '+Theme.config.fontFamily
@@ -16,8 +16,8 @@ export class TextLabel extends LayoutElement
 
     override renderContents(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
           
-        //text
-        this.writeText(ctx, this.label, this.fontSize, 0, maxHeight, Theme.config.textColor );
- 
+        this.drawClipped(ctx, maxWidth, maxHeight, 
+            ()=>this.writeText(ctx, this.label, this.fontSize, 0, maxHeight, Theme.config.textColor )
+        ) 
     } 
 }
