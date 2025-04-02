@@ -7,6 +7,8 @@ import { UVTransformProperty } from "../../properties/UVTransformProperty";
 import { TextureTypeNode } from "./BaseTextureNode";
 import { Script } from '../../export/Script';
 import { TextureColorSpaceProperty } from '../../properties/TextureColorSpaceProperty';
+import { TextureInterpolationProperty } from '../../properties/TextureInterpolationProperty';
+import { ComboBoxProperty } from '../../properties/ComboBoxProperty';
 export class ImageTextureNode extends TextureTypeNode {
  
     private imageProp:TextureProperty;
@@ -14,6 +16,8 @@ export class ImageTextureNode extends TextureTypeNode {
     private extensionPolicy:TextureExtensionProperty;
     private mappingPolicy:TextureMappingModeProperty;
     private colorSpace:TextureColorSpaceProperty;
+    private interpolation:TextureInterpolationProperty;
+    private useMipmaps:ComboBoxProperty;
 
     constructor() {
         super("Image Texture", 
@@ -21,6 +25,11 @@ export class ImageTextureNode extends TextureTypeNode {
                 new Vector3Output("Color"),
                 new Vector1Output("Alpha").outputProp("a"),
                 new TextureProperty(),   
+                new ComboBoxProperty("generate Mipmaps", [
+                    ["true", "use Mipmaps"],
+                    ["false", "Don't use Mipmaps"]
+                ]),
+                new TextureInterpolationProperty(),
                 new TextureExtensionProperty(),
                 new TextureMappingModeProperty(),
                 new TextureColorSpaceProperty(),
@@ -33,6 +42,8 @@ export class ImageTextureNode extends TextureTypeNode {
         this.extensionPolicy = this.getChildOfType(TextureExtensionProperty)!;
         this.mappingPolicy = this.getChildOfType(TextureMappingModeProperty)!;
         this.colorSpace = this.getChildOfType(TextureColorSpaceProperty)!;
+        this.interpolation = this.getChildOfType(TextureInterpolationProperty)!;
+        this.useMipmaps = this.getChildOfType(ComboBoxProperty)!;
     }
 
     override writeScript(script: Script): string {
@@ -52,7 +63,9 @@ ${texture}.wrapT = ${ this.extensionPolicy.value };
 ${texture}.mapping = ${ this.mappingPolicy.value };
 ${texture}.colorSpace = ${ this.colorSpace.value };
 ${texture}.flipY = false;  
-                        ` 
+${texture}.generateMipmaps = ${ this.useMipmaps.value };   
+${ this.interpolation.returnTextureSetupJs(texture) }
+` 
         ) ;
 
         const uv = this.uv.writeScript(script); 
@@ -67,7 +80,9 @@ ${texture}.flipY = false;
             src: this.imageProp.isFromDisk? "" : this.imageProp.imageSrc,
             extension: this.extensionPolicy.value,
             mapping: this.mappingPolicy.value,
-            colorSpace: this.colorSpace.value
+            colorSpace: this.colorSpace.value,
+            interpolation: this.interpolation.value,
+            usemipmap: this.useMipmaps.value,
         }
     }
 
@@ -80,6 +95,8 @@ ${texture}.flipY = false;
         this.extensionPolicy.value = data.extension;
         this.mappingPolicy.value = data.mapping;
         this.colorSpace.value = data.colorSpace;
+        this.interpolation.value = data.interpolation;
+        this.useMipmaps.value = data.usemipmap;
     }
 
     override onRemoved(): void {
