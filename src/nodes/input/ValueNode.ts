@@ -22,4 +22,16 @@ export class ValueNode extends UniformBaseNode {
     protected override getUniformJsValue(): string {
         return this.inputValue.stringValue;
     }
+
+    override serialize(): Record<string, any> {
+        return {
+            ...super.serialize(),
+            value: this.inputValue.value
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
+        this.inputValue.value = Number( data.value );
+    }
 }
