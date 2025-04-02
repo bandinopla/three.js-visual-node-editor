@@ -161,15 +161,27 @@ export class Script {
         //
         // uniforms
         //
-        output += "\n" + exportKeyword + " const $uniforms = {\n" +
-        this.uniforms.map( uniform => `${uniform[0]} : uniform( ${uniform[2]} )`).join(",")
-        +"\n}\n";
+        if( this.uniforms.length )
+        {
+            output += "\n" + exportKeyword + " const $uniforms = {\n" +
+            this.uniforms.map( uniform => `${uniform[0]} : uniform( ${uniform[2]} )`).join(",")
+            +"\n}\n";
+        }
+        
 
         //
         // image loaders...
         //
         if( this.imagePaths.length )
         {
+            output += `
+/**
+ *  --- IMAGE LOADING: README!! ---
+ *  You are responsable for loading the textures. You must import and call "setCustomImageLoader" that function will recieve
+ *  the URL of the image it wants to load. You must return a THREE.Texture instance.
+ */
+            `;
+
             //
             // utility function to load the texture...
             //
@@ -181,7 +193,7 @@ let onImageError = (url, err)=>console.error( "Failed to load: "+url,  err );
  * @param {(failedUrl:string, error:unknown)=>void customErrorHandler}
  * @returns 
  */
-${exportKeyword} const setCustomImageErrorHanlder = ( customErrorHandler )=>onImageError=customErrorHandler;
+${exportKeyword} const setCustomImageErrorHandler = ( customErrorHandler )=>onImageError=customErrorHandler;
 
 let loadTexture = (url, mimeType, onLoaded) => {
     if (mimeType.includes("exr")) {
