@@ -15,8 +15,8 @@ export class TextureInterpolationProperty extends ComboBoxProperty {
     returnTextureSetupJs( textureName:string ) { 
 
         return `
-${ textureName}.magFilter = ${ this.value.includes(".Linear")? this.modes[0][0] : this.modes[1][0] };        
-${ textureName}.minFilter = ${ this.value  };        
+${ textureName}.magFilter = ${ this.value.includes(".Linear")? this.modes[1][0] : this.modes[0][0] };        
+${ textureName}.minFilter = ${textureName}.generateMipmaps? ${ this.value  } : ${ textureName}.magFilter;        
         `;
     }
 }

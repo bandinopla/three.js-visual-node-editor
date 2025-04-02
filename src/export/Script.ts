@@ -178,7 +178,7 @@ let onImageError = (url, err)=>console.error( "Failed to load: "+url,  err );
 
 /**
  * If an image fails to load this will be called...
- * @param {(failedUrl:string, error:unknown)=>void customErrorHandler 
+ * @param {(failedUrl:string, error:unknown)=>void customErrorHandler}
  * @returns 
  */
 ${exportKeyword} const setCustomImageErrorHanlder = ( customErrorHandler )=>onImageError=customErrorHandler;
@@ -201,7 +201,11 @@ let loadTexture = (url, mimeType, onLoaded) => {
  * @returns 
  */
 ${exportKeyword} const setCustomImageLoader = ( customLoader )=>loadTexture=customLoader;
-            `;
+
+/**
+ *  These are the image textures used by your node setup...
+ */ 
+`;
 
             //
             // for each used texture...
@@ -209,8 +213,8 @@ ${exportKeyword} const setCustomImageLoader = ( customLoader )=>loadTexture=cust
             this.imagePaths.forEach( ([ path, mime, previewUrl, setupTexture ], index)=>{
 
                 output += `
-const texture${ index } = loadTexture('${ forExport? path : previewUrl }', '${mime}'${ setupTexture? `, texture => { ${setupTexture(`texture`)} }` :"" });`;
-
+const texture${ index } = loadTexture('${ forExport? path : previewUrl }', '${mime}'${ setupTexture? `, texture => { ${setupTexture(`texture`)} }` :"" });
+`; 
             });
         }
         
