@@ -36,16 +36,21 @@ export class ImageTextureNode extends TextureTypeNode {
         script.importModule("texture");
          
 
-        const map = script.loadTexture( this.imageProp.imagePath, this.imageProp.imageSrc, texture => `
-            ${texture}.wrapS = ${ this.extensionPolicy.extensionMode };
-            ${texture}.wrapT = ${ this.extensionPolicy.extensionMode };
-            ${texture}.mapping = ${ this.mappingPolicy.mappingType };
-            ${texture}.flipY = false; 
+        const map = script.loadTexture( 
+            this.imageProp.imagePath, 
+            this.imageProp.imageType,
+            this.imageProp.imageSrc, 
+            
+            
+            texture => `
+${texture}.wrapS = ${ this.extensionPolicy.extensionMode };
+${texture}.wrapT = ${ this.extensionPolicy.extensionMode };
+${texture}.mapping = ${ this.mappingPolicy.mappingType };
+${texture}.flipY = false;  
+                        ` 
+        ) ;
 
-            ` ) ;
-
-        const uv = this.uv.writeScript(script);
-        
+        const uv = this.uv.writeScript(script); 
 
         return script.define( this.nodeName, `texture( ${map}, ${uv} )`);
 
@@ -68,5 +73,10 @@ export class ImageTextureNode extends TextureTypeNode {
 
         this.extensionPolicy.extensionMode = data.extension;
         this.mappingPolicy.mappingType = data.mapping;
+    }
+
+    override onRemoved(): void {
+        super.onRemoved();
+        this.imageProp.dispose();
     }
 }

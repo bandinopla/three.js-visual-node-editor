@@ -1,18 +1,20 @@
  
-import { Theme } from "../colors/Theme";
 import { Button } from "../components/Button";
-import { ImagePreview } from "../components/ImagePreview";
-import { TextLabel } from "../components/TextLabel";
-import { IOutlet } from "../core/IOutlet";
+//import { ImagePreview } from "../components/ImagePreview";
+import { TextLabel } from "../components/TextLabel"; 
 import { Layout, Row } from "../layout/Layout";
-import { LayoutElement } from "../layout/LayoutElement";
-import { Input } from "./Input"; 
+import { LayoutElement } from "../layout/LayoutElement"; 
 
 export class TextureProperty extends LayoutElement {
 
     private initial : Layout;
     private overwritten : Layout;
     private _imageDisplayLayout : Layout; 
+    private currentLoadedImage? : {
+        url:string,
+        mime:string,
+        dispose:VoidFunction
+    };
  
     /**
      * The path/url used to load the image. In case of a file selected from disk this will only be the filename.
@@ -23,7 +25,8 @@ export class TextureProperty extends LayoutElement {
     private _isFromDisk = false;
     get isFromDisk() { return this._isFromDisk }
 
-    private imgPreview:ImagePreview;
+    //private imgPreview:ImagePreview;
+    private filenameLabel:TextLabel;
 
     get imagePath() {
         return this._filePath;
@@ -32,6 +35,10 @@ export class TextureProperty extends LayoutElement {
     get imageSrc() { return this._imageSrc; }
     set src( imageSrc:string ) {
         this.loadImage( imageSrc )
+    }
+
+    get imageType() {
+        return this.currentLoadedImage?.mime;
     }
 
 
@@ -47,7 +54,8 @@ export class TextureProperty extends LayoutElement {
             justify:"space-around" 
         });
 
-        this.imgPreview = new ImagePreview();
+        //this.imgPreview = new ImagePreview();
+        this.filenameLabel = new TextLabel("");
 
         //"column","start","stretch",
         this._imageDisplayLayout = new Layout( [
@@ -55,7 +63,7 @@ export class TextureProperty extends LayoutElement {
             //"row","space-around","center",
             new Layout( [
 
-                this.imgPreview, 
+                this.filenameLabel, 
                 new Button("X", ()=>this.reset() ), 
 
             ], {
@@ -86,7 +94,7 @@ export class TextureProperty extends LayoutElement {
         return new Promise<File|null>((resolve) => {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = 'image/*'; // Restrict to image files
+            input.accept = 'image/*,.exr,image/x-exr'; // Restrict to image files
             input.style.display = 'none';
         
             input.addEventListener('change', (event: Event) => {
@@ -117,18 +125,37 @@ export class TextureProperty extends LayoutElement {
         const reader = new FileReader();
 
         reader.onload = e => {
-            const dataURL = e.target!.result as string; // dataURL is a string 
-            
-            this.loadImage( dataURL );
+            const arrayBuffer = e.target!.result as ArrayBuffer;
+            // Create a Blob from the ArrayBuffer
+            const imageBlob = new Blob([arrayBuffer], { type: file.type }); // Use original file type
+
+            // Create an Object URL from the Blob
+            const imageURL = URL.createObjectURL(imageBlob);
+
+            this.currentLoadedImage = {
+                url: imageURL,
+                mime: file.type,
+                dispose: ()=>URL.revokeObjectURL(imageURL)
+            }
+            //image/x-exr 
+
+            this.loadImage( imageURL );
         };
 
-        reader.readAsDataURL(file);
+        reader.onerror = (e) => {
+            console.error("FileReader error:", e);
+            alert("Oops! Error loading the image...")
+        };
+
+        reader.readAsArrayBuffer(file);
     }
 
     protected loadImage( url:string ) {
 
         this._imageSrc = url;
-        this.imgPreview.show( url );
+        //this.imgPreview.show( url );
+        this.filenameLabel.label = this.imagePath!;
+
         this.layout = this._imageDisplayLayout;
         this.singleLine = false;
 
@@ -150,11 +177,19 @@ export class TextureProperty extends LayoutElement {
  
 
     protected reset() {
-        this.imgPreview.reset();
+
+        this.dispose();
+
+        // this.imgPreview.reset();
         this.layout = this.initial;
         this.singleLine = true;
 
         this.root.update()
+    }
+
+    dispose() {
+        this.currentLoadedImage?.dispose();
+        this.currentLoadedImage = undefined;
     }
  
 }

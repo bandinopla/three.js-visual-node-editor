@@ -1,6 +1,6 @@
 import * as TSL from 'three/tsl';
 import * as THREE from 'three/webgpu'; 
-
+import * as ADDONS from 'three/examples/jsm/Addons.js';
 
 export type UniformType = "boolean" | "number" | "Color" | "Vector2" | "Vector3" | "Vector4" | "Matrix3" | "Matrix4";
 
@@ -19,7 +19,7 @@ export class Script {
      */
     protected uniforms:[ name:string, type:UniformType, initialValue:string ][]=[];
 
-    protected imagePaths:[ path:string, previewImage?:string, textureSetup?:( refName:string)=>string ][] ; 
+    protected imagePaths:[ path:string, mime:string, previewImage?:string, textureSetup?:( refName:string)=>string ][] ; 
     protected moduleName2Ref:Record<string, unknown>; 
 
     constructor( ) { 
@@ -95,7 +95,7 @@ export class Script {
      * Tells that the script will need this texture loaded before even running...
      * @param imagePath 
      */
-    loadTexture( imagePath?:string, previewImageSrc?:string, textureSetup?:( refName:string)=>string )
+    loadTexture( imagePath?:string, mimeType?:string, previewImageSrc?:string, textureSetup?:( refName:string)=>string )
     {
         if( !imagePath )
         {
@@ -119,17 +119,23 @@ export class Script {
             return "no_texture";
         }
 
+        if( mimeType?.includes("exr") )
+        {
+            this.importModule("EXRLoader","three/examples/jsm/Addons.js", ADDONS);
+        }
+
         let index = this.imagePaths.findIndex( paths=>paths[1]==previewImageSrc );
 
         if( index<0 )
-            index = this.imagePaths.push([ imagePath, previewImageSrc!, textureSetup ])-1;
+            index = this.imagePaths.push([ imagePath, mimeType!, previewImageSrc!, textureSetup ])-1;
 
-        return `textureLoader${ index }`; 
+        return `texture${ index }`; 
     }
 
     toString( lastExpression:string="", forExport = false ) {
  
         let output = `\n`;
+        let exportKeyword = (forExport?"export":"");
 
         if( forExport )
         { 
@@ -155,7 +161,7 @@ export class Script {
         //
         // uniforms
         //
-        output += "\n" + (forExport?"export":"") + " const $uniforms = {\n" +
+        output += "\n" + exportKeyword + " const $uniforms = {\n" +
         this.uniforms.map( uniform => `${uniform[0]} : uniform( ${uniform[2]} )`).join(",")
         +"\n}\n";
 
@@ -167,17 +173,43 @@ export class Script {
             //
             // utility function to load the texture...
             //
-            output += `\nconst loadTexture = url => new THREE.TextureLoader().load(url);
+            output += `  
+let onImageError = (url, err)=>console.error( "Failed to load: "+url,  err );
+
+/**
+ * If an image fails to load this will be called...
+ * @param {(failedUrl:string, error:unknown)=>void customErrorHandler 
+ * @returns 
+ */
+${exportKeyword} const setCustomImageErrorHanlder = ( customErrorHandler )=>onImageError=customErrorHandler;
+
+let loadTexture = (url, mimeType, onLoaded) => {
+    if (mimeType.includes("exr")) {
+        const   exrLoader = new EXRLoader();
+                
+        return  exrLoader.load(url, onLoaded, undefined, onImageError.bind(null, url) );
+    } else {
+        const   textureLoader = new THREE.TextureLoader();
+                
+        return  textureLoader.load(url, onLoaded, undefined, onImageError.bind(null, url));
+    }
+};
+
+/**
+ * Given a image url (or the name of the image if it was loaded via "frile from disk") should return the corresponding texture
+ * @param {(url:string, mimeType:string, onLoaded:(data: THREE.DataTexture, texData: object) => void)=>THREE.Texture} customLoader 
+ * @returns 
+ */
+${exportKeyword} const setCustomImageLoader = ( customLoader )=>loadTexture=customLoader;
             `;
 
             //
             // for each used texture...
             //
-            this.imagePaths.forEach( ([ path, previewUrl, setupTexture ], index)=>{
+            this.imagePaths.forEach( ([ path, mime, previewUrl, setupTexture ], index)=>{
 
-                output += `\nconst textureLoader${ index } = loadTexture('${ forExport? path : previewUrl }');
-                ${ setupTexture? setupTexture(`textureLoader${ index }`) :"" }
-                `;
+                output += `
+const texture${ index } = loadTexture('${ forExport? path : previewUrl }', '${mime}'${ setupTexture? `, texture => { ${setupTexture(`texture`)} }` :"" });`;
 
             });
         }
