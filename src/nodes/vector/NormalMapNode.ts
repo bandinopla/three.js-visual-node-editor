@@ -17,8 +17,7 @@ export class NormalMapNode extends WinNode {
 
         const typeCombo = new ComboBox("Space", [
             "Tangent Space",
-            "Object Space",
-            "World Space"
+            "Object Space"
         ], v=>this.onTypeComboChange(v));
 
         const strength = new InputOrValue(1, { label:"Stength", min:0, max:10, step:0.1, asBar:true, defaultValue:1 });
@@ -43,66 +42,28 @@ export class NormalMapNode extends WinNode {
     }
 
     override writeScript(script: Script): string {
-        // si es tangen space... usa el UV
-        // else usa el object space o el world space tsl params
+
+        script.importModule("normalMap"); 
+
         let map = this.color.writeScript(script);
-        let node = "";
         let strength = this.strength.value; 
 
+        let node = `
+const normalNode = normalMap( ${map}, ${strength});
+        `;
+        
+        // i will leave this as a switch just in case...
         switch( this.typeCombo.index )
         { 
-            case 1: //object space
-                script.importModule("modelNormalMatrix");
-                script.importModule("normalize");
-                script.importModule("normalGeometry"); // Geometry normal in object space
-                script.importModule("vec4"); 
-
-                node = ` 
-                    // object space normal map
-                    const mappedNormal = ${map}.xyz.mul(2).sub(1);
-                    const normalDiff = mappedNormal.sub(normalGeometry);
-                    const adjustedNormal = normalGeometry.add(normalDiff.mul(${strength}));
-
-                    return normalize(modelNormalMatrix.mul(vec4(adjustedNormal, 0)).xyz);
-                `;
-                break;
-
-            case 2: // worlds space
-                script.importModule("modelNormalMatrix");
-                script.importModule("normalize");
-                script.importModule("normalGeometry"); 
-                script.importModule("vec4"); 
-
-                node = `
-                // world's space normal
-                const mappedNormal = ${map}.xyz.mul(2).sub(1);
-                const normalDiff = mappedNormal.sub(normalGeometry);
-                const adjustedNormal = normalGeometry.add(normalDiff.mul(${strength}));
-
-                return normalize((modelNormalMatrix.mul(vec4(adjustedNormal, 0))).xyz);
-                `;
-
-                break;
-
-            default: // tangent space
-                script.importModule("normalMap");
-                script.importModule("TBNViewMatrix");
-                script.importModule("normalGeometry");
-                script.importModule("normalize");
- 
-                node = `
-                    // tangent space normal
-                    const mappedNormal = ${map}.xyz.mul(2).sub(1);
-                    const normalDiff = mappedNormal.sub(normalGeometry);
-                    const adjustedNormal = normalGeometry.add(normalDiff.mul(${strength}));
-
-                    return normalize(TBNViewMatrix.mul(adjustedNormal));
-                    //return normalMap( ${map} );
-                `;
+            case 1: 
+                //object space  
+                node += `  
+normalNode.normalMapType = THREE.ObjectSpaceNormalMap; 
+`;
                 break;
         }
 
-        return script.define( this.nodeName, node, true );
+        return script.define( this.nodeName, node+"\nreturn normalNode;", true );
 
     }
 } 

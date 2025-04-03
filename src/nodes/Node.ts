@@ -106,7 +106,6 @@ export class Node extends LayoutElement implements IScript {
         for (let i = 0; i < this._outlets.length; i++) {
             const outlet = this._outlets[i];
             const result = visitor( outlet, i );
-            console.log("RESULT = ", result)
             if( result !== null && result !== undefined ) return result; 
         }
     }

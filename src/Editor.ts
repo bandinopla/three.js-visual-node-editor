@@ -568,7 +568,7 @@ export class Editor {
         const nodes2delete = this.selectedNodes.filter( node=>node.canBeDeleted );
 
         if( !nodes2delete.length ) return;
-        if( !confirm("Delete currently selected nodes?")) return;
+        //if( !confirm("Delete currently selected nodes?")) return;
 
         this.clearOutletSelection();
 

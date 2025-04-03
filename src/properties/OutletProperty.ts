@@ -133,7 +133,7 @@ export class OutletProperty extends LayoutElement implements IOutlet
             {
                 otherNameRef = this.connectedTo.writeScript( script );
 
-                if( this.connectedTo.size!=this.size ) {
+                if( otherNameRef && this.connectedTo.size!=this.size ) {
                     otherNameRef += (this.size==1? ".toFloat" : 
                                                    ".toVec"+this.size) + "()";
                 }

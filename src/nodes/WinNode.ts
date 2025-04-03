@@ -54,7 +54,7 @@ export class WinNode extends Node {
     }
 
     protected getChildOfType<T>( constructor: new (...args: any[]) => T, pos=0 ): T | undefined {
-        const matches = this.childs.filter((child) => child instanceof constructor);
+        const matches = this.childs.filter((child) => Object.getPrototypeOf(child).constructor === constructor ) //child instanceof constructor);
         return matches[pos] as T | undefined;
     }
     

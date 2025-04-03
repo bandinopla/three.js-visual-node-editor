@@ -7,6 +7,7 @@ import { mathFunctions, mathOperations } from "./nodes/operators/list";
 import {  methodsDefinitions2NodeClassDefinitions } from "./nodes/operators/MethodCallNode";
 import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
 import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
+import { BumpMapNode } from "./nodes/vector/BumpMapNode";
 import { NormalMapNode } from "./nodes/vector/NormalMapNode";
 
 // Define the type for class constructors that extend BaseType
@@ -63,7 +64,8 @@ export const NodeTypes : NodeGroupType[] = [
         group:"Vector",
         color:Theme.config.groupVector as string,
         nodes: [
-            { TypeClass:NormalMapNode, name: "Normal Map", id:"normal-map" }
+            { TypeClass:NormalMapNode, name: "Normal Map", id:"normal-map" },
+            { TypeClass:BumpMapNode, name: "Bump Map", id:"bump-map" },
         ]
     }
 ]
