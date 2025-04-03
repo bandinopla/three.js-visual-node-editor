@@ -35,6 +35,7 @@ export class Theme {
     readonly groupOutput : FillStyle = "#3c1d26";
     readonly groupAttribute:FillStyle = "#83314a";
     readonly groupShader:FillStyle = "#2b652b";
+    readonly groupLogic:FillStyle = "#203c3c";
 
     readonly barBgColor : FillStyle = "#545454";
     readonly barFillColor : FillStyle = "#4772b3";

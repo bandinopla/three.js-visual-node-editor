@@ -11,6 +11,14 @@ export class Node extends LayoutElement implements IScript {
 
     editor!:Editor;
     canBeDeleted = true;
+
+    /**
+     * A win node can have child windows...
+     */
+    public childOf?:Node;
+
+    protected _canHaveChilds?:boolean;
+    get canHanveChilds() { return this._canHaveChilds; }
     
     /**
      * Mostly used to visually show a sign that this node is selected

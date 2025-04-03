@@ -31,6 +31,63 @@ export class Editor {
     private _ctx:CanvasRenderingContext2D;
     private mouseDrag = false;
     private focusedChild :Node|undefined;
+
+    /**
+     * We are editing nodes inside of this node.
+     * Undefined would be top-most nodes
+     * It is an array to support recursive nesting, like folders in a computer
+     */
+    private weAreInsideOf:Node[] = [];
+
+    /**
+     * The node in which we are inside of...
+     */
+    get contextNode() {
+        return this.weAreInsideOf.length? this.weAreInsideOf[ this.weAreInsideOf.length-1 ] : undefined;
+    }
+
+    enterNode( node:Node ) {
+        if( node.canHanveChilds )
+        {
+            this.weAreInsideOf?.push( node );
+            this.refilterNodes();
+        }
+        else 
+        {
+            throw new Error(`Node ${node.nodeName} can't have childrens.`);
+        }
+    }
+
+    exitCurrentNode() {
+        if( this.contextNode ) 
+        {
+            this.weAreInsideOf.pop();
+            this.refilterNodes();
+        }
+    }
+
+    /**
+     * Return `true` only if the node is in context.
+     */
+    protected nodeIsInContext( node:Node )
+    {
+        return this.contextNode==node.childOf;
+    }
+
+    protected get objsInContext() {
+        return this.objs.filter( node=>this.nodeIsInContext(node) );
+    }
+
+    protected refilterNodes() {
+
+    }
+    
+    /**
+     * Used to know what node is under the mouse on click events....
+     * Will be used to tell if a user double clicked a node or not....
+     */
+    private nodeUnderMouse:Node|undefined;
+
     private mouse:Vector2Like = {x:0, y:0}
     private aspectCorrection = 1; 
     private canvasAspect:number;
@@ -149,7 +206,7 @@ export class Editor {
             //
             // check if some prop wants to handle the wheel...
             // 
-            for (const obj of this.objs) { 
+            for (const obj of this.objsInContext) { 
                 if( mouseWheelCaptured(obj, cursor, ev.deltaY) )
                     return;
                 // if( obj.traverse( elem=>{ 
@@ -181,6 +238,7 @@ export class Editor {
         canvas.addEventListener('mousemove', (event) => {
 
             this.mouseMoved = true;
+            this.nodeUnderMouse = undefined;
 
             let scale = this.ctx.getTransform().a; // Get the current scale (assuming uniform scaling)
             const mousePos = this.getMousePos( event); 
@@ -276,7 +334,9 @@ export class Editor {
                 //
                 // let's see if some canvas element wants to capture the mouse....
                 //
-                for (const obj of this.zSortedObjs) {    
+                for (const obj of this.zSortedObjs) { 
+                    
+                    if(!this.nodeIsInContext(obj)) continue;
                     
                     //#region OUTLET
                     //
@@ -334,6 +394,7 @@ export class Editor {
                     {      
                         // default... will make the object move...
                         this.focusedChild = obj; 
+                        this.nodeUnderMouse = obj;
                         this.bingToTop(obj);
                          
                         break; //<-- to avoid processing childrens under us....
@@ -542,6 +603,8 @@ export class Editor {
         }
 
         node.editor = this;
+        node.childOf = this.contextNode;
+
         this.objs.push( node );
         this.zSortedObjs.unshift(node);
 
@@ -723,7 +786,14 @@ export class Editor {
         let dotPos:Vector2Like|undefined;
 
         //#region draw connections 
-        this.connections.forEach( connection=>{ 
+        this.connections
+        
+        //
+        // this is enough since a connection can't point to a node in another context...
+        //
+        .filter( connection=>this.nodeIsInContext(connection.from.owner) )
+
+        .forEach( connection=>{ 
 
             const from = this.global2canvas({x:connection.from.globalX, y:connection.from.globalY });
  
@@ -978,7 +1048,7 @@ export class Editor {
  
         const ctx = this._ctx;
 
-        this.objs.forEach( node => {
+        this.objsInContext.forEach( node => {
 
             const objLeft = node.x;
             const objRight = node.x + node.width(ctx);
@@ -1011,6 +1081,11 @@ export class Editor {
 
         this.zSortedObjs.forEach( obj=>{ 
 
+            //
+            // dont render if not enabled.
+            //
+            if( !this.nodeIsInContext(obj) ) return; 
+
             ctx.save();
 
             obj.selected = this.selectedNodes.includes(obj)
@@ -1030,7 +1105,17 @@ export class Editor {
         requestAnimationFrame(()=>this.start());
     }
 
-    protected showNodeCreationMenu( ev:MouseEvent ) {
+    protected showNodeCreationMenu( ev:MouseEvent ) { 
+
+        if( this.nodeUnderMouse ) {
+
+            if( this.nodeUnderMouse.canHanveChilds )
+            {
+                this.enterNode(this.nodeUnderMouse)
+            }
+            return;
+        };
+
         const at = this.getCanvasMousePosition(this.mouse ); ;
 
         createNewNode( ev.clientX, ev.clientY, newNode => {

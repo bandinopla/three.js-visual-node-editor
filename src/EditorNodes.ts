@@ -2,6 +2,7 @@ import { Theme } from "./colors/Theme";
 import { UVNode } from "./nodes/attribute/UVNode"; 
 import { tslInputNodes } from "./nodes/input/TslInputNode";
 import { ValueNode } from "./nodes/input/ValueNode";
+import { FunctionNode } from "./nodes/logic/FunctionNode";
 import { Node } from "./nodes/Node";
 import { mathFunctions, mathOperations } from "./nodes/operators/list";
 import {  methodsDefinitions2NodeClassDefinitions } from "./nodes/operators/MethodCallNode";
@@ -36,6 +37,15 @@ export const NodeTypes : NodeGroupType[] = [
             ...tslInputNodes
         ]
     }, 
+    {
+        group:"Logic",
+        color:Theme.config.groupLogic as string,
+        nodes: [
+            {
+                TypeClass:FunctionNode, name:"Function", id:"fn"
+            }
+        ]
+    },
     {
         group:"Operators",
         color:Theme.config.groupMath as string, 
