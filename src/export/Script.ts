@@ -150,6 +150,8 @@ export class Script {
         }
         else 
         {
+            output +=`const THREE = fromModule('THREE');
+            `;
             //
             // since the script will be evaluated we will need to be injected by the evaluator...
             //
