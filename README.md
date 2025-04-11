@@ -13,7 +13,7 @@ This node system outputs a single javascript file that contains the layout info 
 
 [![cover](output-format.png)](https://bandinopla.github.io/three.js-visual-node-editor/)
 
-### :bookmark_tabs: Read the [WIKI / Documentation](https://github.com/bandinopla/three.js-visual-node-editor/wiki/three.js-TSL-Visual-Node-Editor) to collaborate!
+### :bookmark_tabs: Read the [WIKI / Documentation](https://github.com/bandinopla/three.js-visual-node-editor/wiki) to collaborate!
 
 # Let's build this together!
 The idea is to let everybody add nodes and have this be the best shader node editor in the galaxy. To do so, you must check the [Three.js-Shading-Language Docs](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language) to know how to implement the TSL sintax.
