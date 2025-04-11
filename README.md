@@ -1,6 +1,7 @@
 # three.js TSL Visual Node Editor
 
 ### :rocket: [Launch Editor (Alpha)](https://bandinopla.github.io/three.js-visual-node-editor/) :rocket:
+Video preview of how it works: https://x.com/bandinopla/status/1910107425589330196
 *remember it is in alpha state, errors might occur, check the console and report if you can*
 
 
