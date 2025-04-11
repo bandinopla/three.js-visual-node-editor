@@ -1,33 +1,32 @@
- 
-import { DraggableValue } from "../../components/DraggableValue";
-import { Script } from "../../export/Script";
-import { UVAttributeProperty } from "../../properties/UVAttributeProperty"; 
-import { BaseAttributeNode } from "./BaseAttributeNode";
+import { DraggableValue } from '../../components/DraggableValue';
+import { DataType } from '../../core/IOutlet';
+import { Script } from '../../export/Script';
+import { UVAttributeProperty } from '../../properties/UVAttributeProperty';
+import { BaseAttributeNode } from './BaseAttributeNode';
 
 export class UVNode extends BaseAttributeNode {
- 
-    private uvChannel:DraggableValue;
+    private uvChannel: DraggableValue;
 
-    constructor() { 
+    constructor() {
+        const uvChannel = new DraggableValue('Channel', false, 0, 5, 1, () =>
+            this.update(),
+        );
 
-        const uvChannel = new DraggableValue("Channel", false, 0, 5, 1, ()=>this.update())
+        super([new UVAttributeProperty(), uvChannel]);
 
-        super([
-            new UVAttributeProperty(),
-            uvChannel,
-        ]); 
-
-        this.uvChannel = uvChannel; 
+        this.uvChannel = uvChannel;
     }
 
-    override writeScript(script: Script): string {
-         
+    override get nodeDataType() {
+        return DataType.vec2;
+    }
+
+    protected override writeNodeScript(script: Script): string {
         const uvChannel = this.uvChannel.stringValue;
 
-        script.importModule("uv");
+        script.importModule('uv');
 
         return script.define(this.nodeName, `uv(${uvChannel})`);
-
     }
 
     override serialize(): Record<string, any> {
@@ -40,6 +39,6 @@ export class UVNode extends BaseAttributeNode {
 
     override unserialize(data: Record<string, any>): void {
         this.uvChannel.value = data.channel;
-        super.unserialize( data );
+        super.unserialize(data);
     }
 }

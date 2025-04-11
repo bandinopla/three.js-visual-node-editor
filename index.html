@@ -1,26 +1,31 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="shortcut icon" href="favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@bandinopla">
     <meta name="twitter:title" content="Three.js - TSL Visual Node Editor">
-    <meta property="og:image" content="https://github.com/bandinopla/three.js-visual-node-editor/raw/main/public/cover.png">
+    <meta property="og:image"
+        content="https://github.com/bandinopla/three.js-visual-node-editor/raw/main/public/cover.png">
     <title>Three.js - TSL Visual Node Editor </title>
     <style>
-        html, body {
-             padding: 0px;
-             margin: 0px;
-             overflow: hidden;
+        html,
+        body {
+            padding: 0px;
+            margin: 0px;
+            overflow: hidden;
         }
-        canvas { 
+
+        canvas {
             border: 0px;
             position: absolute;
-            top:0px;
+            top: 0px;
             left: 0px;
         }
+
         .controls {
             position: fixed;
             bottom: 10px;
@@ -30,10 +35,18 @@
             z-index: 99;
         }
     </style>
-  </head>
-  <body> 
-    <div class="controls"><strong>ALPHA RELEASE v%APP_VERSION%</strong> | MMB: Click and drag to pan | DOUBLE CLICK: add new node | SHIFT+A : open | SHIFT+S : save | <a href="https://github.com/bandinopla/three.js-visual-node-editor" target="_blank">Github Page</a></div>
+</head>
+
+<body>
+    <div style="position: fixed; top:0px; left:0px; right:0px; z-index: 999; background-color: darkblue; color:white">
+        Work in progress (check console for errors, some might require reload...). <a
+            href="https://github.com/bandinopla/three.js-visual-node-editor/issues" target="_blank">Report errors
+            here</a></div>
+    <div class="controls"><strong>ALPHA RELEASE v%APP_VERSION%</strong> | MMB: Click and drag to pan | DOUBLE CLICK: add
+        new node | SHIFT+A : open | SHIFT+S : save | <a href="https://github.com/bandinopla/three.js-visual-node-editor"
+            target="_blank">Github Page</a></div>
     <canvas id="app" width="1024" height="1024"></canvas>
     <script type="module" src="/src/main.ts"></script>
-  </body>
+</body>
+
 </html>

@@ -1,9 +1,7 @@
-import { LayoutElement } from "../layout/LayoutElement";
+import { LayoutElement } from '../layout/LayoutElement';
 
-export class Space extends LayoutElement
-{
-    constructor(private spaceSize = 10)
-    {
+export class Space extends LayoutElement {
+    constructor(private spaceSize = 10) {
         super();
     }
 

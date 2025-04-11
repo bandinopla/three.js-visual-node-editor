@@ -14,10 +14,12 @@
     margin-right: 10px;
 }
 
-.root.term .groupTitle, .root ul .groupTitle {
+.root.term .groupTitle,
+.root ul .groupTitle {
     display: none;
 }
-.root.term .groupLabel, .root.term ul .groupTitle {
+.root.term .groupLabel,
+.root.term ul .groupTitle {
     display: inline;
 }
 
@@ -31,9 +33,7 @@
     padding: 2px;
 }
 .root li:hover {
-    background-color: rgba(255,255,255,0.1);
-     
-    
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .groupTitle {
@@ -43,7 +43,7 @@
     border-radius: 5px;
 }
 
-.root > input[type="text"] {
+.root > input[type='text'] {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 10px;

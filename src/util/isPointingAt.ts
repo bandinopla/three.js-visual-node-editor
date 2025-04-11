@@ -4,7 +4,14 @@ Interpretation:
 0 → The direction is perpendicular to the target. 
 -1 → The direction is exactly opposite to the target.
 */
-export function calculateDirectionAlignment( dirX:number, dirY:number, targetX:number, targetY:number, originX:number, originY:number ) {
+export function calculateDirectionAlignment(
+    dirX: number,
+    dirY: number,
+    targetX: number,
+    targetY: number,
+    originX: number,
+    originY: number,
+) {
     // Direction vector (must be normalized)
     const magV = Math.hypot(dirX, dirY);
     const vX = dirX / magV;

@@ -1,15 +1,16 @@
-export function onDoubleClick(elem: HTMLElement, onClick: (ev: MouseEvent) => void) {
+export function onDoubleClick(
+    elem: HTMLElement,
+    onClick: (ev: MouseEvent) => void,
+) {
     let clickCount = 0;
     let clickTimer = 0;
     let clickX = 0;
     let clickY = 0;
 
     elem.addEventListener('click', (event) => {
-
         if (event.clientX == clickX && event.clientY == clickY) {
             clickCount++;
-        }
-        else {
+        } else {
             clickCount = 1;
         }
 
@@ -18,13 +19,13 @@ export function onDoubleClick(elem: HTMLElement, onClick: (ev: MouseEvent) => vo
 
         if (clickCount === 1) {
             clickTimer = setTimeout(() => {
-                // Single click action 
+                // Single click action
                 clickCount = 0;
             }, 300); // Adjust the delay as needed (milliseconds)
         } else if (clickCount === 2) {
             clearTimeout(clickTimer);
             // Double click action
-            onClick(event)
+            onClick(event);
             clickCount = 0;
         }
     });

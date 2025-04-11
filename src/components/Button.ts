@@ -1,39 +1,54 @@
-import { Theme } from "../colors/Theme";
-import { InteractiveLayoutElement } from "../layout/InteractiveLayoutElement"; 
+import { FillStyle, Theme } from '../colors/Theme';
+import { InteractiveLayoutElement } from '../layout/InteractiveLayoutElement';
 
 type ButtonOptions = {
-    fullWidth?:boolean
-}
+    fullWidth?: boolean;
+    background?: FillStyle;
+};
 
-export class Button extends InteractiveLayoutElement
-{
+export class Button extends InteractiveLayoutElement {
     private xpadding = 5;
-    protected options:ButtonOptions;
+    protected options: ButtonOptions;
 
-    constructor( protected _label:string , protected onClick?:VoidFunction, options?:Partial<ButtonOptions> )
-    {
+    constructor(
+        protected _label: string,
+        protected onClick?: () => void,
+        options?: Partial<ButtonOptions>,
+    ) {
         super();
         this.options = {
-            fullWidth:false,
-            ...options
+            fullWidth: false,
+            ...options,
         };
     }
 
     override width(ctx: CanvasRenderingContext2D): number {
-      
-        return this.options.fullWidth? 0 : ctx.measureText(this.label).width + this.xpadding*2;
+        return this.options.fullWidth
+            ? 0
+            : ctx.measureText(this.label).width + this.xpadding * 2;
     }
 
-    override render(ctx: CanvasRenderingContext2D, maxWidth: number, maxHeight: number): void {
-        
+    override render(
+        ctx: CanvasRenderingContext2D,
+        maxWidth: number,
+        maxHeight: number,
+    ): void {
         //background
-        this.boxShadow(ctx, 2)
-        this.roundedRect(ctx, 0,0, maxWidth, maxHeight, 2);
-        ctx.fillStyle = Theme.config.btnBgColor;
-        ctx.fill();  
-        this.boxShadow(ctx, 0)
+        this.boxShadow(ctx, 2);
+        this.roundedRect(ctx, 0, 0, maxWidth, maxHeight, 2);
+        ctx.fillStyle = this.options.background ?? Theme.config.btnBgColor;
+        ctx.fill();
+        this.boxShadow(ctx, 0);
         //text
-        this.writeText(ctx, this.label, this.fontSize, maxWidth/2, maxHeight, Theme.config.btnTextColor, "center");
+        this.writeText(
+            ctx,
+            this.label,
+            this.fontSize,
+            maxWidth / 2,
+            maxHeight,
+            Theme.config.btnTextColor,
+            'center',
+        );
 
         //hit area...
         super.render(ctx, maxWidth, maxHeight);
@@ -44,10 +59,10 @@ export class Button extends InteractiveLayoutElement
     }
 
     get label() {
-         return this._label;
+        return this._label;
     }
 
-    set label( newLabel:string ) {
+    set label(newLabel: string) {
         this._label = newLabel;
     }
 }

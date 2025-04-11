@@ -1,81 +1,140 @@
-import { Theme } from "./colors/Theme";
-import { UVNode } from "./nodes/attribute/UVNode"; 
-import { tslInputNodes } from "./nodes/input/TslInputNode";
-import { ValueNode } from "./nodes/input/ValueNode";
-import { FunctionNode } from "./nodes/logic/FunctionNode";
-import { Node } from "./nodes/Node";
-import { mathFunctions, mathOperations } from "./nodes/operators/list";
-import {  methodsDefinitions2NodeClassDefinitions } from "./nodes/operators/MethodCallNode";
-import { MeshStandardNode } from "./nodes/shader/MeshStandardNode";
-import { ImageTextureNode } from "./nodes/texture/ImageTextureNode";
-import { BumpMapNode } from "./nodes/vector/BumpMapNode";
-import { NormalMapNode } from "./nodes/vector/NormalMapNode";
+import { Theme } from './colors/Theme';
+import { UVNode } from './nodes/attribute/UVNode';
+import { ColorNode } from './nodes/input/ColorNode';
+import { tslInputNodes } from './nodes/input/TslInputNode';
+import { UniformValueNode } from './nodes/input/UniformValueNode';
+import { ValueNode } from './nodes/input/ValueNode';
+import { FunctionCallNode } from './nodes/logic/FunctionCallNode';
+import { FunctionInputNode } from './nodes/logic/FunctionInputNode';
+import { FunctionNode } from './nodes/logic/FunctionNode';
+import { FunctionOutputNode } from './nodes/logic/FunctionOutputNode';
+import { IfNode } from './nodes/logic/IfNode';
+import { VariableDeclarationNode } from './nodes/logic/VariableDeclarationNode';
+import { VariableValueAssignment } from './nodes/logic/VariableValueAssignment';
+import { Node } from './nodes/Node';
+import { mathFunctionNodes, mathOperatonNodes } from './nodes/operators/list';
+import { SwizzleNode } from './nodes/operators/SwizzleNode';
+import { MeshStandardNode } from './nodes/shader/MeshStandardNode';
+import { ImageTextureNode } from './nodes/texture/ImageTextureNode';
+import { BumpMapNode } from './nodes/vector/BumpMapNode';
+import { NormalMapNode } from './nodes/vector/NormalMapNode';
 
 // Define the type for class constructors that extend BaseType
 type Constructor<T extends Node> = new (...args: any[]) => T;
- 
-export type NodeGroupType = {
-    group:string
-    color:string
-    exportsScript?:boolean,
-    nodes:{ 
-        TypeClass:Constructor<Node>, 
-        name:string, 
-        id:string,
-        constructorArgs?: unknown
-    }[]
-}
 
-export const NodeTypes : NodeGroupType[] = [
+export type NodeGroupType = {
+    group: string;
+    color: string;
+    exportsScript?: boolean;
+    nodes: {
+        TypeClass: Constructor<Node>;
+        name: string;
+        id: string;
+        constructorArgs?: unknown;
+        onCreated?: (instance: Node) => void;
+        hidden?: boolean;
+    }[];
+};
+
+export const NodeTypes: NodeGroupType[] = [
     {
-        group:"Input",
-        color:Theme.config.groupInput as string,
-        nodes: [
-            { TypeClass:ValueNode, name:"Value", id:"input-value"},
-            { TypeClass:UVNode, name:"UV", id:"uv" },
-            //{ TypeClass:PositionPropertiesNode, name:"Position", id:"position" },
-            ...tslInputNodes
-        ]
-    }, 
-    {
-        group:"Logic",
-        color:Theme.config.groupLogic as string,
+        group: 'Input',
+        color: Theme.config.groupInput as string,
         nodes: [
             {
-                TypeClass:FunctionNode, name:"Function", id:"fn"
-            }
-        ]
+                TypeClass: UniformValueNode,
+                name: 'Uniform Value',
+                id: 'uniform-value',
+            },
+            { TypeClass: ValueNode, name: 'Value', id: 'input-value' },
+            { TypeClass: ColorNode, name: 'Color', id: 'color-value' },
+            { TypeClass: UVNode, name: 'UV', id: 'uv' },
+            //{ TypeClass:PositionPropertiesNode, name:"Position", id:"position" },
+            ...tslInputNodes,
+        ],
     },
     {
-        group:"Operators",
-        color:Theme.config.groupMath as string, 
-        nodes:[
-            //{ TypeClass:MathNode, name:"Math", id:"math-operation"}
-            ...methodsDefinitions2NodeClassDefinitions(mathOperations),
-            ...methodsDefinitions2NodeClassDefinitions(mathFunctions, true),
-        ]
-    }, 
-    {
-        group:"Shader",
-        color:Theme.config.groupShader as string,
-        exportsScript: true,
-        nodes:[
-            { TypeClass:MeshStandardNode, name:"Mesh Standard Material", id:"mesh-standard-shader"}
-        ]
-    }, 
-    {
-        group:"Texture",
-        color:Theme.config.groupTexture as string,
-        nodes:[
-            { TypeClass:ImageTextureNode, name:"Image Texture", id:"image-texture"}
-        ]
-    },
-    {
-        group:"Vector",
-        color:Theme.config.groupVector as string,
+        group: 'Logic',
+        color: Theme.config.groupLogic as string,
         nodes: [
-            { TypeClass:NormalMapNode, name: "Normal Map", id:"normal-map" },
-            { TypeClass:BumpMapNode, name: "Bump Map", id:"bump-map" },
-        ]
-    }
-]
+            { TypeClass: FunctionNode, name: 'Function', id: 'fn' },
+            {
+                TypeClass: FunctionInputNode,
+                name: 'Function Parameter',
+                id: 'fn-param',
+                hidden: true,
+            },
+            {
+                TypeClass: FunctionOutputNode,
+                name: 'Function Output',
+                id: 'fn-output',
+                hidden: true,
+            },
+            {
+                TypeClass: FunctionCallNode,
+                name: 'Function Call',
+                id: 'fn-call',
+                hidden: true,
+            },
+            { TypeClass: IfNode, name: 'If / Conditional', id: 'if' },
+            {
+                TypeClass: VariableDeclarationNode,
+                name: 'Variable declaration',
+                id: 'var',
+            },
+            {
+                TypeClass: VariableValueAssignment,
+                name: 'Variable assignment',
+                id: 'var-set',
+            },
+        ],
+    },
+    {
+        group: 'Operators',
+        color: Theme.config.groupMath as string,
+        nodes: [
+            ...mathOperatonNodes,
+            ...mathFunctionNodes,
+            {
+                TypeClass: SwizzleNode,
+                name: 'Swizzle',
+                id: 'swizzle',
+            },
+        ],
+    },
+    {
+        group: 'Shader',
+        color: Theme.config.groupShader as string,
+        exportsScript: true,
+        nodes: [
+            {
+                TypeClass: MeshStandardNode,
+                name: 'Mesh Standard Material',
+                id: 'mesh-standard-shader',
+            },
+        ],
+    },
+    {
+        group: 'Texture',
+        color: Theme.config.groupTexture as string,
+        nodes: [
+            {
+                TypeClass: ImageTextureNode,
+                name: 'Image Texture',
+                id: 'image-texture',
+            },
+        ],
+    },
+    {
+        group: 'Vector',
+        color: Theme.config.groupVector as string,
+        nodes: [
+            { TypeClass: NormalMapNode, name: 'Normal Map', id: 'normal-map' },
+            { TypeClass: BumpMapNode, name: 'Bump Map', id: 'bump-map' },
+        ],
+    },
+];
+
+export function getNodeTypeById(id: string) {
+    return NodeTypes.flatMap((g) => g.nodes).find((n) => n.id == id);
+}

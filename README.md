@@ -1,8 +1,10 @@
 # three.js TSL Visual Node Editor
 
-### :rocket: [Launch Editor](https://bandinopla.github.io/three.js-visual-node-editor/) :rocket:
+### :rocket: [Launch Editor (Alpha)](https://bandinopla.github.io/three.js-visual-node-editor/) :rocket:
+*remember it is in alpha state, errors might occur, check the console and report if you can*
 
-[![cover](/public/cover.png)](https://bandinopla.github.io/three.js-visual-node-editor/)
+
+[![cover](/git-cover.png)](https://bandinopla.github.io/three.js-visual-node-editor/)
 
 ## **[!] Work in progress | Alpha state** <br/>
 Visual node editor, inspired by [Blender's shader editor](https://www.blender.org/), is a tool to visually build [Three.js](https://threejs.org/) materials using [Three.js-Shading-Language](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language).  The socket proximity detection was inspired by [Kennedy Richard](https://x.com/KennedyRichard)'s [Nodezator's node editor](https://x.com/KennedyRichard/status/1823905562192449762)
@@ -23,8 +25,14 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
 ### TSL to Visual Nodes:
 - :white_check_mark: UV Channel
 - :warning: Preview
-- :no_entry: Function
+- :warning: Functions
 - :warning: Uniform
+- Conditional / Logic
+    - :warning: If
+    - :warning: Declare & Assign variables
+    - :no_entry: Ternary
+    - :no_entry: Loop
+    - :warning: Swizzle
 - NodeMaterial
     - :no_entry: fragmentNode
     - :no_entry: vertexNode
@@ -85,7 +93,7 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
 
 
 - :white_check_mark: Image texture node
-- :white_check_mark: Operators
+- :warning: Operators (not fully tested)
     - :white_check_mark: add
     - :white_check_mark: sub
     - :white_check_mark: mul
@@ -109,6 +117,7 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
     - :white_check_mark: shiftLeft
     - :white_check_mark: shiftRight
 - Math
+    - :white_check_mark: mx_noise_float
     - :white_check_mark: abs  
     - :white_check_mark: acos  
     - :white_check_mark: all  
@@ -262,7 +271,3 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
 - Packing
     - :no_entry: directionToColor
     - :no_entry: colorToDirection
-- Conditional / Logic
-    - :no_entry: If
-    - :no_entry: Ternary
-    - :no_entry: Loop

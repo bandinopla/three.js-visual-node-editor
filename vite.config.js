@@ -14,6 +14,6 @@ export default defineConfig(({ mode }) => {
         } ,
         define: {
             'import.meta.env.APP_VERSION': JSON.stringify(packageJson.version), // Define the version
-          },
+          }, 
       }
 })

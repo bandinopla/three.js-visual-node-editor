@@ -1,6 +1,6 @@
-import { LayoutElement } from "./LayoutElement";
+import { LayoutElement } from './LayoutElement';
 
 export interface IOverlayRenderer {
-    renderOverlay( ctx:CanvasRenderingContext2D ):void;
-    get overlayBody():LayoutElement
+    renderOverlay(ctx: CanvasRenderingContext2D): void;
+    get overlayBody(): LayoutElement;
 }

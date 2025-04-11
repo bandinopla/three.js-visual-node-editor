@@ -1,12 +1,10 @@
-import { ComboBoxProperty } from "./ComboBoxProperty";
- 
+import { ComboBoxProperty } from './ComboBoxProperty';
 
-export class TextureColorSpaceProperty extends ComboBoxProperty
-{
+export class TextureColorSpaceProperty extends ComboBoxProperty {
     constructor() {
-        super("Color Space", [
-            [ "THREE.SRGBColorSpace", "sRGB" ], 
-            [ "THREE.LinearSRGBColorSpace", "Non-Color" ],  
-        ])
+        super('Color Space', [
+            ['THREE.SRGBColorSpace', 'sRGB'],
+            ['THREE.LinearSRGBColorSpace', 'Non-Color'],
+        ]);
     }
 }

@@ -1,8 +1,8 @@
-import { Theme } from "../colors/Theme";
-import { Output } from "./Output";
+import { DataType } from '../core/IOutlet';
+import { Output } from './Output';
 
 export class UVAttributeProperty extends Output {
-    constructor() { 
-        super("UV", 2);
+    constructor() {
+        super('UV', DataType.vec2);
     }
 }

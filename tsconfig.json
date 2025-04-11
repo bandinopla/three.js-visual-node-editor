@@ -20,5 +20,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/test.ts","src/nodes/template-node-copy-paste-me.ts"]
 }

@@ -1,69 +1,84 @@
-import { DraggableValue } from "../components/DraggableValue"; 
-import { IOutlet, OutletSize } from "../core/IOutlet";
-import { Script } from "../export/Script";
-import { Layout, Row } from "../layout/Layout";
-import { BasicInputProperty } from "./BasicInputProperty";
-import { Input } from "./Input";
+import { DraggableValue } from '../components/DraggableValue';
+import { IOutlet, DataType } from '../core/IOutlet';
+import { Script } from '../export/Script';
+import { Layout, Row } from '../layout/Layout';
+import { BasicInputProperty } from './BasicInputProperty';
 
 type Config = {
-    min:number
-    max:number
-    step:number
-    label:string
-    asBar:boolean
-    defaultValue:number
-}
+    min: number;
+    max: number;
+    step: number;
+    label: string;
+    asBar: boolean;
+    defaultValue: number;
+};
 
-export class InputOrValue extends BasicInputProperty 
-{
-    protected notConnectedContent:Layout;
-    protected valueSlider:DraggableValue;
+export class InputOrValue extends BasicInputProperty {
+    protected notConnectedContent?: Layout;
+    protected valueSlider: DraggableValue;
 
     /**
      * If true, whatever input value will be multiplied by our value
      */
     multiplyInputWithValue = false;
 
-    constructor( size:OutletSize, label:string|Partial<Config>, protected onChangeListener?:(v?:number)=>void ) {
- 
-        const hasConfig = typeof label!="string";
+    constructor(
+        label: string | Partial<Config>,
+        protected onChangeListener?: (v?: number) => void,
+        acceptsInput = true,
+    ) {
+        const hasConfig = typeof label != 'string';
 
-        const valConfig :Config = {
+        const valConfig: Config = {
             min: Number.MIN_SAFE_INTEGER,
             max: Number.MAX_SAFE_INTEGER,
             step: 0.01,
-            label: "",
+            label: '',
             asBar: false,
-            defaultValue:0,
-            ...( !hasConfig?{}:label )
-        }
+            defaultValue: 0,
+            ...(!hasConfig ? { label } : label),
+        };
 
-        const lbl = !hasConfig? label : label.label;
+        const lbl = !hasConfig ? label : label.label;
 
-        super( size, valConfig.label );
+        super(DataType.float, valConfig.label);
 
-        this.valueSlider = new DraggableValue( valConfig.label, valConfig.asBar, valConfig.min, valConfig.max, valConfig.step, value => this.onChange?.(value) );
+        this._acceptsInputs = acceptsInput;
 
-        this.notConnectedContent = new Row([
-            this.valueSlider
-        ]);
+        this.valueSlider = new DraggableValue(
+            valConfig.label,
+            valConfig.asBar,
+            valConfig.min,
+            valConfig.max,
+            valConfig.step,
+            (value) => this.onChange?.(value),
+        );
+
+        this.notConnectedContent = new Row([this.valueSlider]);
 
         //this.notConnectedContent.parent = this;
         this.layout = this.notConnectedContent;
-        
+
         this.valueSlider.value = valConfig.defaultValue;
+
+        this.addEventListener('typeChange', (ev) => {
+            if (ev.newType?.size > 1) {
+                this.layout = undefined;
+            } else {
+                if (!this.layout && !this.connectedTo) {
+                    this.layout = this.notConnectedContent;
+                }
+            }
+        });
     }
 
     /**
      * Inform the listner or if no listener was passed, then inform the top-most node that "something has changed"
      */
-    protected onChange( val?:number ) {
-        if( this.onChangeListener )
-        {
-            this.onChangeListener( val );
-        }
-        else 
-        {
+    protected onChange(val?: number) {
+        if (this.onChangeListener) {
+            this.onChangeListener(val);
+        } else {
             this.root.update();
         }
     }
@@ -72,47 +87,52 @@ export class InputOrValue extends BasicInputProperty
         return this.valueSlider.value;
     }
 
-    set value( newValue:number ) {
-        const changed = this.valueSlider.value!=newValue;
-        
-        if( changed )
-        {
+    set value(newValue: number) {
+        const changed = this.valueSlider.value != newValue;
+
+        if (changed) {
             this.valueSlider.value = newValue;
             this.onChange?.(newValue);
         }
-            
     }
 
     override width(ctx: CanvasRenderingContext2D): number {
-        if( this.connectedTo ) return super.width(ctx);
-        return this.notConnectedContent.width(ctx)
+        if (this.connectedTo || !this.notConnectedContent)
+            return super.width(ctx);
+        return this.notConnectedContent.width(ctx);
     }
 
     protected override onConnected(to: IOutlet): void {
-        if( !this.multiplyInputWithValue )
-            this.layout = undefined;
+        if (!this.multiplyInputWithValue) this.layout = undefined;
 
         this.onChange?.();
     }
 
     protected override onDisconnected(from: IOutlet): void {
-        if( !this.multiplyInputWithValue )
+        if (!this.multiplyInputWithValue)
             this.layout = this.notConnectedContent;
 
-        this.onChange?.( this.valueSlider.value );
+        this.onChange?.(this.layout ? this.valueSlider.value : undefined);
     }
 
     override writeScript(script: Script): string {
+        script.importModule('float');
 
-        script.importModule("float"); 
+        const val = `float(${this.valueSlider.stringValue})`;
 
-        const val = `float(${ this.valueSlider.stringValue })`;
+        if (this.connectedTo) {
+            const inputValue = this.connectedTo.writeScript(script);
 
-        if( this.connectedTo )
-        {
-            return this.connectedTo.writeScript( script ) + ( this.multiplyInputWithValue? `.mul(${val})` :"");
-        } 
-        
+            if (!inputValue)
+                throw new Error(
+                    `Node ${this.owner.nodeName}.${this.label} has no value or is not pluged...`,
+                );
+
+            //+ ".toFloat()"
+            return (
+                inputValue + (this.multiplyInputWithValue ? `.mul(${val})` : '')
+            );
+        }
 
         return val;
     }

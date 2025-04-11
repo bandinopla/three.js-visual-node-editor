@@ -1,17 +1,15 @@
-import { Theme } from "../colors/Theme";
-import { TextLabel } from "../components/TextLabel";
-import { Row } from "../layout/Layout";
-import { Input } from "./Input";
+import { TextLabel } from '../components/TextLabel';
+import { DataType } from '../core/IOutlet';
+import { Row } from '../layout/Layout';
+import { Input } from './Input';
 
 export class MaterialProperty extends Input {
-    constructor( readonly index:number ) {
-        super(5); 
+    constructor(readonly index: number) {
+        super(DataType.material);
 
-        this.layout = new Row([
-            new TextLabel( `.material # ${index}  ` ),  
-        ] ); 
-        //this.xPadding = 10; 
-    }  
+        this.layout = new Row([new TextLabel(`.material # ${index}  `)]);
+        //this.xPadding = 10;
+    }
 
     getMaterial() {
         // pull data from the input socket....
