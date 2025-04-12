@@ -30,7 +30,7 @@ export class SwizzleNode extends WinNode {
     }
 
     private onCombo(index: number, value: number) {
-        let reset = false;
+      
         this.combos.forEach((combo, i) => {
             if (i <= index) return;
             if (value == 0) {
@@ -96,11 +96,12 @@ export class SwizzleNode extends WinNode {
     }
 
     override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
         this.combos.forEach((combo, i) => {
             combo.index = data.components[i] ?? 0;
         });
 
-        super.unserialize(data);
+        
     }
 }
 

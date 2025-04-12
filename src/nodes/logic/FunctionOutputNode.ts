@@ -60,7 +60,8 @@ export class FunctionOutputNode extends ExecutableLogicNode {
     }
 
     override unserialize(data: Record<string, any>): void {
-        this.dataType.index = data.outputType ?? 0;
         super.unserialize(data);
+        this.dataType.index = data.outputType ?? 0;
+        
     }
 }

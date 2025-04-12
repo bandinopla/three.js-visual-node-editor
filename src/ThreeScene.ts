@@ -18,7 +18,8 @@ export class ThreeScene extends THREE.EventDispatcher<SceneEvents> {
     private objs: THREE.Mesh[] = [];
     readonly pointLight: THREE.PointLight;
     private mouse: THREE.Vector2 = new THREE.Vector2();
-    rotationSpeed = 1;
+    rotationSpeed = 0;
+    rotation = 0;
     protected _currentObjectIndex = 1;
 
     private materialNotSet = new THREE.MeshStandardMaterial({
@@ -66,8 +67,7 @@ export class ThreeScene extends THREE.EventDispatcher<SceneEvents> {
     }
 
     protected buildScene() {
-        const material = this.materialNotSet;
-
+        const material = this.materialNotSet; 
         //
         // dummy objects
         //
@@ -101,6 +101,11 @@ export class ThreeScene extends THREE.EventDispatcher<SceneEvents> {
                 console.error(error);
             },
         );
+
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(5,5), material)
+        plane.name="Plane";
+        this.objs.push(plane);
+        this.objHolder.add(plane);
 
         this.scene.add(this.objHolder);
 
@@ -155,7 +160,12 @@ export class ThreeScene extends THREE.EventDispatcher<SceneEvents> {
     render() {
         const delta = this.clock.getDelta();
         this.updateLightPosition();
-        this.objHolder.rotateY(delta * this.rotationSpeed);
+        //this.objHolder.rotateY(delta * this.rotationSpeed);
+        if( this.rotationSpeed )
+        {
+            this.rotation += delta * this.rotationSpeed;
+        }
+        this.objHolder.rotation.y = this.rotation;
         //this.objHolder.rotateX(-delta*this.rotationSpeed)
         this.renderer.render(this.scene, this.camera);
     }

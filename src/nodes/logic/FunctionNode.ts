@@ -11,7 +11,7 @@ import { FunctionDataFlowNode } from './FunctionDataFlowNode';
 import { NameManager } from '../../util/nameManager';
 import { Script } from '../../export/Script';
 import { ExecutableLogicNode } from './ExecutableLogicNode';
-import { getNodeTypeById } from '../../EditorNodes';
+import { getNodeTypeById, newNodeById } from '../../EditorNodes';
 import { ChangeNodeCustomNameButton } from '../../components/ChangeNodeCustomNameButton';
 
 /**
@@ -49,7 +49,7 @@ export class FunctionNode extends WinNode<FunctionNodeEvents & WinNodeEvents> {
     constructor(protected master?: FunctionNode) {
         super('Function', Theme.config.groupFunction, [
             new ChangeNodeCustomNameButton(newName => this.rename(newName)),
-            new Button('+ Input', () => this.createDataFlowNode(true)),
+            new Button('+ Input', () => this.createInputNode()),
             //new Button("+ Output", ()=>this.createOutputNode()),
             new Output('Execute', DataType.script),
             //new Divider(""),
@@ -106,15 +106,22 @@ export class FunctionNode extends WinNode<FunctionNodeEvents & WinNodeEvents> {
         return this.namesManager.getName(desiredName);
     }
 
-    protected createDataFlowNode(isInput: boolean) {
+    registerInput( node:FunctionDataFlowNode ) {
+        this.registerDataFlowNode( node, true );
+    }
+
+    registerOutput( node:FunctionDataFlowNode ) {
+        this.registerDataFlowNode( node, false );
+    }
+
+    protected createInputNode() {
+        const inputNode = newNodeById("fn-param");
+        this.editor.quickAdd(inputNode);
+    }
+
+    protected registerDataFlowNode( node:FunctionDataFlowNode, isInput: boolean) {
         const channel = isInput ? this.inputs : [];
-        const index = channel.length;
-
-        const NodeType = getNodeTypeById(
-            isInput ? 'fn-param' : 'fn-output',
-        )!.TypeClass;
-
-        const node = new NodeType() as FunctionDataFlowNode;
+        const index = channel.length; 
         const master = this;
 
         node.addEventListener('removed', function onRemoved() {
@@ -124,9 +131,7 @@ export class FunctionNode extends WinNode<FunctionNodeEvents & WinNodeEvents> {
             master.update();
         });
 
-        channel.push(node.outlet);
-
-        this.editor.quickAdd(node);
+        channel.push(node.outlet); 
         this.update();
     }
 

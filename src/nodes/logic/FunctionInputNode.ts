@@ -7,6 +7,11 @@ export class FunctionInputNode extends FunctionDataFlowNode {
         super(true);
     }
 
+    override onAdded(): void {
+        super.onAdded()
+        this.master.registerInput( this );
+    }
+
     protected override writeNodeScript(script: Script): string {
         const vname = this.outlet.outletName;
         const val = script.define(

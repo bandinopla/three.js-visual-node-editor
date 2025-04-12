@@ -13,7 +13,7 @@ import { LayoutElement } from "./layout/LayoutElement";
 import { onDoubleClick } from "./util/onDoubleClick";
 import { createNewNode } from "./ui/NodeSelectionModal";
 import { ConnectionsArray, OuletCandidate } from "./core/Connection";
-import { NodeGroupType, NodeTypes } from "./EditorNodes";
+import { newNodeById, NodeGroupType, NodeTypes } from "./EditorNodes";
 import { ScenePreviewNode } from "./nodes/preview/ScenePreview";
 import { Script } from "./export/Script";
 import { FunctionCallNode } from "./nodes/logic/FunctionCallNode";
@@ -543,18 +543,12 @@ export class Editor {
     }
 
     protected bingToTop(node: Node) {
-        const nodeIndexZ = this.zSortedObjs.indexOf(node);
-        const nodeIndex = this.objs.indexOf(node);
+        const nodeIndexZ = this.zSortedObjs.indexOf(node); 
 
         if (nodeIndexZ !== -1) {
             this.zSortedObjs.splice(nodeIndexZ, 1);
             this.zSortedObjs.push(node);
-        }
-
-        // if (nodeIndex !== -1) {
-        //     this.objs.splice(nodeIndex, 1);
-        //     this.objs.push(node);
-        // }
+        } 
     }
 
     /**
@@ -618,13 +612,7 @@ export class Editor {
 
     add(node: Node | string, nodeSetup?: (node: Node) => void) {
         if (typeof node == "string") {
-            const referencedNode = NodeTypes.flatMap((group) => group.nodes).find(
-                (n) => n.id == node,
-            );
-            if (!referencedNode) {
-                throw new Error(`Trying to create a node with id:${node} that doesn't exist.`);
-            }
-            node = new referencedNode.TypeClass();
+            node = newNodeById( node ); 
         }
 
         node.editor = this;

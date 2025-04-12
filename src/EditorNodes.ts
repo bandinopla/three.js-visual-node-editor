@@ -4,6 +4,7 @@ import { ColorNode } from './nodes/input/ColorNode';
 import { tslInputNodes } from './nodes/input/TslInputNode';
 import { UniformValueNode } from './nodes/input/UniformValueNode';
 import { ValueNode } from './nodes/input/ValueNode';
+import { ForNode } from './nodes/logic/ForNode';
 import { FunctionCallNode } from './nodes/logic/FunctionCallNode';
 import { FunctionInputNode } from './nodes/logic/FunctionInputNode';
 import { FunctionNode } from './nodes/logic/FunctionNode';
@@ -77,6 +78,7 @@ export const NodeTypes: NodeGroupType[] = [
                 hidden: true,
             },
             { TypeClass: IfNode, name: 'If / Conditional', id: 'if' },
+            { TypeClass:ForNode, name:"For loop", id:"foor-loop"},
             {
                 TypeClass: VariableDeclarationNode,
                 name: 'Variable declaration',
@@ -137,4 +139,25 @@ export const NodeTypes: NodeGroupType[] = [
 
 export function getNodeTypeById(id: string) {
     return NodeTypes.flatMap((g) => g.nodes).find((n) => n.id == id);
+}
+
+export function newNodeById( id:string ) {
+    const referencedNode = NodeTypes.flatMap((group) => group.nodes).find(
+        (n) => n.id == id,
+    );
+    if (!referencedNode) {
+        throw new Error(`Trying to create a node with id:${id} that doesn't exist.`);
+    }
+
+    const args = referencedNode.constructorArgs;
+
+    if (args) {
+        return new referencedNode.TypeClass(
+            ...(Array.isArray(args)
+                ? args
+                : [args]),
+        );
+    } else {
+        return new referencedNode.TypeClass();
+    } 
 }

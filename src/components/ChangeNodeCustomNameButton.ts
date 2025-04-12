@@ -1,4 +1,4 @@
-import { FunctionNode } from '../nodes/logic/FunctionNode';
+import { Node } from '../nodes/Node';
 import { WinNode } from '../nodes/WinNode';
 import { Button } from './Button';
 
@@ -21,13 +21,8 @@ export class ChangeNodeCustomNameButton extends Button {
             this.onNewGame(newName);
         }
         else {
-            newName = (
-                (this.root as WinNode).childOf as FunctionNode
-            )?.getValidParameterName(newName);
 
-            if (!newName) {
-                return;
-            }
+            newName = (this.root as WinNode).editor.getSafeName( this.root as Node, newName);
 
             node.customNodeName = newName;
             node.update();

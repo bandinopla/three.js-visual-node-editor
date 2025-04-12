@@ -41,7 +41,8 @@ export class ColorNode extends InputBaseNode {
     }
 
     override unserialize(data: Record<string, any>): void {
-        this.color.color = new Color(data.color);
         super.unserialize(data);
+        this.color.color = new Color(data.color);
+        
     }
 }

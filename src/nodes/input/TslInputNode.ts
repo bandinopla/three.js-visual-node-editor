@@ -1,4 +1,3 @@
-import { string } from 'three/tsl';
 import { PropertiesNode } from './PropertiesNode';
 
 const tslInputs: [string, any][] = [
@@ -285,6 +284,11 @@ const tslInputs: [string, any][] = [
                 desc: 'Returns the viewport size in physical pixel units.',
                 type: 'vec2',
             },
+            {
+                name:"viewportResolution",
+                desc: 'The resolution node is a vec2 containing the render target’s width and height in pixels (e.g., vec2(window.innerWidth, window.innerHeight) for the default canvas).',
+                type: 'vec2',
+            }
         ],
     ],
 

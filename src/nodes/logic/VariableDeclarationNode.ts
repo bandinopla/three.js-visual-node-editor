@@ -3,8 +3,7 @@ import { DataType, IDataType } from '../../core/IOutlet';
 import { Script } from '../../export/Script';
 import { BasicInputProperty } from '../../properties/BasicInputProperty';
 import { Output } from '../../properties/Output';
-import { ExecutableLogicNode } from './ExecutableLogicNode';
-import { FunctionNode } from './FunctionNode';
+import { ExecutableLogicNode } from './ExecutableLogicNode'; 
 
 /**
  * A node that declares a variable. Like when in js you do: const foo = "bar"
@@ -27,9 +26,7 @@ export class VariableDeclarationNode extends ExecutableLogicNode {
 
     override onAdded(): void {
         if (!this.customNodeName) {
-            this.customNodeName = (
-                this.childOf as FunctionNode
-            ).getValidParameterName('noName');
+            this.customNodeName = this.editor.getSafeName( this, "noName");
         }
     }
 
@@ -38,7 +35,12 @@ export class VariableDeclarationNode extends ExecutableLogicNode {
     }
 
     protected override writeNodeScript(script: Script): string {
-        const value = this.input.writeScript(script) + '.toVar()';
+
+        const inputVal = this.input.writeScript(script);
+        const value = inputVal + '.toVar()';
+
+        if(!inputVal)
+            debugger;
 
         return script.define(this.nodeName, value);
     }

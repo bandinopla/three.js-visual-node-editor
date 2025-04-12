@@ -296,6 +296,8 @@ export class OutletProperty
     set outletName(newName: string) {
         const changed = newName != this._customName;
         this._customName = newName;
+
+        if( changed )
         this.dispatchEvent({ type: 'renamed', newName });
     }
 

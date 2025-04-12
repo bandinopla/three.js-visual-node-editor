@@ -20,7 +20,7 @@ export class FunctionDataFlowNode extends WinNode {
      */
     readonly outlet: IOutlet;
     protected defaultValueOutlet?: IOutlet;
-    protected master!: FunctionNode;
+    //protected master!: FunctionNode;
     protected dataTypeCombo: DataTypeComboBox;
 
     /**
@@ -70,8 +70,10 @@ export class FunctionDataFlowNode extends WinNode {
         }
     }
 
-    override onAdded(): void {
-        this.master = this.childOf as FunctionNode;
+    protected get master() {
+        return this.childOf as FunctionNode;
+    }
+    override onAdded(): void { 
 
         if (!this.master) {
             throw new Error(
@@ -142,8 +144,9 @@ export class FunctionDataFlowNode extends WinNode {
     }
 
     override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
         this.dataTypeCombo.index = data.dataType ?? 0;
         this.outlet.outletName = data.outletName;
-        super.unserialize(data);
+       
     }
 }

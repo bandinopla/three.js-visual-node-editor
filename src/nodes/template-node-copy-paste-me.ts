@@ -29,8 +29,8 @@ export class FooNode extends WinNode {
         }
     }
 
-    override unserialize(data: Record<string, any>): void {
-        this.foo = data.foo;
+    override unserialize(data: Record<string, any>): void { 
         super.unserialize(data);
+        this.foo = data.foo;
     }
 }

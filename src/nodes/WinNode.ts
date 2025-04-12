@@ -143,8 +143,8 @@ export class WinNode<T extends WinNodeEvents = WinNodeEvents> extends Node<
     }
 
     override unserialize(data: Record<string, any>): void {
-        this.customNodeName = data.customName;
-        this._nodeName = data.name;
         super.unserialize(data);
+        this.customNodeName = data.customName;
+        this._nodeName = data.name; 
     }
 }

@@ -18,7 +18,7 @@ export class ValueNode extends InputBaseNode {
         );
 
         super('Value', [
-            new DataTypeComboBox((val) => (this.size = val)),
+            new DataTypeComboBox((val) => (this.size = val+1 )),
             ...inputs,
             new Output('value', DataType.wildcard),
         ]);
@@ -33,7 +33,7 @@ export class ValueNode extends InputBaseNode {
     }
     set size(n: number) {
         this.inputs.forEach((input, i) => {
-            input.enabled = i <= n;
+            input.enabled = i < n;
         });
 
         this.output.updateType();
@@ -45,9 +45,9 @@ export class ValueNode extends InputBaseNode {
 
     override get nodeDataType(): IDataType | undefined {
         const size = this.size;
-        return size == 1
+        return size <= 1
             ? DataType.float
-            : DataTypes.find((dt) => dt.name == 'vec' + size)!.type;
+            : DataTypes.find((dt) => dt.name == 'vec' +  size )!.type;
     }
 
     protected override writeNodeScript(script: Script): string {
@@ -75,10 +75,12 @@ export class ValueNode extends InputBaseNode {
     }
 
     override unserialize(data: Record<string, any>): void {
-        this.size = data.size ?? 1;
+        super.unserialize(data); 
         data.values?.forEach((value: number, i: number) => {
             this.inputs[i].value = value;
         });
-        super.unserialize(data);
+
+        this.size = data.size ?? 1;
+        
     }
 }

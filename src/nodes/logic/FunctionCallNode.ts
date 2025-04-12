@@ -154,7 +154,7 @@ export class FunctionCallNode extends BaseLogicNode {
             return myOutlet.writeScript(script);
         } else {
             //use default value...
-            return masterInput.writeScript(script);
+            return "undefined";
         }
     }
 }

@@ -26,7 +26,7 @@ export class MathOperatorNode extends WinNode {
     protected output: Output;
 
     constructor(protected config: MathOpDef) {
-        let childs: MathInput[] = [];
+        const childs: MathInput[] = [];
 
         if (config.params) {
             //inputProperty = new MathInput( config.params[0].name, config.params[0].type );
@@ -122,6 +122,21 @@ export class MathOperatorNode extends WinNode {
         console.log('MATH NODE OUTPUT:', output);
 
         return script.define(this.nodeName, output);
+    }
+
+    override serialize(): Record<string, any> {
+        return {
+            operands: this.operands?.map( op=>op.value ),
+            ...super.serialize()
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize( data );
+        data.operands?.forEach( (val:number, i:number )=> {
+            this.operands![i].value = val;
+        });
+       
     }
 }
 
