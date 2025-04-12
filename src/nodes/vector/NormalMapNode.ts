@@ -21,7 +21,7 @@ export class NormalMapNode extends WinNode {
         );
 
         const strength = new InputOrValue({
-            label: 'Stength',
+            label: 'Strength',
             min: 0,
             max: 10,
             step: 0.1,
