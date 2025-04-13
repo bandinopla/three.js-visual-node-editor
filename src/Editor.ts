@@ -1228,6 +1228,7 @@ export class Editor {
 //   █  ▐▛▀▜▌▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘   ▐▌ ▝▀▚▖
 //   █  ▐▌ ▐▌▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖▗▄▄▞▘▗▄▄▞▘
 //   ThreeJs TSL Visual Node Editor v${formatVersion}
+//   Repo: https://github.com/bandinopla/three.js-visual-node-editor
 // 
 `;
 
