@@ -1362,7 +1362,7 @@ export class Editor {
 
             reader.onload = () => {
                 const content = reader.result as string;
-                const reg = /\*\*LAYOUT\*\*(.*)\*\*LAYOUT\*\*/m;
+                const reg = /\*\*LAYOUT\*\*(.*)\*\*LAYOUT\*\*/s;
                 const match = content.match(reg);
                 if (match) {
                     let data: any;
@@ -1412,11 +1412,14 @@ export class Editor {
             layoutMatrix.f,
         );
 
+        console.log("LOAD", data)
         //
         // recreate nodes
         //
         data.layout.forEach((nodeData: any, i: number) => {
             const node = this.objs[i];
+
+            console.log("LOADED NODE:", nodeData)
 
             if (node) {
                 node.unserialize(nodeData);
@@ -1429,6 +1432,8 @@ export class Editor {
         // create connections
         //
         data.connections?.forEach((connection: any) => {
+            if(!connection) return;
+
             const [fromNodeIndex, fromOutletIndex, toNodeIndex, toOutletIndex] = connection;
 
             const fromNode = this.objs[fromNodeIndex];

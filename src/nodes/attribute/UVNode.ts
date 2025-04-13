@@ -39,7 +39,7 @@ export class UVNode extends BaseAttributeNode {
 
     override unserialize(data: Record<string, any>): void {
         super.unserialize(data);
-        this.uvChannel.value = data.channel;
+        this.uvChannel.value = data.channel ?? 0;
         
     }
 }

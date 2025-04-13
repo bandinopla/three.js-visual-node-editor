@@ -6,7 +6,7 @@ import { InputOrValue } from '../../properties/InputOrValue';
 import { WinNode } from '../WinNode';
 import { Script } from '../../export/Script';
 import { Output } from '../../properties/Output';
-import { DataType } from '../../core/IOutlet';
+import { DataType, IDataType } from '../../core/IOutlet';
 
 export class NormalMapNode extends WinNode {
     protected typeCombo: ComboBox;
@@ -47,11 +47,15 @@ export class NormalMapNode extends WinNode {
         this.update();
     }
 
+    override get nodeDataType(): IDataType | undefined {
+        return DataType.vec2;
+    }
+
     protected override writeNodeScript(script: Script): string {
         script.importModule('normalMap');
 
-        let map = this.color.writeScript(script);
-        let strength = this.strength.value;
+        const map = this.color.writeScript(script);
+        const strength = this.strength.value;
 
         let node = `
 const normalNode = normalMap( ${map}, ${strength});
@@ -72,5 +76,21 @@ normalNode.normalMapType = THREE.ObjectSpaceNormalMap;
             node + '\nreturn normalNode;',
             true,
         );
+    }
+
+    override serialize(): Record<string, any> {
+        return {
+            ...super.serialize(),
+            normalType: this.typeCombo.index,
+            strength: this.strength.value,
+            color: this.color.baseColor.getHex() 
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
+        this.typeCombo.index = data.normalType;
+        this.strength.value = data.strength;
+        this.color.baseColor = new Color(data.color);
     }
 }

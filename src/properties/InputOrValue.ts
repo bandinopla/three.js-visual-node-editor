@@ -70,6 +70,9 @@ export class InputOrValue extends BasicInputProperty {
         });
     } 
 
+    override get label() {
+        return this.valueSlider.name;
+    }
     override set label(str: string) {
         this.valueSlider.name = str;
     } 

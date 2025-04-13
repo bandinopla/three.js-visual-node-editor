@@ -10,7 +10,7 @@ export class BaseColorProperty extends Input {
     protected colorPicker: ColorPicker;
 
     constructor(
-        title = 'Base Color',
+        readonly label = 'Base Color',
         defaultColor?: Color,
         protected multipliesInput = true,
     ) {
@@ -18,7 +18,7 @@ export class BaseColorProperty extends Input {
 
         this.colorPicker = new ColorPicker(() => this.root.update(), false);
 
-        this.layout = new Layout([new TextLabel(title), this.colorPicker], {
+        this.layout = new Layout([new TextLabel(label), this.colorPicker], {
             justify: 'space-between',
         });
 

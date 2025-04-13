@@ -49,7 +49,7 @@ export class BumpMapNode extends WinNode {
         const bumpTexture =
             this.bumpHeight.writeScript(script) + this.invert.value;
 
-        let output = `bumpMap( ${bumpTexture}, ${bumpStrength})`;
+        const output = `bumpMap( ${bumpTexture}, ${bumpStrength})`;
 
         const normal = this.normal.writeScript(script);
 
@@ -129,5 +129,19 @@ return ${perturbNormalArb}( {
         } else {
             return script.define(this.nodeName, output);
         }
+    }
+
+    override serialize(): Record<string, any> {
+        return {
+            ...super.serialize(),
+            invert: this.invert.value,
+            strength: this.strength.value, 
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data);
+        this.invert.value = data.invert;
+        this.strength.value = data.strength;
     }
 }
