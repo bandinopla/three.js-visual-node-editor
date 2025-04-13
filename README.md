@@ -23,6 +23,7 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
 # == STATUS == 
 
 ### TSL to Visual Nodes:
+- :white_check_mark: Time node
 - :white_check_mark: UV Channel
 - :warning: Preview
 - :warning: Functions

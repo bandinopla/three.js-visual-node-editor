@@ -1,6 +1,7 @@
 import { Theme } from './colors/Theme';
 import { UVNode } from './nodes/attribute/UVNode';
 import { ColorNode } from './nodes/input/ColorNode';
+import { TimeNode } from './nodes/input/TimeNode';
 import { tslInputNodes } from './nodes/input/TslInputNode';
 import { UniformValueNode } from './nodes/input/UniformValueNode';
 import { ValueNode } from './nodes/input/ValueNode';
@@ -47,6 +48,7 @@ export const NodeTypes: NodeGroupType[] = [
                 name: 'Uniform Value',
                 id: 'uniform-value',
             },
+            { TypeClass: TimeNode, name:"time", id:"timer" },
             { TypeClass: ValueNode, name: 'Value', id: 'input-value' },
             { TypeClass: ColorNode, name: 'Color', id: 'color-value' },
             { TypeClass: UVNode, name: 'UV', id: 'uv' },
