@@ -26,6 +26,7 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
 - :white_check_mark: Time node
 - :white_check_mark: UV Channel
 - :warning: Preview
+- :warning: Animated pixel (not tested)
 - :warning: Functions
 - :warning: Uniform
 - Conditional / Logic
@@ -34,6 +35,7 @@ You can also fix bugs or improve the code/interface. Just clone and do a pull re
     - :no_entry: Ternary
     - :warning: Loop
     - :warning: Swizzle
+    - :warning: Split
 - NodeMaterial
     - :no_entry: fragmentNode
     - :no_entry: vertexNode
