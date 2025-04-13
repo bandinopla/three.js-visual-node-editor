@@ -10,6 +10,7 @@ import { InputBaseNode } from './InputBaseNode';
 export class ValueNode extends InputBaseNode {
     protected inputs: InputOrValue[];
     protected output: Output;
+    protected typeCombo:DataTypeComboBox;
 
     constructor(acceptsInputs = true) {
         const lbl = ['X', 'Y', 'Z', 'W'];
@@ -23,6 +24,7 @@ export class ValueNode extends InputBaseNode {
             new Output('value', DataType.wildcard),
         ]);
 
+        this.typeCombo = this.getChildOfType(DataTypeComboBox)!;
         this.inputs = inputs;
         this.output = this.getChildOfType(Output)!;
         this.size = 0;

@@ -13,7 +13,7 @@ import { WinNode } from "../WinNode";
 export class TimeNode extends WinNode {
 
     constructor() {
-        super("Timer", Theme.config.groupInput, [
+        super("Timer", Theme.config.groupAnimation, [
             new Output("seconds", DataType.wildcard),
         ])
     }
@@ -33,9 +33,9 @@ export class TimeNode extends WinNode {
             this.nodeName,
             '0',
         ); 
- 
-        script.writeLine(`${ref}.onFrameUpdate( frame => ${ref}.value = frame.time  )`);
- 
+  
+        script.importModule("uint");
+        script.writeLine(`${ref}.onFrameUpdate( frame => ${ref}.value = frame.time )`); 
 
         return ref;
     } 

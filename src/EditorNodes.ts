@@ -1,7 +1,7 @@
 import { Theme } from './colors/Theme';
 import { UVNode } from './nodes/attribute/UVNode';
 import { ColorNode } from './nodes/input/ColorNode';
-import { TimeNode } from './nodes/input/TimeNode';
+import { TimeNode } from './nodes/animation/TimeNode';
 import { tslInputNodes } from './nodes/input/TslInputNode';
 import { UniformValueNode } from './nodes/input/UniformValueNode';
 import { ValueNode } from './nodes/input/ValueNode';
@@ -20,6 +20,9 @@ import { MeshStandardNode } from './nodes/shader/MeshStandardNode';
 import { ImageTextureNode } from './nodes/texture/ImageTextureNode';
 import { BumpMapNode } from './nodes/vector/BumpMapNode';
 import { NormalMapNode } from './nodes/vector/NormalMapNode';
+import { AnimatedPixelNode } from './nodes/animation/AnimatedPixelNode';
+import { SpliNode } from './nodes/operators/SplitNode';
+import { HSVNode } from './nodes/input/HSVNode';
 
 // Define the type for class constructors that extend BaseType
 type Constructor<T extends Node> = new (...args: any[]) => T;
@@ -48,13 +51,21 @@ export const NodeTypes: NodeGroupType[] = [
                 name: 'Uniform Value',
                 id: 'uniform-value',
             },
-            { TypeClass: TimeNode, name:"time", id:"timer" },
             { TypeClass: ValueNode, name: 'Value', id: 'input-value' },
             { TypeClass: ColorNode, name: 'Color', id: 'color-value' },
+            { TypeClass: HSVNode, name:"HSV", id:"hsv"},
             { TypeClass: UVNode, name: 'UV', id: 'uv' },
             //{ TypeClass:PositionPropertiesNode, name:"Position", id:"position" },
             ...tslInputNodes,
         ],
+    },
+    {
+        group:'Animation',
+        color: Theme.config.groupAnimation as string,
+        nodes: [
+            { TypeClass: TimeNode, name:"time", id:"timer" },
+            { TypeClass: AnimatedPixelNode, name:"Animated Pixel", id:"timer" },
+        ]
     },
     {
         group: 'Logic',
@@ -104,6 +115,7 @@ export const NodeTypes: NodeGroupType[] = [
                 name: 'Swizzle',
                 id: 'swizzle',
             },
+            { TypeClass:SpliNode, name:"Split", id:"split"}
         ],
     },
     {

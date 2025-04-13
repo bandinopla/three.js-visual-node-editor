@@ -41,6 +41,7 @@ export class Theme {
     readonly groupLogic: FillStyle = '#203c3c';
     readonly groupFunction: FillStyle = '#005456';
     readonly groupCustomMade: FillStyle = '#785323';
+    readonly groupAnimation: FillStyle = '#6e1d20';
 
     readonly barBgColor: FillStyle = '#545454';
     readonly barFillColor: FillStyle = '#4772b3';

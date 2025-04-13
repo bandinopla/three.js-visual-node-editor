@@ -6,6 +6,11 @@ import { Input } from './Input';
  * Just an input with a label.
  */
 export class BasicInputProperty extends Input {
+
+    protected _label:string;
+    set label(str:string){ this._label=str; }
+    get label(){ return this._label; }
+
     /**
      * @param size
      * @param label
@@ -13,10 +18,11 @@ export class BasicInputProperty extends Input {
      */
     constructor(
         type: IDataType,
-        public label: string,
+        label: string,
         protected defaultScriptIfNotConnected?: (script: Script) => string,
     ) {
         super(type);
+        this._label = label;
     }
 
     override renderContents(

@@ -37,9 +37,7 @@ export class InputOrValue extends BasicInputProperty {
             asBar: false,
             defaultValue: 0,
             ...(!hasConfig ? { label } : label),
-        };
-
-        const lbl = !hasConfig ? label : label.label;
+        }; 
 
         super(DataType.float, valConfig.label);
 
@@ -70,7 +68,11 @@ export class InputOrValue extends BasicInputProperty {
                 }
             }
         });
-    }
+    } 
+
+    override set label(str: string) {
+        this.valueSlider.name = str;
+    } 
 
     /**
      * Inform the listner or if no listener was passed, then inform the top-most node that "something has changed"

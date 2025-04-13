@@ -10,7 +10,7 @@ export class DraggableValue extends InteractiveLayoutElement {
     private promptValueOnMouseUp = false;
 
     constructor(
-        readonly name: string,
+        public name: string,
         readonly usesBar: boolean,
         readonly min: number,
         readonly max: number,

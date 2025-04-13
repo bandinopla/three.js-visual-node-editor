@@ -349,15 +349,15 @@ export class OutletProperty
 
                 otherNameRef = this.owner.writeScript(script); ///script.getOrCacheNodeScript( this.owner ); // if this throws an error, it will be catche by the input outlet that called us.
 
+                if (this._outputProp) {
+                    otherNameRef += '.' + this._outputProp;
+                }
+
                 if (this.owner.nodeDataType)
                     otherNameRef = this.convertDataRef(
                         otherNameRef,
                         this.owner.nodeDataType,
                     );
-
-                if (this._outputProp) {
-                    otherNameRef += '.' + this._outputProp;
-                }
             }
 
             //
@@ -384,6 +384,8 @@ export class OutletProperty
         } else {
             this.type = sourceDataType;
         }
+
+        console.log("OUTLET TYPE:", this.type)
 
         //
         // since out type changed...
