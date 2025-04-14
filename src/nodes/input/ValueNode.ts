@@ -27,7 +27,7 @@ export class ValueNode extends InputBaseNode {
         this.typeCombo = this.getChildOfType(DataTypeComboBox)!;
         this.inputs = inputs;
         this.output = this.getChildOfType(Output)!;
-        this.size = 0;
+        this.size =1;
     }
 
     get size() {
