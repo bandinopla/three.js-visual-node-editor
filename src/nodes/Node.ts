@@ -19,6 +19,15 @@ export class Node<MyEvents extends NodeEvents = NodeEvents>
 {
     editor!: Editor;
 
+    private _type:string|undefined;
+    set type( nodeTYpe:string ) {
+        if(!this._type) this._type=nodeTYpe;
+        else throw new Error(`Node ${this.nodeName} already has a type ${nodeTYpe}, you can't set the type again (to ${nodeTYpe})`);
+    }
+    get type() { 
+        return this._type ?? "";
+    }
+
     /**
      * ... by the user...
      */
@@ -165,7 +174,7 @@ export class Node<MyEvents extends NodeEvents = NodeEvents>
         globalY: number,
         onOutletHit?: (outlet: IOutlet) => void,
     ) {
-        let hitAreaRatio = 10;
+        const hitAreaRatio = 10;
 
         //
         // for each outlet of this node....

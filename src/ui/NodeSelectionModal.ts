@@ -86,6 +86,8 @@ class NodeSelector {
                         instance = new node.TypeClass();
                     }
 
+                    instance.type = node.id;
+                    
                     node.onCreated?.(instance);
                     this.addNewNode(instance);
                 });

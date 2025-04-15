@@ -164,14 +164,19 @@ export function newNodeById( id:string ) {
     }
 
     const args = referencedNode.constructorArgs;
+    let node:Node;
 
     if (args) {
-        return new referencedNode.TypeClass(
+        node = new referencedNode.TypeClass(
             ...(Array.isArray(args)
                 ? args
                 : [args]),
         );
     } else {
-        return new referencedNode.TypeClass();
+        node = new referencedNode.TypeClass();
     } 
+
+    node.type = id;
+    
+    return node;
 }
