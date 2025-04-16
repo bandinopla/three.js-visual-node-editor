@@ -1244,7 +1244,7 @@ export class Editor {
             // the node type id...
             //
             type:
-                NodeTypes.flatMap((g) => g.nodes).find((n) => o instanceof n.TypeClass)?.id ??
+                o.type ??
                 "default",
 
             //
