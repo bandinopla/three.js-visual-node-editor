@@ -47,6 +47,19 @@ export class ForNode extends ExecutableLogicNode {
 
         return '';
     }
+
+    override serialize(): Record<string, any> {
+        return {
+            count: this.count.value,
+            ...super.serialize()
+        }
+    }
+
+    override unserialize(data: Record<string, any>): void {
+        super.unserialize(data)
+        this.count.value = data.count ?? 0;
+
+    }
  
 }
 
