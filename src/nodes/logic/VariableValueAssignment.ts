@@ -37,7 +37,14 @@ export class VariableValueAssignment extends ExecutableLogicNode {
                 ? this.varValue.connectedTo.type
                 : DataType.wildcard;
 
-        if (!this.varOutlet.connectedTo) this.varOutlet.type = type;
+        if (!this.varOutlet.connectedTo) 
+        {
+            this.varOutlet.type = type;
+            this.customNodeName = undefined;
+        }
+        else this.customNodeName = this.varOutlet.connectedTo.owner.nodeName + " = ...";
+
+
         if (!this.varValue.connectedTo) this.varValue.type = type;
 
         super.update();
