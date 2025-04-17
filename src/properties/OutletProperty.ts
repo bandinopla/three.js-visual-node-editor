@@ -62,7 +62,7 @@ export class OutletProperty
      * @param prop
      * @returns
      */
-    outputProp(prop: string | ()=>string) {
+    outputProp(prop: string | (()=>string)) {
         this._outputProp = prop;
         return this;
     }

@@ -263,6 +263,7 @@ export class Node<MyEvents extends NodeEvents = NodeEvents>
      */
     get nodeDataType(): IDataType | undefined {
         //throw new Error(`Implement me...`);
+        return;
     }
 
     /**
