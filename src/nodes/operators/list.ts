@@ -76,7 +76,6 @@ floor(x:vec):vec
 fract(x:vec):vec
 fwidth(x:vec):vec
 inverseSqrt(x:vec):vec
-invert(x:vec):vec
 length(x:vec):float
 lengthSq(x:vec):float
 log(x:vec):vec
