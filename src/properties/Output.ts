@@ -10,7 +10,7 @@ export class Output extends OutletProperty {
     constructor(
         public label: string,
         size: IDataType,
-        ownerProp?: string,
+        ownerProp?: string | (()=>string),
     ) {
         super(false, size);
 

@@ -64,7 +64,7 @@ export const NodeTypes: NodeGroupType[] = [
         color: Theme.config.groupAnimation as string,
         nodes: [
             { TypeClass: TimeNode, name:"time", id:"timer" },
-            { TypeClass: AnimatedPixelNode, name:"Animated Pixel", id:"timer" },
+            { TypeClass: AnimatedPixelNode, name:"Animated Pixel", id:"animated-pixel" },
         ]
     },
     {

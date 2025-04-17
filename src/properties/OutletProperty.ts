@@ -38,7 +38,7 @@ export class OutletProperty
     /**
      * What property of the data we will read we must return? if undefined, the entire data will be returned.
      */
-    private _outputProp?: string;
+    private _outputProp?: string | (()=>string);
 
     private _type!: IDataType;
 
@@ -62,7 +62,7 @@ export class OutletProperty
      * @param prop
      * @returns
      */
-    outputProp(prop: string) {
+    outputProp(prop: string | ()=>string) {
         this._outputProp = prop;
         return this;
     }
@@ -184,6 +184,8 @@ export class OutletProperty
                 return `${base}.toInt()`;
             }
         }
+
+        console.log("NEED TO CONVERT ", from, to)
 
         if (size === DataSize.vec2) return `${base}.toVec2()`;
         if (size === DataSize.vec3) return `${base}.toVec3()`;
@@ -347,10 +349,18 @@ export class OutletProperty
             else {
                 // if the scope of our cached owner is not reachabe from the script current scope, it means it is invalid, non reachable.
 
-                otherNameRef = this.owner.writeScript(script); ///script.getOrCacheNodeScript( this.owner ); // if this throws an error, it will be catche by the input outlet that called us.
+                 ///script.getOrCacheNodeScript( this.owner ); // if this throws an error, it will be catche by the input outlet that called us.
+                
 
-                if (this._outputProp) {
-                    otherNameRef += '.' + this._outputProp;
+                if (this._outputProp && typeof this._outputProp == "function") {
+                    otherNameRef = this._outputProp(); 
+                }
+                else 
+                {
+                    otherNameRef = this.owner.writeScript(script);
+                    if (this._outputProp) {
+                        otherNameRef += '.' + this._outputProp;
+                    }
                 }
 
                 if (this.owner.nodeDataType)

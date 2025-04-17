@@ -222,6 +222,8 @@ export class Script {
     ) {
         functionName = 'fn_' + functionName;
 
+        this.importModule("Fn");
+
         if (!this.isDefined(functionName, this.rootScope)) {
             this.rootScope.definitions.push([
                 functionName,

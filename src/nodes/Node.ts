@@ -262,7 +262,7 @@ export class Node<MyEvents extends NodeEvents = NodeEvents>
      * specify what data type that reference will be expressed as.
      */
     get nodeDataType(): IDataType | undefined {
-        throw new Error(`Implement me...`);
+        //throw new Error(`Implement me...`);
     }
 
     /**

@@ -38,7 +38,7 @@ export class BaseColorProperty extends Input {
         let baseColor = `color(0x${this.colorPicker.color.getHexString()})`;
 
         if (this.connectedTo) {
-            const input = this.connectedTo.writeScript(script) + '.toVec3()';
+            const input = this.connectedTo.writeScript(script)  ;
             baseColor = this.multipliesInput
                 ? `${baseColor}.mul(${input})`
                 : input;

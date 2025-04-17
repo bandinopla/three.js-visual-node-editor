@@ -1,7 +1,7 @@
  
  
 import { Theme } from "../../colors/Theme";
-import { DataType } from "../../core/IOutlet";
+import { DataType, IDataType } from "../../core/IOutlet";
 import { Script } from "../../export/Script";
 import { Output } from "../../properties/Output";
 import { ExecutableLogicNode } from "../logic/ExecutableLogicNode";
@@ -18,13 +18,17 @@ export class AnimatedPixelNode extends WinNode {
 
     constructor() {
         super("Animated Pixel", Theme.config.groupAnimation, [
-            new Output("color ( VAR )", DataType.vec3, "color" ), 
+            new Output("color ( VAR )", DataType.vec3, ()=>this.nodeName+".color" ), 
             new Output("on update", DataType.script),
             new Output("final color", DataType.vec3, "output" ),
         ]);
 
         this.scriptOutput = this.getChildOfType(Output,1)!;
     }  
+
+    override get nodeDataType(): IDataType | undefined {
+        return DataType.vec3
+    }
 
     protected override writeNodeScript( script: Script ): string {
         // this is where we write our ThreeJs TSL javascript node code...
@@ -42,8 +46,9 @@ export class AnimatedPixelNode extends WinNode {
             scope,
             this.nodeName+"Fn",
             false, 
+            colorVar
         );
 
-        return script.define( this.nodeName, `{ color:${colorVar}, output:${fn} }`);
+        return script.define( this.nodeName, `{ color:${colorVar}, output:${fn}() }`);
     } 
 }
