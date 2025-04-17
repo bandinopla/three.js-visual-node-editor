@@ -490,6 +490,13 @@ export class Editor {
     }
 
     reset() {
+
+        
+        //call exitCurrentNode until we reach the root
+        while (this.weAreInsideOf.length) {
+            this.exitCurrentNode();
+        }
+
         this.aspectCorrection =
             (this.canvas.offsetWidth / this.canvas.offsetHeight) * this.canvasAspect;
 

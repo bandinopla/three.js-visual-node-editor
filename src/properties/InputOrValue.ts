@@ -1,5 +1,5 @@
 import { DraggableValue } from '../components/DraggableValue';
-import { IOutlet, DataType } from '../core/IOutlet';
+import { IOutlet, DataType, DataTypes } from '../core/IOutlet';
 import { Script } from '../export/Script';
 import { Layout, Row } from '../layout/Layout';
 import { BasicInputProperty } from './BasicInputProperty';
@@ -60,12 +60,10 @@ export class InputOrValue extends BasicInputProperty {
         this.valueSlider.value = valConfig.defaultValue;
 
         this.addEventListener('typeChange', (ev) => {
-            if (ev.newType?.size > 1) {
+            if (this.connectedTo) {
                 this.layout = undefined;
             } else {
-                if (!this.layout && !this.connectedTo) {
-                    this.layout = this.notConnectedContent;
-                }
+                this.layout = this.notConnectedContent;
             }
         });
     } 
@@ -109,7 +107,6 @@ export class InputOrValue extends BasicInputProperty {
 
     protected override onConnected(to: IOutlet): void {
         if (!this.multiplyInputWithValue) this.layout = undefined;
-
         this.onChange?.();
     }
 
@@ -120,10 +117,18 @@ export class InputOrValue extends BasicInputProperty {
         this.onChange?.(this.layout ? this.valueSlider.value : undefined);
     }
 
-    override writeScript(script: Script): string {
-        script.importModule('float');
+    override writeScript(script: Script): string { 
 
-        const val = `float(${this.valueSlider.stringValue})`;
+        const typeName = DataTypes.find( dt => dt.type == this.type)!.name;
+
+        script.importModule(typeName);
+        
+        const valValue = this.valueSlider.stringValue;
+ 
+        const values = new Array(this.type.size).fill(valValue); 
+        
+        const val = `${typeName}(${values.join(',')})`; 
+        
 
         if (this.connectedTo) {
             const inputValue = this.connectedTo.writeScript(script);

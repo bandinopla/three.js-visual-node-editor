@@ -31,7 +31,7 @@ export class BumpMapNode extends WinNode {
                 defaultValue: 1,
             }),
             //new InputOrValue(1, { label:"Distance", step:0.01, defaultValue:0.1 }),
-            new BasicInputProperty(DataType.vec1, 'Height', () => 'float(0.1)'),
+            new BasicInputProperty(DataType.float, 'Height', () => 'float(0.1)'),
             new BasicInputProperty(DataType.vec2, 'Normal', () => ''),
         ]);
 

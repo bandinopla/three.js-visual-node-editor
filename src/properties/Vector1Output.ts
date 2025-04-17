@@ -3,6 +3,6 @@ import { Output } from './Output';
 
 export class Vector1Output extends Output {
     constructor(name: string) {
-        super(name, DataType.vec1);
+        super(name, DataType.float);
     }
 }

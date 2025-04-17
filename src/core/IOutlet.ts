@@ -62,22 +62,18 @@ export const DataType = {
     float: { size: 1 },
     bool: { size: 1, bool: true },
 
-    vec1: { size: 1 },
     vec2: { size: 2 },
     vec3: { size: 3 },
     vec4: { size: 4 },
 
-    uvec1: { size: 1, unsigned: true, int: true },
     uvec2: { size: 2, unsigned: true, int: true },
     uvec3: { size: 3, unsigned: true, int: true },
     uvec4: { size: 4, unsigned: true, int: true },
 
-    ivec1: { size: 1, unsigned: false, int: true },
     ivec2: { size: 2, unsigned: false, int: true },
     ivec3: { size: 3, unsigned: false, int: true },
     ivec4: { size: 4, unsigned: false, int: true },
 
-    bvec1: { size: 1, bool: true },
     bvec2: { size: 2, bool: true },
     bvec3: { size: 3, bool: true },
     bvec4: { size: 4, bool: true },
