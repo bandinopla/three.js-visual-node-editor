@@ -5,7 +5,7 @@ import { Node } from '../nodes/Node';
 
 /**
  * When writing to the script, this object represents the "scope" in which the script is in... for example, defining a variable at the root
- * will declare the variable at a diferent place than if you are inside of an If statement. 
+ * will declare the variable at a diferent place than if you are inside of an If statement.
  */
 type Scope = {
     parent?: Scope;
@@ -222,7 +222,7 @@ export class Script {
     ) {
         functionName = 'fn_' + functionName;
 
-        this.importModule("Fn");
+        this.importModule('Fn');
 
         if (!this.isDefined(functionName, this.rootScope)) {
             this.rootScope.definitions.push([
@@ -346,29 +346,10 @@ export class Script {
         return `texture${index}`;
     }
 
-    toString(lastExpression: string = '', forExport = false) {
-        let output = `\n`;
+    // 主过程转换为字符串
+    toProcessString(forExport = false) {
         const exportKeyword = forExport ? 'export' : '';
-
-        if (forExport) {
-            output += "import * as THREE from 'three/webgpu';\n";
-
-            //
-            // Imports...
-            //
-            for (const module in this.imports)
-                output += `\nimport {${[...this.imports[module]].join(',')}} from '${module}';
-                `;
-        } else {
-            output += `  const THREE = fromModule('THREE');
-            `;
-            //
-            // since the script will be evaluated we will need to be injected by the evaluator...
-            //
-            for (const module in this.imports)
-                output += `\n   const {${[...this.imports[module]].join(',')}} = fromModule('${module}');
-                `;
-        }
+        let output = '';
 
         //
         // uniforms
@@ -453,16 +434,60 @@ const texture${index} = loadTexture('${forExport ? path : previewUrl}', '${mime}
 
         output += this.writeScopeDefinitions(this.rootScope);
 
+        return output;
+    }
+
+    toString(lastExpression: string = '', forExport = false) {
+        let output = `\n`;
+
+        if (forExport) {
+            output += "import * as THREE from 'three/webgpu';\n";
+
+            //
+            // Imports...
+            //
+            for (const module in this.imports)
+                output += `\nimport {${[...this.imports[module]].join(',')}} from '${module}';
+                `;
+        } else {
+            output += `  const THREE = fromModule('THREE');
+            `;
+            //
+            // since the script will be evaluated we will need to be injected by the evaluator...
+            //
+            for (const module in this.imports)
+                output += `\n   const {${[...this.imports[module]].join(',')}} = fromModule('${module}');
+                `;
+        }
+
+        output += this.toProcessString(forExport);
+
         return output + `\n${lastExpression};`;
     }
 
     eval(returnThisRef: string) {
-        const fromModule = (modulePath: string) =>
-            this.moduleName2Ref[modulePath];
+        const stringFunc = this.toProcessString(false);
 
-        fromModule(''); //Uff... i'll see how to improve this later.
+        const importKeys = Object.values(this.imports)
+            .map((item) => Array.from(item.values()))
+            .flat();
 
-        return eval(this.toString(returnThisRef, false));
+        const importValues = Object.entries(this.imports)
+            .map((item) => {
+                const module: any = this.moduleName2Ref[item[0]];
+                return Array.from(item[1].values()).map((name) => module[name]);
+            })
+            .flat();
+
+        const _function = new Function(
+            'THREE',
+            ...importKeys,
+            stringFunc + `\n;return ${returnThisRef};`,
+        );
+
+        const material = _function(THREE, ...importValues);
+
+        return material;
     }
 
     public static makeValidVariableName(input: string) {
